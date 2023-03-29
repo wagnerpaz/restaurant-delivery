@@ -12,11 +12,28 @@
     "@types/node": "18.15.10",
     "@types/react": "18.0.30",
     "@types/react-dom": "18.0.11",
+    "busboy": "^1.6.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "formidable": "^2.1.1",
+    "fs": "^0.0.1-security",
+    "gridfs-stream": "^1.1.1",
+    "mongoose": "^7.0.3",
+    "multer": "^1.4.4",
+    "multer-gridfs-storage": "^5.0.2",
     "next": "13.2.4",
+    "next-connect": "^0.13.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.0",
+    "@types/formidable": "^2.0.5",
+    "@types/gridfs-stream": "^0.5.36",
+    "@types/multer": "^1.4.7",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.3.0"
   }
 }
