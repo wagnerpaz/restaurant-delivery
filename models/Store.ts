@@ -1,12 +1,25 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 
-interface IStore extends Document {
+import { IIngredient } from "./Ingredients";
+import { IMenuItem } from "./MenuItem";
+
+export interface IStore extends Document {
   name: string;
   logo?: mongoose.Types.ObjectId;
+  slug: string;
   locations: ILocation[];
+  menu: {
+    sections: IMenuSection[];
+  };
+  ingredients: mongoose.Types.ObjectId[] | IIngredient[];
 }
 
-interface ILocation {
+export interface IMenuSection {
+  name: string;
+  items: IMenuItem[];
+}
+
+export interface ILocation {
   address: string;
   number: string;
   neighborhood: string;
@@ -15,13 +28,14 @@ interface ILocation {
   postalCode: string;
 }
 
-const storeSchema: Schema = new mongoose.Schema({
+const storeSchema: Schema = new mongoose.Schema<IStore>({
   name: { type: String, required: true },
   logo: {
     type: mongoose.Types.ObjectId,
     ref: "images.files",
     required: false,
   },
+  slug: { type: String, required: true, unique: true },
   locations: [
     {
       address: String,
@@ -32,6 +46,15 @@ const storeSchema: Schema = new mongoose.Schema({
       postalCode: String,
     },
   ],
+  menu: {
+    sections: [
+      {
+        name: String,
+        items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
+      },
+    ],
+  },
+  ingredients: [{ type: mongoose.Types.ObjectId, ref: "Ingredient" }],
 });
 
 const Store = models.Store || mongoose.model<IStore>("Store", storeSchema);

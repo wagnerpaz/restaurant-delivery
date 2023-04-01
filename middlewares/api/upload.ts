@@ -14,7 +14,7 @@ const upload = (
   onSuccess: (
     req: NextApiRequest,
     res: NextApiResponse,
-    filesResult: { [key: string]: IUploadFileResult }
+    filesResult: { [key: string]: mongoose.Types.ObjectId }
   ) => void
 ) => {
   async function handler(req: NextApiRequest, res: NextApiResponse) {
