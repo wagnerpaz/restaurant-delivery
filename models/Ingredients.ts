@@ -9,7 +9,7 @@ const ingredientsSchema: Schema = new mongoose.Schema({
 });
 
 const Ingredients =
-  models.Ingredients ||
-  mongoose.model<IIngredient>("Ingredients", ingredientsSchema);
+  models.Ingredient ||
+  mongoose.model<IIngredient>("Ingredient", ingredientsSchema);
 
 export default Ingredients;

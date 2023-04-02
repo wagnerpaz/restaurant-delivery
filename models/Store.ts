@@ -11,7 +11,7 @@ export interface IStore extends Document {
   menu: {
     sections: IMenuSection[];
   };
-  ingredients: mongoose.Types.ObjectId[] | IIngredient[];
+  ingredients: IIngredient[];
 }
 
 export interface IMenuSection {

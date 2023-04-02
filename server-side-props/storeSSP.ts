@@ -26,6 +26,9 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     await store.populate("menu.sections.items.composition");
     await store.populate("menu.sections.items.composition.ingredient");
     await store.populate("menu.sections.items.sides.menuItem");
+    await store.populate("ingredients");
+
+    console.log(store);
   }
 
   // Convert the store object to a plain JavaScript object

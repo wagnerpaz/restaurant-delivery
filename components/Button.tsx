@@ -14,7 +14,11 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classNames(
-        "uppercase px-6 py-4 rounded-2xl text-sm font-bold text-light-high shadow-md bg-dark-300",
+        "uppercase text-sm font-bold text-light-high",
+        {
+          "px-6 py-4 rounded-2xl shadow-md bg-dark-300":
+            variant === "contained",
+        },
         className
       )}
       {...props}

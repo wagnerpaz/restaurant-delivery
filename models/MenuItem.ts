@@ -8,8 +8,8 @@ export interface IMenuItem extends Document {
     others?: mongoose.Types.ObjectId[];
   };
   details: {
-    short: string;
-    long: string;
+    short?: string;
+    long?: string;
   };
   composition: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
@@ -50,7 +50,7 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
     {
       ingredient: {
         type: mongoose.Types.ObjectId,
-        ref: "Ingredients",
+        ref: "Ingredient",
       },
       essential: { type: Boolean, required: false },
       quantity: { type: Number, required: false },
