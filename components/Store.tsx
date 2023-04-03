@@ -110,6 +110,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
                     composition={menuItem.composition}
                     sides={menuItem.sides}
                     index={menuItemIndex}
+                    onClick={() => {
+                      setEditMenuItemObject({ ...menuItem });
+                      setEditMenuItemSectionIndex(sectionIndex);
+                      setEditMenuItemModalOpen(true);
+                    }}
                   />
                 </>
               ))}
@@ -118,6 +123,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
         </Menu>
       </main>
       <Modal
+        className="!z-40"
         open={editMenuItemModalOpen}
         onOpenChange={(newValue: boolean) => setEditMenuItemModalOpen(newValue)}
       >

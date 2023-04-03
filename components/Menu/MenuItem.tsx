@@ -2,10 +2,10 @@ import { ComponentProps } from "react";
 import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
 
-import DbImage from "/components/DbImage";
 import { IMenuItemCompositionItem, ISidesItem } from "/models/MenuItem";
 import Button from "/components/Button";
 import Image from "next/image";
+import DbImageEditor from "../DbImageEditor";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   name: string;
@@ -13,6 +13,7 @@ interface MenuItemProps extends ComponentProps<"div"> {
   mainImageId?: string;
   composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
+  onClick: () => void;
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
@@ -23,6 +24,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   mainImageId,
   composition,
   sides,
+  onClick,
   ...props
 }) => {
   return (
@@ -32,15 +34,16 @@ const MenuItem: React.FC<MenuItemProps> = ({
         className
       )}
       {...props}
+      onClick={onClick}
     >
       <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10">
         <span className="font-bold text-[#036704]">R$20,00</span>
       </div>
       {mainImageId ? (
-        <DbImage
-          className=""
+        <DbImageEditor
           id={mainImageId}
           alt={`${name} hero image`}
+          upload={{ path: "/store/menu-item", fileKey: "main" }}
           width={99999}
           height={99999}
         />

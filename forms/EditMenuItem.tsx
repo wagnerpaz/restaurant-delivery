@@ -2,12 +2,20 @@ import { ComponentProps, useState } from "react";
 import classNames from "classnames";
 import { IoMdCloseCircle } from "react-icons/io";
 import { IoIosAddCircle } from "react-icons/io";
-import { Option, Select, Input, Button } from "@material-tailwind/react";
+import {
+  Option,
+  Select,
+  Input,
+  Button,
+  Textarea,
+} from "@material-tailwind/react";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/Store";
 import { IIngredient } from "/models/Ingredients";
+import DbImageEditor from "/components/DbImageEditor";
+import MenuItem from "/components/Menu/MenuItem";
 
 interface EditMenuItemProps extends ComponentProps<"form"> {
   store: IStore;
@@ -56,20 +64,63 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
       className={classNames("flex flex-col gap-4", className)}
       onSubmit={(e) => e.preventDefault()}
     >
-      <Input
-        label="Nome"
-        value={edit.name}
-        onChange={(e) =>
-          setEdit({
-            ...edit,
-            name: e.target.value,
-          } as IMenuItem)
-        }
-      />
-      <Fieldset
-        className="flex flex-col gap-2 text-light-high"
-        title="Composição"
-      >
+      <div className="flex flex-row gap-4">
+        <MenuItem
+          className="w-80"
+          name={edit.name}
+          mainImageId={edit.images?.main?.toString()}
+          composition={edit.composition}
+          sides={edit.sides}
+          index={-1}
+          onClick={() => {}}
+        />
+        <div className="w-full flex flex-col gap-2">
+          <Input
+            label="Nome"
+            value={edit.name}
+            onChange={(e) =>
+              setEdit({
+                ...edit,
+                name: e.target.value,
+              } as IMenuItem)
+            }
+          />
+          <Input
+            label="Preço"
+            value={edit.price}
+            onChange={(e) =>
+              setEdit({
+                ...edit,
+                price: e.target.value,
+              } as IMenuItem)
+            }
+          />
+          <Fieldset className="flex flex-col gap-2 mt-2" title="Detalhes">
+            <Input
+              label="Descrição curta"
+              value={edit.details?.short}
+              onChange={(e) =>
+                setEdit({
+                  ...edit,
+                  details: { ...edit.details, short: e.target.value },
+                } as IMenuItem)
+              }
+            />
+            <Textarea
+              label="Descrição longa"
+              value={edit.details?.long}
+              rows={10}
+              onChange={(e) =>
+                setEdit({
+                  ...edit,
+                  details: { ...edit.details, long: e.target.value },
+                } as IMenuItem)
+              }
+            />
+          </Fieldset>
+        </div>
+      </div>
+      <Fieldset className="flex flex-col gap-2" title="Composição">
         {edit.composition.map((compositionItem, compositionItemIndex) => (
           <div
             key={compositionItem.ingredient?.name}

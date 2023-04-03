@@ -3,7 +3,11 @@ const withMT = require("@material-tailwind/react/utils/withMT");
 /** @type {import('tailwindcss').Config} */
 module.exports = withMT({
   mode: "jit",
-  content: ["./pages/**/*.{html,ts,tsx}", "./components/**/*.{html,ts,tsx}"],
+  content: [
+    "./pages/**/*.{html,ts,tsx}",
+    "./components/**/*.{html,ts,tsx}",
+    "./forms/**/*.{html,ts,tsx}",
+  ],
   theme: {
     fontFamily: {
       lato: ["Lato"],
