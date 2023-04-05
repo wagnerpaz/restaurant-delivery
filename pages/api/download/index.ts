@@ -7,7 +7,6 @@ import connectToDatabase from "/lib/mongoose";
 async function downloadImage(req: NextApiRequest, res: NextApiResponse) {
   try {
     const id = req.query.id as string;
-    console.log(id);
 
     const conn = await connectToDatabase();
 

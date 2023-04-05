@@ -22,6 +22,7 @@ module.exports = withMT({
       "light-medium": "#949494",
       "light-low": "#5E5E5E",
     },
+    container: {},
     extend: {
       backgroundImage: {
         "hero-pattern": "url('/istockphoto-515373062-612x612.jpg')",

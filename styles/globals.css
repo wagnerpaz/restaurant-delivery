@@ -4,6 +4,6 @@
 
 @layer components {
   .react-crop .ReactCrop__child-wrapper {
-    @apply h-full;
+    @apply h-full w-full min-w-0 min-h-0;
   }
 }

@@ -5,17 +5,16 @@ import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 
-import Button from "/components/Button";
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
 import MenuItem from "/components/Menu/MenuItem";
 import { ILocation, IStore } from "/models/Store";
-import Input from "/components/Input";
 import Modal from "/components/Modal";
 import EditMenuItem from "/forms/EditMenuItem";
 import { IMenuItem } from "/models/MenuItem";
 import usePutStore from "/hooks/usePutStore";
 import usePutMenuItem from "/hooks/usePutMenuItem";
+import { Button, Input } from "@material-tailwind/react";
 
 interface StoreProps {
   store: IStore;
@@ -50,7 +49,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
       })}
     >
       <header className="bg-dark-500 text-light-high sticky top-0 z-10 shadow-lg">
-        <div className="flex flex-row gap-4 px-6 py-4">
+        <div className="flex flex-row items-center gap-4 px-6 py-4">
           <Image
             className="rounded-md"
             src={`/api/download?id=${clientStore.logo}`}
@@ -58,29 +57,25 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
             width={50}
             height={50}
           />
-          <div>
-            <h1 className="font-bold text-xl">{clientStore.name}</h1>
-            <address className="flex flex-row items-center text-sm">
-              <MdLocationPin className="inline mr-1" />
-              <span className="font-bold mr-2">
+          <div className="flex-1 overflow-hidden">
+            <h1 className="hidden md:block font-bold text-xl">
+              {clientStore.name}
+            </h1>
+            <address className="hidden md:block text-sm text-light-medium overflow-hidden w-full text-ellipsis whitespace-nowrap">
+              <span className="font-bold mr-2 text-light-high">
                 {selectedLocation.city} - {selectedLocation.state}
               </span>
-              <span className="text-light-medium">
+              <span>
                 {selectedLocation.address} {selectedLocation.number},{" "}
-                {selectedLocation.neighborhood}
-              </span>
-              <span className="text-light-medium">
-                , {selectedLocation.postalCode}
+                {selectedLocation.neighborhood}, {selectedLocation.postalCode}
               </span>
             </address>
           </div>
           <Input
-            className="outline-none"
             id="search"
-            variant="search"
-            placeholder="Pesquisar"
+            containerProps={{ className: "!w-48 hidden sm:block" }}
+            label="Pesquisar"
           ></Input>
-          <div className="flex-1" />
           <Button className="flex flex-row gap-2 items-center">
             <RiUser3Fill />
             Entrar
@@ -106,11 +101,13 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
                   <MenuItem
                     key={menuItem.name}
                     name={menuItem.name}
+                    id={menuItem._id}
                     mainImageId={menuItem.images?.main?.toString()}
                     composition={menuItem.composition}
                     sides={menuItem.sides}
                     index={menuItemIndex}
-                    onClick={() => {
+                    editable
+                    onEditClick={() => {
                       setEditMenuItemObject({ ...menuItem });
                       setEditMenuItemSectionIndex(sectionIndex);
                       setEditMenuItemModalOpen(true);

@@ -20,7 +20,7 @@ import MenuItem from "/components/Menu/MenuItem";
 interface EditMenuItemProps extends ComponentProps<"form"> {
   store: IStore;
   menuItem: IMenuItem;
-  onMenuItemChange: (newValue: IMenuItem, index: number) => void;
+  onMenuItemChange: (newValue: IMenuItem) => void;
 }
 
 const emptyCompositionItem: IMenuItemCompositionItem = {
@@ -61,20 +61,26 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
 
   return (
     <form
+      id="edit-menu-item-form"
       className={classNames("flex flex-col gap-4", className)}
       onSubmit={(e) => e.preventDefault()}
     >
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-col lg:flex-row items-center gap-4">
         <MenuItem
-          className="w-80"
+          className="!w-80"
+          id={edit._id}
           name={edit.name}
           mainImageId={edit.images?.main?.toString()}
           composition={edit.composition}
           sides={edit.sides}
           index={-1}
+          editable
           onClick={() => {}}
+          portalTargetEditModal={() =>
+            document.querySelector("#edit-menu-item-form") as HTMLElement
+          }
         />
-        <div className="w-full flex flex-col gap-2">
+        <div className="w-full lg:flex-1 flex flex-col gap-2">
           <Input
             label="Nome"
             value={edit.name}
@@ -124,11 +130,11 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         {edit.composition.map((compositionItem, compositionItemIndex) => (
           <div
             key={compositionItem.ingredient?.name}
-            className="flex flex-row gap-2 items-center"
+            className="flex flex-col lg:flex-row gap-2 items-center"
           >
             <div className="w-full">
               <Select
-                className="flex-1 "
+                className="flex-1"
                 label="Ingrediente"
                 value={compositionItem.ingredient?.name}
                 onChange={handleModifyCompositionProp(
@@ -148,36 +154,39 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
                 ))}
               </Select>
             </div>
-            <Input
-              type="number"
-              label="Qtd."
-              value={compositionItem.quantity}
-              defaultValue={1}
-              onChange={handleModifyCompositionProp(
-                compositionItem,
-                compositionItemIndex,
-                "quantity",
-                (e) => e.target.value
-              )}
-            />
-            <Select
-              className="flex-1"
-              label="Essencial"
-              value={`${compositionItem.essential}`}
-              onChange={handleModifyCompositionProp(
-                compositionItem,
-                compositionItemIndex,
-                "essential",
-                (value) => value == true
-              )}
-            >
-              <Option key={`true`} value={`true`}>
-                Sim
-              </Option>
-              <Option key={`false`} value={`false`}>
-                Não
-              </Option>
-            </Select>
+            <div className="w-full min-w-48">
+              <Input
+                type="number"
+                label="Qtd."
+                value={compositionItem.quantity}
+                defaultValue={1}
+                onChange={handleModifyCompositionProp(
+                  compositionItem,
+                  compositionItemIndex,
+                  "quantity",
+                  (e) => e.target.value
+                )}
+              />
+            </div>
+            <div className="w-full min-w-48">
+              <Select
+                label="Essencial"
+                value={`${compositionItem.essential}`}
+                onChange={handleModifyCompositionProp(
+                  compositionItem,
+                  compositionItemIndex,
+                  "essential",
+                  (value) => value == true
+                )}
+              >
+                <Option key={`true`} value={`true`}>
+                  Sim
+                </Option>
+                <Option key={`false`} value={`false`}>
+                  Não
+                </Option>
+              </Select>
+            </div>
             <div className="flex flex-row">
               <Button className="mr-2 text-light-high" variant="text" size="sm">
                 <IoMdCloseCircle size={24} />
@@ -207,7 +216,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         </span>
       </Fieldset>
       <Button
-        className=""
+        className="mb-4"
         onClick={() => {
           onMenuItemChange(edit);
         }}

@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import { ThemeProvider } from "@material-tailwind/react";
 
 import "/styles/globals.css";
+import "react-image-crop/dist/ReactCrop.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -47,7 +48,7 @@ export default function App({ Component, pageProps }: AppProps) {
             styles: {
               base: {
                 initial: {
-                  key: "!bg-dark-300",
+                  key: "!bg-dark-300 !shadow-none",
                 },
               },
             },

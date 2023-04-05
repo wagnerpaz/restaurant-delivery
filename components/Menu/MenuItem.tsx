@@ -8,22 +8,30 @@ import Image from "next/image";
 import DbImageEditor from "../DbImageEditor";
 
 interface MenuItemProps extends ComponentProps<"div"> {
+  id: string;
   name: string;
   index: number;
   mainImageId?: string;
   composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
+  editable?: boolean;
+  portalTargetEditModal?: () => HTMLElement;
+  onEditClick: () => void;
   onClick: () => void;
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
   className,
   children,
+  id,
   name,
   index,
   mainImageId,
   composition,
   sides,
+  editable = false,
+  portalTargetEditModal,
+  onEditClick,
   onClick,
   ...props
 }) => {
@@ -39,23 +47,17 @@ const MenuItem: React.FC<MenuItemProps> = ({
       <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10">
         <span className="font-bold text-[#036704]">R$20,00</span>
       </div>
-      {mainImageId ? (
-        <DbImageEditor
-          id={mainImageId}
-          alt={`${name} hero image`}
-          upload={{ path: "/store/menu-item", fileKey: "main" }}
-          width={99999}
-          height={99999}
-        />
-      ) : (
-        <Image
-          className="bg-dark-200"
-          src="/no-image-icon-4.png"
-          alt="no photo"
-          width={99999}
-          height={99999}
-        />
-      )}
+      <DbImageEditor
+        className="bg-dark-200"
+        id={mainImageId}
+        alt={`${name} hero image`}
+        upload={{ path: "/store/menu-item", id, fileKey: "main" }}
+        width={99999}
+        height={99999}
+        editable={editable}
+        onEditClick={onEditClick}
+        portalTargetEditModal={portalTargetEditModal}
+      />
       <div className="flex-1 relative bottom-0 w-full p-4 mb-14 flex flex-col bg-light-high -translate-y-6 group-hover:-translate-y-12 rounded-tl-2xl rounded-tr-2xl">
         <div className="flex flex-row justify-between">
           <h3 className="text-md font-bold">{name}</h3>
@@ -64,14 +66,16 @@ const MenuItem: React.FC<MenuItemProps> = ({
         <div className="relative flex-1 pb-2">
           <ul className="text-xs pt-2 opacity-60">
             {composition
-              ?.map((compositionItem) => (
-                <li className="inline" key={compositionItem.ingredient.name}>
-                  {compositionItem.quantity
-                    ? `${compositionItem.quantity}x `
-                    : ""}
-                  {compositionItem.ingredient.name}
-                </li>
-              ))
+              ?.map((compositionItem) =>
+                compositionItem.ingredient ? (
+                  <li className="inline" key={compositionItem.ingredient.name}>
+                    {compositionItem.quantity
+                      ? `${compositionItem.quantity}x `
+                      : ""}
+                    {compositionItem.ingredient.name}
+                  </li>
+                ) : null
+              )
               .flatMap((item) => [item, ", "])
               .slice(0, -1)}
           </ul>

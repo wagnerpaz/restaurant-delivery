@@ -14,7 +14,7 @@ const DbImage: React.FC<MenuProps> = ({
   id,
   ...props
 }) => {
-  return (
+  return id ? (
     <Image
       className={classNames(className)}
       alt={alt}
@@ -23,6 +23,13 @@ const DbImage: React.FC<MenuProps> = ({
     >
       {children}
     </Image>
+  ) : (
+    <Image
+      className={classNames(className)}
+      alt={`${alt} (no photo)`}
+      {...props}
+      src="/no-image-icon-4.png"
+    />
   );
 };
 

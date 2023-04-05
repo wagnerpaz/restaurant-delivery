@@ -6,12 +6,14 @@ import { createPortal } from "react-dom";
 interface ModalProps extends ComponentProps<"div"> {
   open: boolean;
   onOpenChange: (newValue: boolean) => void;
+  portalTarget?: () => HTMLElement;
 }
 
 const Modal: React.FC<ModalProps> = ({
   className,
   children,
   open,
+  portalTarget,
   onOpenChange,
   ...props
 }) => {
@@ -26,23 +28,27 @@ const Modal: React.FC<ModalProps> = ({
         <>
           <div
             className={classNames(
-              "fixed top-0 left-0 w-full h-full z-50 bg-dark-500 opacity-70",
+              "fixed top-0 left-0 w-full h-full bg-dark-500 opacity-70",
               className
             )}
             {...props}
           />
           <div
-            ref={container}
             className={classNames(
-              "fixed m-16 top-0 left-0 w-[calc(100%-8rem)] h-[calc(100%-8rem)] z-50 bg-dark-100 rounded-2xl p-4 overflow-auto",
+              "fixed inset-0 container mx-auto m-4 z-50 flex items-center justify-center",
               className
             )}
             {...props}
           >
-            <div className="relative w-full h-full">{children}</div>
+            <div
+              ref={container}
+              className="w-full h-full bg-dark-100 p-4 rounded-2xl overflow-auto"
+            >
+              {children}
+            </div>
           </div>
         </>,
-        document.body
+        portalTarget?.() || document.body
       )
     : null;
 };

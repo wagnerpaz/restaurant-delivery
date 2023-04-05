@@ -19,8 +19,12 @@ import mongoose from "mongoose";
 interface DbImageEditorProps extends ComponentProps<typeof DbImage> {
   upload: {
     path: string;
+    id: string;
     fileKey: string;
   };
+  editable?: boolean;
+  onEditClick?: () => void;
+  portalTargetEditModal?: () => HTMLElement;
 }
 
 const DbImageEditor: React.FC<DbImageEditorProps> = ({
@@ -28,6 +32,9 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
   children,
   id,
   upload,
+  editable = true,
+  onEditClick,
+  portalTargetEditModal,
   ...props
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,8 +45,9 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
     width: 100,
     height: 100,
   });
-  const [imageRef, setImageRef] = useState<HTMLImageElement>();
-  const [image, setImage] = useState<string>(id);
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
+  const [cachedImage, setCachedImage] = useState<string>();
   const [loadingSave, setLoadingSave] = useState(false);
 
   const putUpload = usePutUpload();
@@ -69,35 +77,50 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
   return (
     <>
       <EditableSection
-        className={classNames(className)}
-        hideDelete
-        onEditClick={() => setModalOpen(true)}
+        className={className}
+        iconsContainerClassName="bg-light-high p-2 rounded-full"
+        hideEdit={!editable}
+        hideDelete={!editable}
+        onEditClick={onEditClick || (() => setModalOpen(true))}
       >
         <DbImage id={id} {...props} />
       </EditableSection>
-      <Modal open={modalOpen} onOpenChange={(value) => setModalOpen(value)}>
-        <div className="flex flex-col gap-4 h-full">
-          <ReactCrop
-            className="flex-1 relative"
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            aspect={1}
-            minWidth={300}
-            minHeight={300}
-          >
-            <DbImage
-              className="object-contain rounded-sm"
-              ref={(ref) => setImageRef(ref as HTMLImageElement)}
-              alt="Profile Photo"
-              id={image}
-              onLoad={onImageLoad}
-              fill
-            />
-          </ReactCrop>
-
+      <Modal
+        open={modalOpen}
+        onOpenChange={(value) => setModalOpen(value)}
+        portalTarget={portalTargetEditModal}
+      >
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex-1 w-[500px] h-[500px]">
+            <ReactCrop
+              className={classNames("object-contain")}
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              aspect={1}
+            >
+              {cachedImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  ref={(ref) => setImageRef(ref)}
+                  className="rounded-sm"
+                  alt="Profile Photo"
+                  src={cachedImage}
+                  onLoad={onImageLoad}
+                />
+              ) : (
+                <DbImage
+                  className="rounded-sm w-full h-full"
+                  alt="Profile photo stored"
+                  id={id}
+                  fill
+                />
+              )}
+            </ReactCrop>
+          </div>
           <div className="flex gap-4">
             <Input
               className="flex-1"
+              label="Arquivo de Imagem"
               type="file"
               onChange={function (evt) {
                 const reader = new FileReader();
@@ -110,9 +133,11 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
                   image.src = uploadedImage as string;
                   image.onload = () => {
                     //RESIZE TO MAX WIDTH 300
-                    canvas.width = 300;
-                    canvas.height =
-                      (image.naturalHeight / image.naturalWidth) * 300;
+                    // canvas.width = 300;
+                    // canvas.height =
+                    //   (image.naturalHeight / image.naturalWidth) * 300;
+                    canvas.width = image.naturalWidth;
+                    canvas.height = image.naturalHeight;
                     context2d?.drawImage(
                       image,
                       0,
@@ -120,7 +145,7 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
                       canvas.width,
                       canvas.height
                     );
-                    setImage(`${canvas.toDataURL("image/png")}`);
+                    setCachedImage(`${canvas.toDataURL("image/png")}`);
                   };
                 });
                 reader.readAsDataURL((evt.target.files as FileList)[0]);
@@ -133,6 +158,10 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
             <Button
               className="block"
               onClick={() => {
+                if (!cachedImage) {
+                  setModalOpen(false);
+                }
+
                 setLoadingSave(true);
                 imgPreview(
                   imageRef as HTMLImageElement,
@@ -144,7 +173,7 @@ const DbImageEditor: React.FC<DbImageEditorProps> = ({
                     upload.path,
                     upload.fileKey,
                     dataUrl,
-                    new mongoose.Types.ObjectId(id)
+                    new mongoose.Types.ObjectId(upload.id)
                   );
                   setLoadingSave(false);
                   setModalOpen(false);

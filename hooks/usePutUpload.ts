@@ -8,7 +8,7 @@ const usePutUpload = () => {
     dataUrl: string,
     id: mongoose.Types.ObjectId
   ) => {
-    const blob = new Blob([dataUrl], { type: "image/png" });
+    const blob = await (await fetch(dataUrl)).blob();
     const formData = new FormData();
     formData.append(fileKey, blob);
 
