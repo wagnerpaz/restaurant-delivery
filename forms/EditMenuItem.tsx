@@ -17,11 +17,13 @@ import { IIngredient } from "/models/Ingredients";
 import MenuItem from "/components/Menu/MenuItem";
 import mongoose from "mongoose";
 import ImageEditorModal from "/modals/ImageEditorModal";
+import AddIngredientModal from "/modals/AddIngredientModal";
 
 interface EditMenuItemProps extends ComponentProps<"form"> {
   store: IStore;
+  ingredients: IIngredient[];
   menuItem: IMenuItem;
-  onMenuItemChange: (newValue: IMenuItem) => void;
+  onMenuItemChange: (newValue?: IMenuItem) => void;
 }
 
 const emptyCompositionItem: IMenuItemCompositionItem = {
@@ -34,12 +36,14 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
   className,
   children,
   store,
+  ingredients,
   menuItem,
   onMenuItemChange,
   ...props
 }) => {
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
+  const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
   const handleModifyCompositionProp =
     (
@@ -68,7 +72,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
     >
       <div className="flex flex-col lg:flex-row items-center gap-4">
         <MenuItem
-          className="!w-80"
+          className="w-full sm:!w-80"
           id={edit._id}
           name={edit.name}
           mainImageId={edit.images?.main?.toString()}
@@ -213,17 +217,31 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         ))}
         <span className="text-sm">
           Procurou o ingrediente acima e não achou? Registre{" "}
-          <span className="text-dark-500 font-bold cursor-pointer">aqui</span>
+          <span
+            className="text-dark-500 font-bold cursor-pointer"
+            onClick={() => setAddIngredientModalOpen(true)}
+          >
+            aqui
+          </span>
         </span>
       </Fieldset>
-      <Button
-        className="mb-4"
-        onClick={() => {
-          onMenuItemChange(edit);
-        }}
-      >
-        Salvar
-      </Button>
+      <div className="flex flex-row gap-2">
+        <Button
+          onClick={() => {
+            onMenuItemChange();
+          }}
+        >
+          cancel
+        </Button>
+        <Button
+          className="flex-1"
+          onClick={() => {
+            onMenuItemChange(edit);
+          }}
+        >
+          Salvar
+        </Button>
+      </div>
       <ImageEditorModal
         open={editImageModalOpen}
         onOpenChange={(newValue) => setEditImageModalOpen(newValue)}
@@ -244,6 +262,15 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
             },
           } as IMenuItem);
         }}
+      />
+      <AddIngredientModal
+        store={store}
+        ingredients={ingredients}
+        open={addIngredientModalOpen}
+        onOpenChange={(newValue) => setAddIngredientModalOpen(newValue)}
+        portalTarget={() =>
+          document.querySelector("#edit-menu-item-form") as HTMLElement
+        }
       />
     </form>
   );

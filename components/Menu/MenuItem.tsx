@@ -48,28 +48,30 @@ const MenuItem: React.FC<MenuItemProps> = ({
   ...props
 }) => {
   return (
-    <EditableSection
-      className={classNames({
-        "sm:hover:scale-[110%] transition-all": useEffects,
-      })}
-      iconsContainerClassName="bg-light-high p-2 rounded-full"
-      hideEdit={!editable}
-      hideDelete={!editable}
-      onEditClick={onEditClick}
-      onDeleteClick={onDeleteClick}
+    <div
+      className={classNames(
+        "flex flex-row sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
+        {
+          "sm:hover:scale-[110%] transition-all": useEffects,
+        },
+        className
+      )}
+      {...props}
+      onClick={onClick}
     >
-      <div
-        className={classNames(
-          "flex flex-row sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
-          className
-        )}
-        {...props}
-        onClick={onClick}
-      >
-        <div className="relative">
-          <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10">
-            <span className="font-bold text-[#036704]">R${price}</span>
-          </div>
+      <div className="relative">
+        <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
+          <span className="font-bold text-[#036704]">
+            R${(Math.round(price * 100) / 100).toFixed(2).replace(".", ",")}
+          </span>
+        </div>
+        <EditableSection
+          iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-light-high p-2 rounded-full"
+          hideEdit={!editable}
+          hideDelete={!editable}
+          onEditClick={onEditClick}
+          onDeleteClick={onDeleteClick}
+        >
           <DbImage
             className="w-32 h-32 sm:w-full sm:h-full bg-dark-200"
             id={mainImageId}
@@ -77,61 +79,54 @@ const MenuItem: React.FC<MenuItemProps> = ({
             height={99999}
             alt={`${name} hero image`}
           />
+        </EditableSection>
+      </div>
+      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl mr-12 sm:mr-0">
+        <div className="flex flex-row justify-between items-center h-[36px]">
+          <h3 className="text-md font-bold">{name}</h3>
         </div>
-        <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-14 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl mr-12 sm:mr-0">
-          <div className="flex flex-row justify-between items-center h-[36px]">
-            <h3 className="text-md font-bold">{name}</h3>
-          </div>
 
-          <div className="relative flex-1 pb-2">
-            <ul className="text-xs pt-2 opacity-60">
-              {composition
-                ?.map((compositionItem) =>
-                  compositionItem.ingredient ? (
-                    <li
-                      className="inline"
-                      key={compositionItem.ingredient.name}
-                    >
-                      {compositionItem.quantity &&
-                      compositionItem.quantity !== 1
-                        ? `${compositionItem.quantity}x `
-                        : ""}
-                      {compositionItem.ingredient.name}
-                    </li>
-                  ) : null
-                )
+        <div className="relative flex-1 pb-2">
+          <ul className="text-xs pt-2 opacity-60">
+            {composition
+              ?.map((compositionItem) =>
+                compositionItem.ingredient ? (
+                  <li className="inline" key={compositionItem.ingredient.name}>
+                    {compositionItem.quantity && compositionItem.quantity !== 1
+                      ? `${compositionItem.quantity}x `
+                      : ""}
+                    {compositionItem.ingredient.name}
+                  </li>
+                ) : null
+              )
+              .flatMap((item) => [item, ", "])
+              .slice(0, -1)}
+          </ul>
+          {sides?.length ? (
+            <ul className="text-sm mt-1">
+              <span>Acompanha: </span>
+              {sides
+                ?.map((side) => (
+                  <li className="inline" key={side.menuItem.name}>
+                    {side.menuItem.name}
+                  </li>
+                ))
                 .flatMap((item) => [item, ", "])
                 .slice(0, -1)}
             </ul>
-            {sides?.length ? (
-              <ul className="text-sm mt-1">
-                <span>Acompanha: </span>
-                {sides
-                  ?.map((side) => (
-                    <li className="inline" key={side.menuItem.name}>
-                      {side.menuItem.name}
-                    </li>
-                  ))
-                  .flatMap((item) => [item, ", "])
-                  .slice(0, -1)}
-              </ul>
-            ) : null}
-          </div>
-        </div>
-        <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
-          <span className="text-[darkblue] hidden sm:inline ">
-            Mais detalhes
-          </span>
-          <Button
-            className="w-full sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center"
-            variant="contained"
-          >
-            <FaShoppingCart className="text-xl" />
-            <span className="hidden sm:inline-block">Adicionar</span>
-          </Button>
+          ) : null}
         </div>
       </div>
-    </EditableSection>
+      <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
+        <Button
+          className="w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center"
+          variant="contained"
+        >
+          <FaShoppingCart className="text-xl" />
+          <span className="hidden sm:inline-block">Adicionar</span>
+        </Button>
+      </div>
+    </div>
   );
 };
 

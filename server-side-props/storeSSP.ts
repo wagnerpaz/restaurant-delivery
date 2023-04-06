@@ -3,7 +3,7 @@ import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
 
 import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
-import Ingredients from "/models/Ingredients";
+import Ingredients, { IIngredient } from "/models/Ingredients";
 import MenuItem from "/models/MenuItem";
 import Store, { IStore } from "/models/Store";
 
@@ -27,12 +27,17 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     await store.populate("menu.sections.items.composition.ingredient");
     await store.populate("menu.sections.items.sides.menuItem");
     await store.populate("ingredients");
-
-    console.log(store);
   }
 
   // Convert the store object to a plain JavaScript object
   const storeObject = serializeJson(store?.toObject());
+
+  const ingredients: IIngredient[] = await Ingredients.find();
+  const ingredientsObjects = ingredients?.map((o) =>
+    serializeJson(o.toObject())
+  );
+
+  console.log(ingredientsObjects);
 
   // merge props and pass down to the next function
   return {
@@ -40,6 +45,7 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
       ...input.props,
       store: storeObject,
       selectedLocation: storeObject.locations[0],
+      ingredients: ingredientsObjects,
     },
   };
 };

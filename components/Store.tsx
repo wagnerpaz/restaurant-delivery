@@ -16,10 +16,12 @@ import { IMenuItem } from "/models/MenuItem";
 import usePutStore from "/hooks/usePutStore";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
+import { IIngredient } from "/models/Ingredients";
 
 interface StoreProps {
   store: IStore;
   onStoreChange: (value: IStore) => void;
+  ingredients: IIngredient[];
   selectedLocation: ILocation;
 }
 
@@ -30,7 +32,7 @@ const emptyMenuItem: IMenuItem = {
   composition: [{ ingredient: undefined, quantity: 1, essential: false }],
 };
 
-const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
+const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [clientStore, setClientStore] = useState(store);
 
   const [editMenuItemModalOpen, setEditMenuItemModalOpen] = useState(false);
@@ -44,7 +46,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
 
-  console.log("clientStore", clientStore);
+  console.log("clientStore", clientStore, ingredients);
 
   return (
     <div
@@ -150,8 +152,19 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
       >
         <EditMenuItem
           store={clientStore}
+          ingredients={ingredients}
           menuItem={editMenuItemObject}
-          onMenuItemChange={async (newMenuItem: IMenuItem) => {
+          onMenuItemChange={async (newMenuItem?: IMenuItem) => {
+            if (!newMenuItem) {
+              setEditMenuItemObject({
+                ...emptyMenuItem,
+              } as IMenuItem);
+              setEditMenuItemIndex(-1);
+              setEditMenuItemSectionIndex(-1);
+              setEditMenuItemModalOpen(false);
+              return;
+            }
+
             const storeClone = cloneDeep(clientStore);
             const items =
               storeClone.menu.sections[editMenuItemSectionIndex].items;

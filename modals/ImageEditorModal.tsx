@@ -82,7 +82,11 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
       portalTarget={portalTargetEditModal}
     >
       <div className="flex flex-col items-center justify-center gap-4">
-        <div className="flex-1 w-[500px] h-[500px]">
+        {/*problem with w-[500px] h-[500px] not being applied*/}
+        <div
+          className="flex-1 w-[500px] h-[500px]"
+          style={{ width: 500, height: 500 }}
+        >
           {cachedImage ? (
             <ReactCrop
               className={classNames("object-contain w-full h-full")}
