@@ -18,6 +18,7 @@ interface MenuItemProps extends ComponentProps<"div"> {
   composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
   editable?: boolean;
+  useEffects?: boolean;
   portalTargetEditModal?: () => HTMLElement;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
@@ -37,6 +38,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   composition,
   sides,
   editable = false,
+  useEffects = false,
   portalTargetEditModal,
   onEditClick,
   onDeleteClick,
@@ -47,6 +49,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
 }) => {
   return (
     <EditableSection
+      className={classNames({
+        "sm:hover:scale-[110%] transition-all": useEffects,
+      })}
       iconsContainerClassName="bg-light-high p-2 rounded-full"
       hideEdit={!editable}
       hideDelete={!editable}
@@ -55,24 +60,26 @@ const MenuItem: React.FC<MenuItemProps> = ({
     >
       <div
         className={classNames(
-          "flex flex-col h-full relative rounded-bl-2xl rounded-br-2xl rounded-tl-2xl overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
+          "flex flex-row sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
           className
         )}
         {...props}
         onClick={onClick}
       >
-        <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10">
-          <span className="font-bold text-[#036704]">R${price}</span>
+        <div className="relative">
+          <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10">
+            <span className="font-bold text-[#036704]">R${price}</span>
+          </div>
+          <DbImage
+            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200"
+            id={mainImageId}
+            width={99999}
+            height={99999}
+            alt={`${name} hero image`}
+          />
         </div>
-        <DbImage
-          className="bg-dark-200"
-          id={mainImageId}
-          width={99999}
-          height={99999}
-          alt={`${name} hero image`}
-        />
-        <div className="flex-1 relative bottom-0 w-full p-4 mb-14 flex flex-col bg-light-high -translate-y-6 group-hover:-translate-y-12 rounded-tl-2xl rounded-tr-2xl">
-          <div className="flex flex-row justify-between">
+        <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-14 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl mr-12 sm:mr-0">
+          <div className="flex flex-row justify-between items-center h-[36px]">
             <h3 className="text-md font-bold">{name}</h3>
           </div>
 
@@ -111,14 +118,16 @@ const MenuItem: React.FC<MenuItemProps> = ({
             ) : null}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <span className="text-[darkblue]">Mais detalhes</span>
+        <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
+          <span className="text-[darkblue] hidden sm:inline ">
+            Mais detalhes
+          </span>
           <Button
-            className="w-full mt-2 flex flex-row gap-2 items-center justify-center"
+            className="w-full sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center"
             variant="contained"
           >
             <FaShoppingCart className="text-xl" />
-            Adicionar
+            <span className="hidden sm:inline-block">Adicionar</span>
           </Button>
         </div>
       </div>

@@ -78,7 +78,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
           </div>
           <Input
             id="search"
-            containerProps={{ className: "!w-48 hidden sm:block" }}
+            containerProps={{ className: "!w-full !min-w-0 max-w-xs" }}
             label="Pesquisar"
           ></Input>
           <Button className="flex flex-row gap-2 items-center">
@@ -114,6 +114,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
                     sides={menuItem.sides}
                     index={menuItemIndex}
                     editable
+                    useEffects
                     onEditClick={() => {
                       setEditMenuItemObject({ ...menuItem } as IMenuItem);
                       setEditMenuItemIndex(menuItemIndex);
