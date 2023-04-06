@@ -3,7 +3,7 @@ import classNames from "classnames";
 import Image from "next/image";
 
 interface MenuProps extends ComponentProps<typeof Image> {
-  id: string;
+  id?: string;
   src?: string;
 }
 

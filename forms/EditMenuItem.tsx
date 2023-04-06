@@ -14,8 +14,9 @@ import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/Store";
 import { IIngredient } from "/models/Ingredients";
-import DbImageEditor from "/components/DbImageEditor";
 import MenuItem from "/components/Menu/MenuItem";
+import mongoose from "mongoose";
+import ImageEditorModal from "/modals/ImageEditorModal";
 
 interface EditMenuItemProps extends ComponentProps<"form"> {
   store: IStore;
@@ -38,6 +39,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
   ...props
 }) => {
   const [edit, setEdit] = useState(menuItem);
+  const [editImageModalOpen, setEditImageModalOpen] = useState(false);
 
   const handleModifyCompositionProp =
     (
@@ -52,7 +54,6 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         ...compositionItem,
         [key]: getter(value),
       });
-      console.log(slicedComposition, value);
       setEdit({
         ...edit,
         composition: slicedComposition,
@@ -71,14 +72,13 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
           id={edit._id}
           name={edit.name}
           mainImageId={edit.images?.main?.toString()}
+          price={edit.price}
           composition={edit.composition}
           sides={edit.sides}
           index={-1}
           editable
           onClick={() => {}}
-          portalTargetEditModal={() =>
-            document.querySelector("#edit-menu-item-form") as HTMLElement
-          }
+          onEditClick={() => setEditImageModalOpen(true)}
         />
         <div className="w-full lg:flex-1 flex flex-col gap-2">
           <Input
@@ -92,12 +92,13 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
             }
           />
           <Input
+            type="number"
             label="Preço"
-            value={edit.price}
+            value={`${edit.price}`}
             onChange={(e) =>
               setEdit({
                 ...edit,
-                price: e.target.value,
+                price: +e.target.value,
               } as IMenuItem)
             }
           />
@@ -223,6 +224,27 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
       >
         Salvar
       </Button>
+      <ImageEditorModal
+        open={editImageModalOpen}
+        onOpenChange={(newValue) => setEditImageModalOpen(newValue)}
+        upload={{
+          path: "/",
+          fileKey: "file",
+          id: edit.images.main?.toString(),
+        }}
+        portalTargetEditModal={() =>
+          document.querySelector("#edit-menu-item-form") as HTMLElement
+        }
+        onUploadIdChange={(newMainImageId) => {
+          setEdit({
+            ...edit,
+            images: {
+              ...edit.images,
+              main: new mongoose.Types.ObjectId(newMainImageId),
+            },
+          } as IMenuItem);
+        }}
+      />
     </form>
   );
 };

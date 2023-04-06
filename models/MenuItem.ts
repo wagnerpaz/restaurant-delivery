@@ -11,6 +11,7 @@ export interface IMenuItem extends Document {
     short?: string;
     long?: string;
   };
+  price: number;
   composition: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
 }
@@ -46,6 +47,7 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
     short: { type: String, required: false },
     long: { type: String, required: false },
   },
+  price: Number,
   composition: [
     {
       ingredient: {

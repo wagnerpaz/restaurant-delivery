@@ -4,6 +4,7 @@ import { MdLocationPin } from "react-icons/md";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
+import { Button, Input } from "@material-tailwind/react";
 
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
@@ -14,7 +15,7 @@ import EditMenuItem from "/forms/EditMenuItem";
 import { IMenuItem } from "/models/MenuItem";
 import usePutStore from "/hooks/usePutStore";
 import usePutMenuItem from "/hooks/usePutMenuItem";
-import { Button, Input } from "@material-tailwind/react";
+import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 
 interface StoreProps {
   store: IStore;
@@ -33,13 +34,17 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
   const [clientStore, setClientStore] = useState(store);
 
   const [editMenuItemModalOpen, setEditMenuItemModalOpen] = useState(false);
+  const [editMenuItemIndex, setEditMenuItemIndex] = useState(-1);
   const [editMenuItemObject, setEditMenuItemObject] = useState({
     ...emptyMenuItem,
-  });
+  } as IMenuItem);
   const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState(-1);
 
   const putStore = usePutStore();
   const putMenuItem = usePutMenuItem();
+  const deleteMenuItem = useDeleteMenuItem();
+
+  console.log("clientStore", clientStore);
 
   return (
     <div
@@ -91,7 +96,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
               name={section.name}
               length={section.items.length}
               onAddClick={() => {
-                setEditMenuItemObject({ ...emptyMenuItem });
+                setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
+                setEditMenuItemIndex(-1);
                 setEditMenuItemSectionIndex(sectionIndex);
                 setEditMenuItemModalOpen(true);
               }}
@@ -103,14 +109,31 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
                     name={menuItem.name}
                     id={menuItem._id}
                     mainImageId={menuItem.images?.main?.toString()}
+                    price={menuItem.price}
                     composition={menuItem.composition}
                     sides={menuItem.sides}
                     index={menuItemIndex}
                     editable
                     onEditClick={() => {
-                      setEditMenuItemObject({ ...menuItem });
+                      setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                      setEditMenuItemIndex(menuItemIndex);
                       setEditMenuItemSectionIndex(sectionIndex);
                       setEditMenuItemModalOpen(true);
+                    }}
+                    onDeleteClick={() => {
+                      const confirmed = confirm(
+                        `Deseja excluir o item "${menuItem.name}"?`
+                      );
+                      if (confirmed) {
+                        deleteMenuItem(store._id, menuItem._id);
+                        const cloneStore = cloneDeep(clientStore);
+                        const section = cloneStore.menu.sections[sectionIndex];
+                        section.items = section.items.filter(
+                          (f) => f._id !== menuItem._id
+                        );
+                        console.log("section", section);
+                        setClientStore(cloneStore);
+                      }
                     }}
                   />
                 </>
@@ -127,19 +150,21 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
         <EditMenuItem
           store={clientStore}
           menuItem={editMenuItemObject}
-          onMenuItemChange={async (newMenuItem, menuItemIndex) => {
+          onMenuItemChange={async (newMenuItem: IMenuItem) => {
             const storeClone = cloneDeep(clientStore);
             const items =
               storeClone.menu.sections[editMenuItemSectionIndex].items;
 
-            const serverMenuItem = await putMenuItem(
-              storeClone,
-              newMenuItem,
-              editMenuItemSectionIndex
-            );
+            const serverMenuItem = (
+              await putMenuItem(
+                storeClone,
+                newMenuItem,
+                editMenuItemSectionIndex
+              )
+            ).data;
 
-            if (menuItemIndex) {
-              items.splice(menuItemIndex, 1, serverMenuItem);
+            if (editMenuItemIndex > 0) {
+              items.splice(editMenuItemIndex, 1, serverMenuItem);
             } else {
               items.push(serverMenuItem);
             }

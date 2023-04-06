@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({
   onOpenChange,
   ...props
 }) => {
-  const container = useRef<HTMLElement>(null);
+  const container = useRef<HTMLDivElement>(null);
 
   useOnClickOutside(container, () => {
     onOpenChange(false);
@@ -42,7 +42,7 @@ const Modal: React.FC<ModalProps> = ({
           >
             <div
               ref={container}
-              className="w-full h-full bg-dark-100 p-4 rounded-2xl overflow-auto"
+              className="ma-w-full max-h-full bg-dark-100 p-4 rounded-2xl overflow-auto"
             >
               {children}
             </div>

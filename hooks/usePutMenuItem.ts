@@ -11,12 +11,12 @@ const usePutMenuItem = () => {
     sectionIndex?: number
   ) => {
     if (menuItem._id) {
-      return axiosInstance.put(
+      return await axiosInstance.put(
         `/api/store/${store._id}/menu-item/${menuItem._id}`,
         menuItem
       );
     } else {
-      return axiosInstance.put(
+      return await axiosInstance.put(
         `/api/store/${store._id}/menu-item/section/${sectionIndex}`,
         menuItem
       );

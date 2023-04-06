@@ -10,7 +10,6 @@ export const config = {
 };
 
 const handler = upload(["main"], async (req, res, results) => {
-  console.log(results, typeof results["main"]);
   const menuItem = await MenuItem.findById({ _id: req.query.id });
   if (menuItem) {
     menuItem.images.main = results["main"];
