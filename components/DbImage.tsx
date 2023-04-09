@@ -2,12 +2,9 @@ import { ComponentProps } from "react";
 import classNames from "classnames";
 import Image from "next/image";
 
-interface MenuProps extends ComponentProps<typeof Image> {
-  id?: string;
-  src?: string;
-}
+interface DbImageProps extends ComponentProps<typeof Image> {}
 
-const DbImage: React.FC<MenuProps> = ({
+const DbImage: React.FC<DbImageProps> = ({
   className,
   children,
   alt,
