@@ -73,7 +73,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <DbImage
-            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200"
+            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200 rounded-xl"
             id={mainImageId}
             width={99999}
             height={99999}
@@ -81,9 +81,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         </EditableSection>
       </div>
-      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl mr-12 sm:mr-0">
-        <div className="flex flex-row justify-between items-center h-[36px]">
-          <h3 className="text-md font-bold">{name}</h3>
+      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
+        <div className="flex flex-row justify-between items-center min-h-[36px]">
+          <h3 className="text-md font-bold mr-12">{name}</h3>
         </div>
 
         <div className="relative flex-1 pb-2">
