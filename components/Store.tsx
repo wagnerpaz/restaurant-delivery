@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { FC, useState } from "react";
-import { MdLocationPin } from "react-icons/md";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
@@ -13,10 +12,11 @@ import { ILocation, IStore } from "/models/Store";
 import Modal from "/components/Modal";
 import EditMenuItem from "/forms/EditMenuItem";
 import { IMenuItem } from "/models/MenuItem";
-import usePutStore from "/hooks/usePutStore";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { IIngredient } from "/models/Ingredients";
+import { replaceAt } from "/lib/immutable";
+import useGetStoreMenuSectionItems from "/hooks/useGetStoreMenuSectionItems";
+import usePutMenuItem from "/hooks/usePutMenuItem";
 
 interface StoreProps {
   store: IStore;
@@ -34,6 +34,7 @@ const emptyMenuItem: IMenuItem = {
 
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [clientStore, setClientStore] = useState(store);
+  const [clientIngredients, setClientIngredients] = useState(ingredients);
 
   const [editMenuItemModalOpen, setEditMenuItemModalOpen] = useState(false);
   const [editMenuItemIndex, setEditMenuItemIndex] = useState(-1);
@@ -42,15 +43,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   } as IMenuItem);
   const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState(-1);
 
-  const putStore = usePutStore();
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
 
-  console.log("clientStore", clientStore, ingredients);
-
   return (
     <div
-      className={classNames({
+      className={classNames("font-lato", {
         "fixed top-0 left-0 w-full h-full overflow-hidden":
           editMenuItemModalOpen,
       })}
@@ -152,38 +150,43 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       >
         <EditMenuItem
           store={clientStore}
-          ingredients={ingredients}
+          ingredients={clientIngredients}
           menuItem={editMenuItemObject}
+          onStoreChange={(newStore) => setClientStore(newStore)}
+          onIngredientsChange={(newIngredients) =>
+            setClientIngredients(newIngredients)
+          }
           onMenuItemChange={async (newMenuItem?: IMenuItem) => {
             if (!newMenuItem) {
-              setEditMenuItemObject({
-                ...emptyMenuItem,
-              } as IMenuItem);
-              setEditMenuItemIndex(-1);
-              setEditMenuItemSectionIndex(-1);
-              setEditMenuItemModalOpen(false);
               return;
             }
 
-            const storeClone = cloneDeep(clientStore);
-            const items =
-              storeClone.menu.sections[editMenuItemSectionIndex].items;
+            await putMenuItem(store, newMenuItem, editMenuItemSectionIndex);
 
-            const serverMenuItem = (
-              await putMenuItem(
-                storeClone,
-                newMenuItem,
-                editMenuItemSectionIndex
-              )
-            ).data;
+            const menu = clientStore.menu;
+            const sections = menu.sections;
+            const section = sections[editMenuItemSectionIndex];
+            setClientStore({
+              ...clientStore,
+              menu: {
+                ...menu,
+                sections: replaceAt(sections, editMenuItemSectionIndex, {
+                  ...section,
+                  items: replaceAt(
+                    section.items,
+                    editMenuItemIndex > 0
+                      ? editMenuItemIndex
+                      : section.items.length,
+                    newMenuItem
+                  ),
+                }),
+              },
+            } as IStore);
 
-            if (editMenuItemIndex > 0) {
-              items.splice(editMenuItemIndex, 1, serverMenuItem);
-            } else {
-              items.push(serverMenuItem);
-            }
-
-            setClientStore(storeClone);
+            setEditMenuItemObject({ ...emptyMenuItem });
+            setEditMenuItemIndex(-1);
+            setEditMenuItemSectionIndex(-1);
+            setEditMenuItemModalOpen(false);
           }}
         />
       </Modal>

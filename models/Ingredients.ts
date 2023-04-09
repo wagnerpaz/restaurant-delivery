@@ -1,6 +1,6 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 
-export interface IIngredient extends Document {
+export interface IIngredient {
   name: string;
 }
 

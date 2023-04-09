@@ -10,7 +10,6 @@ export const config = {
 };
 
 const handler = upload(["logo"], async (req, res, results) => {
-  console.log(results["logo"]);
   const store = await Store.findById({ _id: req.query.id });
   if (store) {
     store.logo = new mongoose.Types.ObjectId(results["logo"].id);

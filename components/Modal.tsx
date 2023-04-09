@@ -5,12 +5,14 @@ import { createPortal } from "react-dom";
 
 interface ModalProps extends ComponentProps<"div"> {
   open: boolean;
+  contentClassName?: string;
   onOpenChange: (newValue: boolean) => void;
   portalTarget?: () => HTMLElement;
 }
 
 const Modal: React.FC<ModalProps> = ({
   className,
+  contentClassName,
   children,
   open,
   portalTarget,
@@ -27,10 +29,7 @@ const Modal: React.FC<ModalProps> = ({
     ? createPortal(
         <>
           <div
-            className={classNames(
-              "fixed top-0 left-0 w-full h-full bg-dark-500 opacity-70",
-              className
-            )}
+            className="fixed top-0 left-0 w-full h-full bg-dark-500 opacity-70"
             {...props}
           />
           <div
@@ -42,7 +41,10 @@ const Modal: React.FC<ModalProps> = ({
           >
             <div
               ref={container}
-              className="max-w-full max-h-full bg-dark-100 p-4 rounded-2xl overflow-auto"
+              className={classNames(
+                "max-w-full max-h-full bg-dark-100 p-4 rounded-2xl overflow-auto",
+                contentClassName
+              )}
             >
               {children}
             </div>

@@ -14,17 +14,22 @@ async function createMenuItemSection(
 
     await connectToDatabase();
 
-    const serverMenuItem = await MenuItem.create(req.body);
-    await Store.updateOne(
-      { _id: storeId },
-      {
-        $push: {
-          [`menu.sections.${menuItemSectionIndex}.items`]: serverMenuItem,
-        },
-      }
-    );
-
-    res.status(200).end();
+    if (req.method === "PUT") {
+      const serverMenuItem = await MenuItem.create(req.body);
+      await Store.updateOne(
+        { _id: storeId },
+        {
+          $push: {
+            [`menu.sections.${menuItemSectionIndex}.items`]: serverMenuItem,
+          },
+        }
+      );
+      res.status(200).end();
+    } else if (req.method === "GET") {
+      const store = await Store.findById(storeId);
+      const menuItems = store.menu.sections[menuItemSectionIndex];
+      res.status(200).json(menuItems);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");

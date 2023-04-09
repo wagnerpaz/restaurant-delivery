@@ -7,6 +7,7 @@ module.exports = withMT({
     "./pages/**/*.{html,ts,tsx}",
     "./components/**/*.{html,ts,tsx}",
     "./forms/**/*.{html,ts,tsx}",
+    "./modals/**/*.{html,ts,tsx}",
   ],
   theme: {
     fontFamily: {

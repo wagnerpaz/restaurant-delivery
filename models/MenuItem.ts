@@ -1,7 +1,7 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 import { IIngredient } from "./Ingredients";
 
-export interface IMenuItem extends Document {
+export interface IMenuItem {
   name: string;
   images: {
     main?: mongoose.Types.ObjectId;
@@ -17,6 +17,7 @@ export interface IMenuItem extends Document {
 }
 
 export interface IMenuItemCompositionItem {
+  id?: string;
   ingredient: IIngredient;
   essential?: boolean;
   quantity?: number;
