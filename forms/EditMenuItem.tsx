@@ -2,7 +2,6 @@ import { ComponentProps, useCallback, useEffect, useState } from "react";
 import classNames from "classnames";
 import { IoMdCloseCircle } from "react-icons/io";
 import { IoIosAddCircle } from "react-icons/io";
-import { MdDragIndicator } from "react-icons/md";
 import {
   Option,
   Select,
@@ -22,7 +21,6 @@ import AddIngredientModal from "/modals/AddIngredientModal";
 import { insertAt, swap } from "/lib/immutable";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 
 interface EditMenuItemProps extends ComponentProps<"form"> {
   store: IStore;
@@ -54,23 +52,24 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
-  const putMenuItem = usePutMenuItem();
-
   useEffect(() => {
+    const compositionIndexed = menuItem.composition?.map((c, index) => ({
+      ...c,
+      id: `${index}`,
+    }));
+
     setEdit({
       ...menuItem,
-      composition: menuItem.composition.map((c, index) => ({
-        ...c,
-        id: `${index}`,
-      })),
+      composition:
+        compositionIndexed?.length > 0 ? compositionIndexed : [{ id: "0" }],
     } as IMenuItem);
   }, [menuItem]);
 
   const onFindCompositionItem = useCallback(
     (id: string) => {
-      const index = edit.composition.findIndex((f) => f.id === id);
+      const index = edit.composition?.findIndex((f) => f.id === id);
       return {
-        compositionItem: edit.composition[index],
+        compositionItem: edit.composition?.[index],
         index,
       };
     },
@@ -176,7 +175,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
       </div>
       <Fieldset className="flex flex-col gap-2" title="Composição">
         <DraggableGroup className="flex flex-col gap-2">
-          {edit.composition.map((compositionItem, compositionItemIndex) => (
+          {edit.composition?.map((compositionItem, compositionItemIndex) => (
             <Draggable
               className="flex flex-col lg:flex-row gap-2 items-center"
               id={compositionItem.id}
@@ -250,7 +249,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
                     setEdit({
                       ...edit,
                       composition: [
-                        ...edit.composition.filter(
+                        ...edit.composition?.filter(
                           (f, i) => i !== compositionItemIndex
                         ),
                       ],
@@ -272,7 +271,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
                         {
                           ...emptyCompositionItem,
                           id: `${
-                            edit.composition.reduce(
+                            edit.composition?.reduce(
                               (acc, cur) => Math.max(acc, +(cur.id || 0)),
                               0
                             ) + 1
@@ -310,7 +309,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
           className="flex-1"
           onClick={() => {
             //remove empty ingredients
-            edit.composition = edit.composition.filter(
+            edit.composition = edit.composition?.filter(
               (f) => f.ingredient?.name
             );
             onMenuItemChange(edit);
@@ -325,7 +324,7 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         upload={{
           path: "/",
           fileKey: "file",
-          id: edit.images.main?.toString(),
+          id: edit.images?.main?.toString(),
         }}
         portalTargetEditModal={() =>
           document.querySelector("#edit-menu-item-form") as HTMLElement

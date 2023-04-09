@@ -17,6 +17,7 @@ export interface IStore extends Document {
 export interface IMenuSection {
   name: string;
   items: IMenuItem[];
+  sections: IMenuSection[];
 }
 
 export interface ILocation {
@@ -47,10 +48,48 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
     },
   ],
   menu: {
+    //five levels of nested sections
     sections: [
       {
         name: String,
         items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
+        sections: [
+          {
+            name: String,
+            items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
+            sections: [
+              {
+                name: String,
+                items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
+                sections: [
+                  {
+                    name: String,
+                    items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
+                    sections: [
+                      {
+                        name: String,
+                        items: [
+                          { type: mongoose.Types.ObjectId, ref: "MenuItem" },
+                        ],
+                        sections: [
+                          {
+                            name: String,
+                            items: [
+                              {
+                                type: mongoose.Types.ObjectId,
+                                ref: "MenuItem",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
     ],
   },

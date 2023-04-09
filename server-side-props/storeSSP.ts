@@ -1,7 +1,7 @@
 import { ParsedUrlQuery } from "querystring";
+
 import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
-
 import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
 import Ingredients, { IIngredient } from "/models/Ingredients";
 import MenuItem from "/models/MenuItem";
@@ -17,17 +17,38 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   const { params } = context;
   const { storeSlug, locationSlug } = params as ParsedUrlQuery;
 
+  const sectionsPopulate = (append?: any) => {
+    const populate = [
+      {
+        path: "items",
+        populate: [
+          { path: "composition", populate: { path: "ingredient" } },
+          { path: "sides", populate: { path: "menuItem" } },
+        ],
+      },
+    ];
+    if (append) {
+      populate.push(append);
+    }
+    return {
+      path: "sections",
+      populate,
+    };
+  };
+
+  const populate = {
+    path: "menu",
+    populate: sectionsPopulate(
+      sectionsPopulate(sectionsPopulate(sectionsPopulate(sectionsPopulate())))
+    ),
+  };
+
   const store: IStore | null = await Store.findOne({
     slug: storeSlug,
-  });
-  if (store) {
-    await store.populate("menu");
-    await store.populate("menu.sections.items");
-    await store.populate("menu.sections.items.composition");
-    await store.populate("menu.sections.items.composition.ingredient");
-    await store.populate("menu.sections.items.sides.menuItem");
-    await store.populate("ingredients");
-  }
+  })
+    .populate("ingredients")
+    .populate(populate)
+    .exec();
 
   // Convert the store object to a plain JavaScript object
   const storeObject = serializeJson(store?.toObject());
@@ -37,7 +58,7 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     serializeJson(o.toObject())
   );
 
-  console.log(ingredientsObjects);
+  console.log(storeObject.menu.sections[0].items[0].composition);
 
   // merge props and pass down to the next function
   return {

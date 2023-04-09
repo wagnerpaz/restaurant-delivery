@@ -43,45 +43,125 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [editMenuItemObject, setEditMenuItemObject] = useState({
     ...emptyMenuItem,
   } as IMenuItem);
-  const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState(-1);
+  const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState([
+    -1,
+  ]);
 
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
 
   const onFindMenuItem = useCallback(
-    (section: IMenuSection) => (id: string) => {
-      const index = section.items.findIndex((f) => f._id === id);
+    (sectionIndex: number[]) => (id: string) => {
+      const store = clientStore;
+      let section = store.menu as IMenuSection;
+      for (const index of sectionIndex) {
+        section = section.sections[index];
+      }
+      const menuItems = section.items;
+      const index = menuItems.findIndex((f) => f._id === id);
       return {
-        menuItem: section.items[index],
+        menuItem: menuItems[index],
         index,
       };
     },
-    []
+    [clientStore]
   );
 
   const onDropMenuItem = useCallback(
-    (section: IMenuSection) => (id: string, atIndex: number) => {
-      const { index } = onFindMenuItem(section)(id);
-      setClientStore((clientStore) => {
-        const menu = clientStore.menu;
-        const sections = menu.sections;
-        const sectionIndex = sections.findIndex((f) => f.name === section.name);
-        return {
-          ...clientStore,
-          menu: {
-            ...menu,
-            sections: [
-              ...replaceAt(sections, sectionIndex, {
-                ...sections[sectionIndex],
-                items: swap(sections[sectionIndex].items, index, atIndex),
-              }),
-            ],
-          },
-        } as IStore;
-      });
+    (sectionIndex: number[]) => (id: string, atIndex: number) => {
+      const { index } = onFindMenuItem(sectionIndex)(id);
+      const cloneStore = cloneDeep(clientStore);
+      let section = cloneStore.menu as IMenuSection;
+      for (const index of sectionIndex) {
+        section = section.sections[index];
+      }
+
+      section.items = swap(section.items, index, atIndex);
+      setClientStore(cloneStore);
     },
-    [onFindMenuItem]
+    [clientStore, onFindMenuItem]
   );
+
+  const renderMenuSections = (
+    sections: IMenuSection[] = [],
+    path: IMenuSection[] = [],
+    indexPath: number[] = []
+  ) => {
+    return sections.map((section, sectionIndex) => (
+      <>
+        {section.items?.length > 0 && (
+          <MenuSection
+            className="mb-4"
+            key={section.name}
+            name={[path.map((p) => p.name).join(" | "), section.name]
+              .filter((f) => f)
+              .join(" | ")}
+            length={section.items.length}
+            onAddClick={() => {
+              setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
+              setEditMenuItemIndex(-1);
+              setEditMenuItemSectionIndex([...indexPath, sectionIndex]);
+              setEditMenuItemModalOpen(true);
+            }}
+          >
+            <DraggableGroup>
+              {section.items.map((menuItem, menuItemIndex) => (
+                <Draggable
+                  containerClassName="h-full"
+                  key={menuItem.name}
+                  id={menuItem._id}
+                  originalIndex={menuItemIndex}
+                  onFind={onFindMenuItem([...indexPath, sectionIndex])}
+                  onDrop={onDropMenuItem([...indexPath, sectionIndex])}
+                >
+                  <MenuItem
+                    name={menuItem.name}
+                    id={menuItem._id}
+                    mainImageId={menuItem.images?.main?.toString()}
+                    price={menuItem.price}
+                    composition={menuItem.composition}
+                    sides={menuItem.sides}
+                    index={menuItemIndex}
+                    editable
+                    useEffects
+                    onEditClick={() => {
+                      setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                      setEditMenuItemIndex(menuItemIndex);
+                      setEditMenuItemSectionIndex([...indexPath, sectionIndex]);
+                      setEditMenuItemModalOpen(true);
+                    }}
+                    onDeleteClick={() => {
+                      const confirmed = confirm(
+                        `Deseja excluir o item "${menuItem.name}"?`
+                      );
+                      if (confirmed) {
+                        deleteMenuItem(
+                          store,
+                          [...indexPath, sectionIndex],
+                          menuItem
+                        );
+                        const cloneStore = cloneDeep(clientStore);
+                        const section = cloneStore.menu.sections[sectionIndex];
+                        section.items = section.items.filter(
+                          (f) => f._id !== menuItem._id
+                        );
+                        setClientStore(cloneStore);
+                      }
+                    }}
+                  />
+                </Draggable>
+              ))}
+            </DraggableGroup>
+          </MenuSection>
+        )}
+        {renderMenuSections(
+          section.sections || [],
+          [...path, section],
+          [...indexPath, sectionIndex]
+        )}
+      </>
+    ));
+  };
 
   return (
     <div
@@ -125,69 +205,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         </div>
       </header>
       <main>
-        <Menu>
-          {clientStore.menu.sections.map((section, sectionIndex) => (
-            <MenuSection
-              className="mb-4"
-              key={section.name}
-              name={section.name}
-              length={section.items.length}
-              onAddClick={() => {
-                setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
-                setEditMenuItemIndex(-1);
-                setEditMenuItemSectionIndex(sectionIndex);
-                setEditMenuItemModalOpen(true);
-              }}
-            >
-              <DraggableGroup>
-                {section.items.map((menuItem, menuItemIndex) => (
-                  <Draggable
-                    containerClassName="h-full"
-                    key={menuItem.name}
-                    id={menuItem._id}
-                    originalIndex={menuItemIndex}
-                    onFind={onFindMenuItem(section)}
-                    onDrop={onDropMenuItem(section)}
-                  >
-                    <MenuItem
-                      name={menuItem.name}
-                      id={menuItem._id}
-                      mainImageId={menuItem.images?.main?.toString()}
-                      price={menuItem.price}
-                      composition={menuItem.composition}
-                      sides={menuItem.sides}
-                      index={menuItemIndex}
-                      editable
-                      useEffects
-                      onEditClick={() => {
-                        setEditMenuItemObject({ ...menuItem } as IMenuItem);
-                        setEditMenuItemIndex(menuItemIndex);
-                        setEditMenuItemSectionIndex(sectionIndex);
-                        setEditMenuItemModalOpen(true);
-                      }}
-                      onDeleteClick={() => {
-                        const confirmed = confirm(
-                          `Deseja excluir o item "${menuItem.name}"?`
-                        );
-                        if (confirmed) {
-                          deleteMenuItem(store._id, menuItem._id);
-                          const cloneStore = cloneDeep(clientStore);
-                          const section =
-                            cloneStore.menu.sections[sectionIndex];
-                          section.items = section.items.filter(
-                            (f) => f._id !== menuItem._id
-                          );
-                          console.log("section", section);
-                          setClientStore(cloneStore);
-                        }
-                      }}
-                    />
-                  </Draggable>
-                ))}
-              </DraggableGroup>
-            </MenuSection>
-          ))}
-        </Menu>
+        <Menu>{renderMenuSections(clientStore.menu.sections)}</Menu>
       </main>
       <Modal
         className="!z-40"
@@ -213,29 +231,26 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               editMenuItemSectionIndex
             );
 
-            const menu = clientStore.menu;
-            const sections = menu.sections;
-            const section = sections[editMenuItemSectionIndex];
-            setClientStore({
-              ...clientStore,
-              menu: {
-                ...menu,
-                sections: replaceAt(sections, editMenuItemSectionIndex, {
-                  ...section,
-                  items: replaceAt(
-                    section.items,
-                    editMenuItemIndex > 0
-                      ? editMenuItemIndex
-                      : section.items.length,
-                    serverMenuItem
-                  ),
-                }),
-              },
-            } as IStore);
+            const cloneStore = cloneDeep(clientStore);
+            const menu = cloneStore.menu;
+
+            let curSection = menu as IMenuSection;
+            for (const index of editMenuItemSectionIndex) {
+              curSection = curSection.sections[index];
+            }
+            curSection.items = replaceAt(
+              curSection.items,
+              editMenuItemIndex >= 0
+                ? editMenuItemIndex
+                : curSection.items.length,
+              serverMenuItem
+            );
+
+            setClientStore(cloneStore);
 
             setEditMenuItemObject({ ...emptyMenuItem });
             setEditMenuItemIndex(-1);
-            setEditMenuItemSectionIndex(-1);
+            setEditMenuItemSectionIndex([-1]);
             setEditMenuItemModalOpen(false);
           }}
         />
