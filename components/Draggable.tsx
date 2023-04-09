@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import { ComponentProps, ReactNode } from "react";
+import { ReactNode } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { MdDragIndicator } from "react-icons/md";
 
-interface DraggableProps extends ComponentProps<"div"> {
+interface DraggableProps {
   id: string;
   originalIndex: number;
   dragIndicator?: boolean;
