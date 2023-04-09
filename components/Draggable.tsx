@@ -6,10 +6,12 @@ import { MdDragIndicator } from "react-icons/md";
 interface DraggableProps extends ComponentProps<"div"> {
   id: string;
   originalIndex: number;
+  dragIndicator?: boolean;
   onFind: (id: string) => { index: number };
   onDrop: (droppedId: string, originalIndex: number) => void;
   children: ReactNode;
   className?: string;
+  containerClassName?: string;
 }
 
 interface Item {
@@ -22,12 +24,14 @@ export const ACCEPT = "Anything";
 const Draggable: React.FC<DraggableProps> = ({
   id,
   originalIndex,
+  dragIndicator,
   onFind = () => {
     return { index: -1 };
   },
   onDrop = () => {},
   children,
   className,
+  containerClassName,
   ...props
 }) => {
   const [{ isDragging }, drag, preview] = useDrag(
@@ -64,15 +68,30 @@ const Draggable: React.FC<DraggableProps> = ({
   return (
     <div
       ref={(node) => preview(drop(node))}
-      className={classNames("flex flex-row items-center gap-2", {
-        "opacity-0": isDragging,
-      })}
+      className={classNames(
+        {
+          "flex flex-row items-center gap-2": dragIndicator,
+        },
+        containerClassName,
+        {
+          "opacity-0": isDragging,
+        }
+      )}
       {...props}
     >
-      <div ref={(node) => drag(node)}>
-        <MdDragIndicator className="cursor-move -mx-1" size={24} />
-      </div>
-      <div className={classNames("flex-1", className)}>{children}</div>
+      {dragIndicator && (
+        <>
+          <div ref={(node) => drag(node)}>
+            <MdDragIndicator className="cursor-move -mx-1" size={24} />
+          </div>
+          <div className={classNames("flex-1", className)}>{children}</div>
+        </>
+      )}
+      {!dragIndicator && (
+        <div ref={(node) => drag(node)} className={containerClassName}>
+          {children}
+        </div>
+      )}
     </div>
   );
 };

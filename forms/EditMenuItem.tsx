@@ -178,9 +178,10 @@ const EditMenuItem: React.FC<EditMenuItemProps> = ({
         <DraggableGroup className="flex flex-col gap-2">
           {edit.composition.map((compositionItem, compositionItemIndex) => (
             <Draggable
+              className="flex flex-col lg:flex-row gap-2 items-center"
               id={compositionItem.id}
               key={compositionItem.id}
-              className="flex flex-col lg:flex-row gap-2 items-center"
+              dragIndicator
               originalIndex={compositionItemIndex}
               onFind={onFindCompositionItem}
               onDrop={onDropCompositionItem}

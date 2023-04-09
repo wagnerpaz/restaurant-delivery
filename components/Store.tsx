@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
@@ -8,15 +8,17 @@ import { Button, Input } from "@material-tailwind/react";
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
 import MenuItem from "/components/Menu/MenuItem";
-import { ILocation, IStore } from "/models/Store";
+import { ILocation, IMenuSection, IStore } from "/models/Store";
 import Modal from "/components/Modal";
 import EditMenuItem from "/forms/EditMenuItem";
 import { IMenuItem } from "/models/MenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { IIngredient } from "/models/Ingredients";
-import { replaceAt } from "/lib/immutable";
+import { replaceAt, swap } from "/lib/immutable";
 import useGetStoreMenuSectionItems from "/hooks/useGetStoreMenuSectionItems";
 import usePutMenuItem from "/hooks/usePutMenuItem";
+import DraggableGroup from "./DraggableGroup";
+import Draggable from "./Draggable";
 
 interface StoreProps {
   store: IStore;
@@ -45,6 +47,41 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
+
+  const onFindMenuItem = useCallback(
+    (section: IMenuSection) => (id: string) => {
+      const index = section.items.findIndex((f) => f._id === id);
+      return {
+        menuItem: section.items[index],
+        index,
+      };
+    },
+    []
+  );
+
+  const onDropMenuItem = useCallback(
+    (section: IMenuSection) => (id: string, atIndex: number) => {
+      const { index } = onFindMenuItem(section)(id);
+      setClientStore((clientStore) => {
+        const menu = clientStore.menu;
+        const sections = menu.sections;
+        const sectionIndex = sections.findIndex((f) => f.name === section.name);
+        return {
+          ...clientStore,
+          menu: {
+            ...menu,
+            sections: [
+              ...replaceAt(sections, sectionIndex, {
+                ...sections[sectionIndex],
+                items: swap(sections[sectionIndex].items, index, atIndex),
+              }),
+            ],
+          },
+        } as IStore;
+      });
+    },
+    [onFindMenuItem]
+  );
 
   return (
     <div
@@ -102,43 +139,52 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                 setEditMenuItemModalOpen(true);
               }}
             >
-              {section.items.map((menuItem, menuItemIndex) => (
-                <>
-                  <MenuItem
+              <DraggableGroup>
+                {section.items.map((menuItem, menuItemIndex) => (
+                  <Draggable
+                    containerClassName="h-full"
                     key={menuItem.name}
-                    name={menuItem.name}
                     id={menuItem._id}
-                    mainImageId={menuItem.images?.main?.toString()}
-                    price={menuItem.price}
-                    composition={menuItem.composition}
-                    sides={menuItem.sides}
-                    index={menuItemIndex}
-                    editable
-                    useEffects
-                    onEditClick={() => {
-                      setEditMenuItemObject({ ...menuItem } as IMenuItem);
-                      setEditMenuItemIndex(menuItemIndex);
-                      setEditMenuItemSectionIndex(sectionIndex);
-                      setEditMenuItemModalOpen(true);
-                    }}
-                    onDeleteClick={() => {
-                      const confirmed = confirm(
-                        `Deseja excluir o item "${menuItem.name}"?`
-                      );
-                      if (confirmed) {
-                        deleteMenuItem(store._id, menuItem._id);
-                        const cloneStore = cloneDeep(clientStore);
-                        const section = cloneStore.menu.sections[sectionIndex];
-                        section.items = section.items.filter(
-                          (f) => f._id !== menuItem._id
+                    originalIndex={menuItemIndex}
+                    onFind={onFindMenuItem(section)}
+                    onDrop={onDropMenuItem(section)}
+                  >
+                    <MenuItem
+                      name={menuItem.name}
+                      id={menuItem._id}
+                      mainImageId={menuItem.images?.main?.toString()}
+                      price={menuItem.price}
+                      composition={menuItem.composition}
+                      sides={menuItem.sides}
+                      index={menuItemIndex}
+                      editable
+                      useEffects
+                      onEditClick={() => {
+                        setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                        setEditMenuItemIndex(menuItemIndex);
+                        setEditMenuItemSectionIndex(sectionIndex);
+                        setEditMenuItemModalOpen(true);
+                      }}
+                      onDeleteClick={() => {
+                        const confirmed = confirm(
+                          `Deseja excluir o item "${menuItem.name}"?`
                         );
-                        console.log("section", section);
-                        setClientStore(cloneStore);
-                      }
-                    }}
-                  />
-                </>
-              ))}
+                        if (confirmed) {
+                          deleteMenuItem(store._id, menuItem._id);
+                          const cloneStore = cloneDeep(clientStore);
+                          const section =
+                            cloneStore.menu.sections[sectionIndex];
+                          section.items = section.items.filter(
+                            (f) => f._id !== menuItem._id
+                          );
+                          console.log("section", section);
+                          setClientStore(cloneStore);
+                        }
+                      }}
+                    />
+                  </Draggable>
+                ))}
+              </DraggableGroup>
             </MenuSection>
           ))}
         </Menu>
@@ -161,7 +207,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               return;
             }
 
-            await putMenuItem(store, newMenuItem, editMenuItemSectionIndex);
+            const serverMenuItem = await putMenuItem(
+              store,
+              newMenuItem,
+              editMenuItemSectionIndex
+            );
 
             const menu = clientStore.menu;
             const sections = menu.sections;
@@ -177,7 +227,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                     editMenuItemIndex > 0
                       ? editMenuItemIndex
                       : section.items.length,
-                    newMenuItem
+                    serverMenuItem
                   ),
                 }),
               },

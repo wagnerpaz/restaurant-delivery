@@ -11,15 +11,17 @@ const usePutMenuItem = () => {
     sectionIndex?: number
   ) => {
     if (menuItem._id) {
-      return await axiosInstance.put(
+      const response = await axiosInstance.put(
         `/api/store/${store._id}/menu-item/${menuItem._id}`,
         menuItem
       );
+      return response.data;
     } else {
-      return await axiosInstance.put(
+      const response = await axiosInstance.put(
         `/api/store/${store._id}/menu-item/section/${sectionIndex}`,
         menuItem
       );
+      return response.data;
     }
   };
   return call;

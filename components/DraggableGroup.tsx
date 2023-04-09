@@ -8,18 +8,18 @@ import { ACCEPT } from "./Draggable";
 const DraggableGroup = (props) => {
   return (
     <DndProvider backend={HTML5Backend}>
-      <ArrayFieldsControl {...props} />
+      <DraggableGroupContent {...props} />
     </DndProvider>
   );
 };
 
-const ArrayFieldsControl = ({ className, children }) => {
+const DraggableGroupContent = ({ className, children }) => {
   const [, drop] = useDrop(() => ({
     accept: ACCEPT,
   }));
 
   return (
-    <div ref={drop} className={classNames(className)}>
+    <div ref={drop} className={classNames("contents", className)}>
       {children}
     </div>
   );

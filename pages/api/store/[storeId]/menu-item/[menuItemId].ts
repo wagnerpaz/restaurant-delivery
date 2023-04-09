@@ -7,9 +7,8 @@ import MenuItem from "/models/MenuItem";
 async function menuItems(req: NextApiRequest, res: NextApiResponse) {
   try {
     const menuItemId = req.query.menuItemId as string;
+    await connectToDatabase();
     if (req.method === "POST" || req.method === "PUT") {
-      await connectToDatabase();
-
       const serverItem = await MenuItem.findOneAndUpdate(
         { _id: menuItemId },
         req.body

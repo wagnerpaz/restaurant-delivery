@@ -24,7 +24,7 @@ async function createMenuItemSection(
           },
         }
       );
-      res.status(200).end();
+      res.status(200).json(serverMenuItem.toObject());
     } else if (req.method === "GET") {
       const store = await Store.findById(storeId);
       const menuItems = store.menu.sections[menuItemSectionIndex];
