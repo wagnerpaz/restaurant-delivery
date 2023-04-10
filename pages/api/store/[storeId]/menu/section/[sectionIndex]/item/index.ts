@@ -1,11 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
 
 import connectToDatabase from "/lib/mongoose";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const session = await getServerSession(req, res, authOptions);
+
     const storeId = req.query.storeId as string;
     const sectionIndex = req.query.sectionIndex as string;
 
@@ -22,17 +26,23 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
       const menuItems = section.items;
       res.status(200).json(menuItems);
     } else if (req.method === "POST") {
-      const serverItem = await MenuItem.create(req.body);
-      await Store.updateOne(
-        { _id: storeId },
-        {
-          $push: {
-            [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
-              serverItem,
-          },
-        }
-      );
-      res.status(200).json(serverItem.toObject());
+      if (session) {
+        const serverItem = await MenuItem.create(req.body);
+        await Store.updateOne(
+          { _id: storeId },
+          {
+            $push: {
+              [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
+                serverItem,
+            },
+          }
+        );
+        res.status(200).json(serverItem.toObject());
+      } else {
+        res.status(401).json({
+          error: "You must be signed in.",
+        });
+      }
     }
   } catch (err) {
     console.error(err);

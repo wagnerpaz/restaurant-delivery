@@ -1,9 +1,10 @@
 import Image from "next/image";
-import { FC, useCallback, useState } from "react";
+import { FC, ReactNode, useCallback, useState } from "react";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { Button, Input } from "@material-tailwind/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
@@ -18,6 +19,8 @@ import { replaceAt, swap } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import DraggableGroup from "./DraggableGroup";
 import Draggable from "./Draggable";
+import UserIcon from "./UserIcon";
+import { IUser } from "/models/User";
 
 interface StoreProps {
   store: IStore;
@@ -45,6 +48,17 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState([
     -1,
   ]);
+
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const admin = (session?.user as IUser)?.role === "admin";
+
+  const AdminDraggableGroup = admin
+    ? DraggableGroup
+    : ({ children }: { children: React.ReactNode }) => children;
+  const AdminDraggable = admin
+    ? Draggable
+    : ({ children }: { children: React.ReactNode }) => children;
 
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
@@ -81,6 +95,10 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     [clientStore, onFindMenuItem]
   );
 
+  const handleSignIn = () => {
+    signIn();
+  };
+
   const renderMenuSections = (
     sections: IMenuSection[] = [],
     path: IMenuSection[] = [],
@@ -103,9 +121,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               setEditMenuItemModalOpen(true);
             }}
           >
-            <DraggableGroup>
+            <AdminDraggableGroup editable={admin}>
               {section.items.map((menuItem, menuItemIndex) => (
-                <Draggable
+                <AdminDraggable
                   containerClassName="h-full"
                   key={menuItem.name}
                   id={menuItem._id}
@@ -121,7 +139,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                     composition={menuItem.composition}
                     sides={menuItem.sides}
                     index={menuItemIndex}
-                    editable
+                    editable={admin}
                     useEffects
                     onEditClick={() => {
                       setEditMenuItemObject({ ...menuItem } as IMenuItem);
@@ -148,9 +166,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                       }
                     }}
                   />
-                </Draggable>
+                </AdminDraggable>
               ))}
-            </DraggableGroup>
+            </AdminDraggableGroup>
           </MenuSection>
         )}
         {renderMenuSections(
@@ -169,7 +187,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           editMenuItemModalOpen,
       })}
     >
-      <header className="bg-dark-500 text-light-high sticky top-0 z-10 shadow-lg">
+      <header className="bg-dark-500 text-light-high sticky top-0 shadow-lg z-20">
         <div className="flex flex-row items-center gap-4 px-6 py-4">
           <Image
             className="rounded-md"
@@ -197,10 +215,16 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             containerProps={{ className: "!w-full !min-w-0 max-w-xs" }}
             label="Pesquisar"
           ></Input>
-          <Button className="flex flex-row gap-2 items-center">
-            <RiUser3Fill />
-            Entrar
-          </Button>
+          {!session?.user && !loading && (
+            <Button
+              className="flex flex-row gap-2 items-center"
+              onClick={handleSignIn}
+            >
+              <RiUser3Fill />
+              Entrar
+            </Button>
+          )}
+          <UserIcon />
         </div>
       </header>
       <main>

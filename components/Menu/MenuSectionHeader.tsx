@@ -2,6 +2,8 @@ import { ComponentProps } from "react";
 import classNames from "classnames";
 
 import Button from "/components/Button";
+import { useSession } from "next-auth/react";
+import { IUser } from "/models/User";
 
 interface MenuSectionHeaderProps extends ComponentProps<"form"> {
   name: string;
@@ -17,6 +19,10 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   onAddClick,
   ...props
 }) => {
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const admin = (session?.user as IUser)?.role === "admin";
+
   return (
     <form
       className={classNames(
@@ -33,13 +39,15 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
             ({length} items)
           </span>
         </div>
-        <Button
-          className="ml-4 justify-self-end"
-          variant="text"
-          onClick={onAddClick}
-        >
-          Adicionar
-        </Button>
+        {admin && (
+          <Button
+            className="ml-4 justify-self-end"
+            variant="text"
+            onClick={onAddClick}
+          >
+            Adicionar
+          </Button>
+        )}
       </div>
     </form>
   );

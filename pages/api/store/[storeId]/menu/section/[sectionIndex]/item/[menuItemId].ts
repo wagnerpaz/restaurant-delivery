@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
 import axiosInstance from "/lib/axiosInstance";
 
 import connectToDatabase from "/lib/mongoose";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
+import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,39 +13,47 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
     const sectionIndex = req.query.sectionIndex as string;
     const menuItemId = req.query.menuItemId as string;
 
+    const session = await getServerSession(req, res, authOptions);
+
     const sectionIndexSplit = sectionIndex.split(",");
 
     await connectToDatabase();
 
-    if (req.method === "PUT") {
-      const serverMenuItem = await MenuItem.findByIdAndUpdate(
-        menuItemId,
-        req.body,
-        { new: true }
-      );
-      res.status(200).json(serverMenuItem.toObject());
-    } else if (req.method === "DELETE") {
-      await Store.updateOne(
-        { _id: storeId },
-        {
-          $pull: {
-            [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
-              menuItemId,
-          },
+    if (session) {
+      if (req.method === "PUT") {
+        const serverMenuItem = await MenuItem.findByIdAndUpdate(
+          menuItemId,
+          req.body,
+          { new: true }
+        );
+        res.status(200).json(serverMenuItem.toObject());
+      } else if (req.method === "DELETE") {
+        await Store.updateOne(
+          { _id: storeId },
+          {
+            $pull: {
+              [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
+                menuItemId,
+            },
+          }
+        );
+        await MenuItem.deleteOne({ _id: menuItemId });
+
+        const store = await Store.findById(storeId);
+        let section = store.menu;
+        for (const index of sectionIndexSplit) {
+          section = section.sections[index];
         }
-      );
-      await MenuItem.deleteOne({ _id: menuItemId });
+        const menuItems = section.items;
 
-      const store = await Store.findById(storeId);
-      let section = store.menu;
-      for (const index of sectionIndexSplit) {
-        section = section.sections[index];
+        res.status(200).json(menuItems);
+      } else {
+        res.status(405).json({ message: "Method not allowed" });
       }
-      const menuItems = section.items;
-
-      res.status(200).json(menuItems);
     } else {
-      res.status(405).json({ message: "Method not allowed" });
+      res.status(401).json({
+        error: "You must be signed in.",
+      });
     }
   } catch (err) {
     console.error(err);
