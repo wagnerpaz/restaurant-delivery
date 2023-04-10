@@ -15,7 +15,6 @@ import { IMenuItem } from "/models/MenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { IIngredient } from "/models/Ingredients";
 import { replaceAt, swap } from "/lib/immutable";
-import useGetStoreMenuSectionItems from "/hooks/useGetStoreMenuSectionItems";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import DraggableGroup from "./DraggableGroup";
 import Draggable from "./Draggable";
