@@ -2,7 +2,9 @@ import { ComponentProps } from "react";
 import classNames from "classnames";
 import Image from "next/image";
 
-interface DbImageProps extends ComponentProps<typeof Image> {}
+interface DbImageProps extends ComponentProps<typeof Image> {
+  id?: string;
+}
 
 const DbImage: React.FC<DbImageProps> = ({
   className,

@@ -11,7 +11,7 @@ import MenuSection from "/components/Menu/MenuSection";
 import MenuItem from "/components/Menu/MenuItem";
 import { ILocation, IMenuSection, IStore } from "/models/Store";
 import Modal from "/components/Modal";
-import EditMenuItem from "/forms/EditMenuItem";
+import EditMenuItemModal from "/forms/EditMenuItem";
 import { IMenuItem } from "/models/MenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { IIngredient } from "/models/Ingredients";
@@ -22,6 +22,7 @@ import Draggable from "./Draggable";
 import UserIcon from "./UserIcon";
 import { IUser } from "/models/User";
 import useSwapMenuItems from "/hooks/useSwapMenuItems";
+import isEqual from "lodash.isequal";
 
 interface StoreProps {
   store: IStore;
@@ -232,58 +233,50 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       <main>
         <Menu>{renderMenuSections(clientStore.menu.sections)}</Menu>
       </main>
-      <Modal
-        className="!z-40"
+      <EditMenuItemModal
         open={editMenuItemModalOpen}
-        onOpenChange={(newValue: boolean) => setEditMenuItemModalOpen(newValue)}
-      >
-        <EditMenuItem
-          store={clientStore}
-          ingredients={clientIngredients}
-          menuItem={editMenuItemObject}
-          onStoreChange={(newStore) => setClientStore(newStore)}
-          onIngredientsChange={(newIngredients) =>
-            setClientIngredients(newIngredients)
+        onOpenChange={(newValue) => setEditMenuItemModalOpen(newValue)}
+        store={clientStore}
+        ingredients={clientIngredients}
+        menuItem={editMenuItemObject}
+        onStoreChange={(newStore) => setClientStore(newStore)}
+        onIngredientsChange={(newIngredients) =>
+          setClientIngredients(newIngredients)
+        }
+        onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
+          if (cancelled) {
+            return;
           }
-          onMenuItemChange={async (newMenuItem?: IMenuItem) => {
-            if (!newMenuItem) {
-              setEditMenuItemObject({ ...emptyMenuItem });
-              setEditMenuItemIndex(-1);
-              setEditMenuItemSectionIndex([-1]);
-              setEditMenuItemModalOpen(false);
-              return;
-            }
 
-            const serverMenuItem = await putMenuItem(
-              store,
-              newMenuItem,
-              editMenuItemSectionIndex
-            );
+          const serverMenuItem = await putMenuItem(
+            store,
+            newMenuItem,
+            editMenuItemSectionIndex
+          );
 
-            const cloneStore = cloneDeep(clientStore);
-            const menu = cloneStore.menu;
+          const cloneStore = cloneDeep(clientStore);
+          const menu = cloneStore.menu;
 
-            let curSection = menu as IMenuSection;
-            for (const index of editMenuItemSectionIndex) {
-              curSection = curSection.sections[index];
-            }
-            curSection.items = replaceAt(
-              curSection.items,
-              editMenuItemIndex >= 0
-                ? editMenuItemIndex
-                : curSection.items.length,
-              serverMenuItem
-            );
+          let curSection = menu as IMenuSection;
+          for (const index of editMenuItemSectionIndex) {
+            curSection = curSection.sections[index];
+          }
+          curSection.items = replaceAt(
+            curSection.items,
+            editMenuItemIndex >= 0
+              ? editMenuItemIndex
+              : curSection.items.length,
+            serverMenuItem
+          );
 
-            setClientStore(cloneStore);
+          setClientStore(cloneStore);
 
-            setEditMenuItemObject({ ...emptyMenuItem });
-            setEditMenuItemIndex(-1);
-            setEditMenuItemSectionIndex([-1]);
-            setEditMenuItemModalOpen(false);
-          }}
-        />
-      </Modal>
+          setEditMenuItemObject({ ...emptyMenuItem });
+          setEditMenuItemIndex(-1);
+          setEditMenuItemSectionIndex([-1]);
+          setEditMenuItemModalOpen(false);
+        }}
+      />
     </div>
   );
 };
