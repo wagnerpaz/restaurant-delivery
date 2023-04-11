@@ -58,8 +58,6 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     serializeJson(o.toObject())
   );
 
-  console.log(storeObject.menu.sections[0].items[0].composition);
-
   // merge props and pass down to the next function
   return {
     props: {

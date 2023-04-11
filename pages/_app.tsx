@@ -48,6 +48,18 @@ export default function App({
               },
             },
           },
+          textarea: {
+            styles: {
+              base: {
+                label: {
+                  key: "!text-light-medium",
+                },
+                textarea: {
+                  key: "text-light-high !bg-dark-200",
+                },
+              },
+            },
+          },
           button: {
             styles: {
               base: {

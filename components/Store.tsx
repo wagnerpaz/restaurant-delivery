@@ -21,6 +21,7 @@ import DraggableGroup from "./DraggableGroup";
 import Draggable from "./Draggable";
 import UserIcon from "./UserIcon";
 import { IUser } from "/models/User";
+import useSwapMenuItems from "/hooks/useSwapMenuItems";
 
 interface StoreProps {
   store: IStore;
@@ -62,6 +63,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
+  const swapMenuItems = useSwapMenuItems();
 
   const onFindMenuItem = useCallback(
     (sectionIndex: number[]) => (id: string) => {
@@ -81,18 +83,19 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   );
 
   const onDropMenuItem = useCallback(
-    (sectionIndex: number[]) => (id: string, atIndex: number) => {
-      const { index } = onFindMenuItem(sectionIndex)(id);
+    (sectionIndex: number[]) => async (id: string, atIndex: number) => {
+      const { index, menuItem } = onFindMenuItem(sectionIndex)(id);
       const cloneStore = cloneDeep(clientStore);
       let section = cloneStore.menu as IMenuSection;
       for (const index of sectionIndex) {
         section = section.sections[index];
       }
 
+      swapMenuItems(clientStore, sectionIndex, [menuItem._id, atIndex]);
       section.items = swap(section.items, index, atIndex);
       setClientStore(cloneStore);
     },
-    [clientStore, onFindMenuItem]
+    [clientStore, onFindMenuItem, swapMenuItems]
   );
 
   const handleSignIn = () => {
@@ -106,9 +109,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   ) => {
     return sections.map((section, sectionIndex) => (
       <>
-        {section.items?.length > 0 && (
+        {(admin ? true : section.items?.length > 0) && (
           <MenuSection
-            className="mb-4"
             key={section.name}
             name={[path.map((p) => p.name).join(" | "), section.name]
               .filter((f) => f)
@@ -125,7 +127,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               {section.items.map((menuItem, menuItemIndex) => (
                 <AdminDraggable
                   containerClassName="h-full"
-                  key={menuItem.name}
+                  key={menuItem._id}
                   id={menuItem._id}
                   originalIndex={menuItemIndex}
                   onFind={onFindMenuItem([...indexPath, sectionIndex])}
@@ -245,6 +247,10 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           }
           onMenuItemChange={async (newMenuItem?: IMenuItem) => {
             if (!newMenuItem) {
+              setEditMenuItemObject({ ...emptyMenuItem });
+              setEditMenuItemIndex(-1);
+              setEditMenuItemSectionIndex([-1]);
+              setEditMenuItemModalOpen(false);
               return;
             }
 

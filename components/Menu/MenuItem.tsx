@@ -4,8 +4,6 @@ import { FaShoppingCart } from "react-icons/fa";
 
 import { IMenuItemCompositionItem, ISidesItem } from "/models/MenuItem";
 import Button from "/components/Button";
-import Image from "next/image";
-import ImageEditorModal from "../../modals/ImageEditorModal";
 import EditableSection from "../EditableSection";
 import DbImage from "../DbImage";
 
@@ -62,7 +60,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
       <div className="relative">
         <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
           <span className="font-bold text-[#036704]">
-            R${(Math.round(price * 100) / 100).toFixed(2).replace(".", ",")}
+            R$
+            {(Math.round((price || 0) * 100) / 100)
+              .toFixed(2)
+              .replace(".", ",")}
           </span>
         </div>
         <EditableSection
