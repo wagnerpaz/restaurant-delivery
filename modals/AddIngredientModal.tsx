@@ -13,23 +13,23 @@ import useGetIngredients from "/hooks/useGetIngredients";
 import useGetStoreIngredients from "/hooks/useGetStoreIngredients";
 
 interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
-  store: IStore;
   ingredients: IIngredient[];
+  initialSelection: IIngredient[];
   onIngredientsChange?: (ingredients: IIngredient[]) => void;
-  onStoreIngredientsChange: (ingredients: IIngredient[]) => void;
+  onSelectionChange?: (ingredientsSel: IIngredientSelection[]) => void;
 }
 
-interface IIngredientSelection {
+export interface IIngredientSelection {
   ingredient: IIngredient;
   selected: boolean;
 }
 
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
-  store,
+  initialSelection,
   ingredients,
   onOpenChange,
   onIngredientsChange = () => {},
-  onStoreIngredientsChange = () => {},
+  onSelectionChange = () => {},
   ...props
 }) => {
   const [filter, setFilter] = useState("");
@@ -41,19 +41,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
   const getIngredients = useGetIngredients();
   const putIngredient = usePutIngredient();
-  const getStoreIngredients = useGetStoreIngredients();
-  const putStoreIngredients = usePutStoreIngredients();
-
-  useEffect(() => {
-    setIngredientsSel((ingredientsSel) =>
-      ingredients.map((i) => ({
-        ingredient: i,
-        selected:
-          ingredientsSel.find((is) => is.ingredient._id === i._id)?.selected ||
-          store.ingredients.map((i) => i._id).includes(i._id),
-      }))
-    );
-  }, [ingredients, store.ingredients]);
 
   const sorted = useMemo(
     () =>
@@ -72,6 +59,17 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       ),
     [sorted, filter]
   );
+
+  useEffect(() => {
+    const newIngredientsSel = ingredients.map((ingredient) => ({
+      ingredient,
+      selected: initialSelection
+        .map((is) => is?._id)
+        .filter((f) => f)
+        .includes(ingredient._id),
+    }));
+    setIngredientsSel(newIngredientsSel);
+  }, [initialSelection, ingredients]);
 
   const handleAdd = () => {
     const confirmation =
@@ -95,13 +93,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
   const handleSave = async () => {
     await putIngredient(additions.map((a) => a.ingredient));
-    await putStoreIngredients(
-      store,
-      ingredientsSel.filter((is) => is.selected).map((is) => is.ingredient._id)
-    );
-
     onIngredientsChange(await getIngredients());
-    onStoreIngredientsChange(await getStoreIngredients(store));
+    onSelectionChange(ingredientsSel);
 
     setAdditions([]);
     onOpenChange(false);

@@ -18,8 +18,10 @@ import { IIngredient } from "/models/Ingredients";
 import MenuItem from "/components/Menu/MenuItem";
 import mongoose from "mongoose";
 import ImageEditorModal from "/modals/ImageEditorModal";
-import AddIngredientModal from "/modals/AddIngredientModal";
-import { insertAt, swap } from "/lib/immutable";
+import AddIngredientModal, {
+  IIngredientSelection,
+} from "/modals/AddIngredientModal";
+import { insertAt, replaceAt, swap } from "/lib/immutable";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import Modal from "/components/Modal";
@@ -115,13 +117,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       onOpenChange(false);
     }
 
-    function revertTransient(menuItem: IMenuItem) {
-      ({ ...menuItem }.composition.map((ci) => delete ci.id));
-      return menuItem;
-    }
-
-    console.log(menuItem, revertTransient(edit), isEqual(menuItem, edit));
-
     if (!isEqual(menuItem, edit)) {
       const confirmed = confirm("Você tem alterações não salvas. Deseja sair?");
       if (confirmed) {
@@ -130,6 +125,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     } else {
       cancel();
     }
+  };
+
+  const handleFillIngredients = () => {
+    setAddIngredientModalOpen(true);
   };
 
   return (
@@ -211,6 +210,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           </div>
         </div>
         <Fieldset className="flex flex-col gap-2" title="Composição">
+          <Button onClick={handleFillIngredients}>
+            Gerenciar Ingredientes
+          </Button>
           <DraggableGroup className="flex flex-col gap-2">
             {edit.composition?.map((compositionItem, compositionItemIndex) => (
               <Draggable
@@ -226,22 +228,42 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   <Select
                     className="flex-1"
                     label="Ingrediente"
-                    value={compositionItem.ingredient?.name}
-                    onChange={handleModifyCompositionProp(
-                      compositionItem,
-                      compositionItemIndex,
-                      "ingredient",
-                      (value) =>
-                        store.ingredients.find(
-                          (ing) => ing.name === value
-                        ) as IIngredient
-                    )}
+                    value={compositionItem.ingredient?._id}
+                    onChange={(value) => {
+                      setEdit({
+                        ...edit,
+                        composition: replaceAt(
+                          edit.composition,
+                          compositionItemIndex,
+                          {
+                            ...edit.composition[compositionItemIndex],
+                            ingredient: ingredients.find(
+                              (f) => f._id === value
+                            ),
+                          }
+                        ),
+                      });
+                    }}
                   >
-                    {store.ingredients.map((ingredient) => (
-                      <Option key={ingredient.name} value={ingredient.name}>
-                        {ingredient.name}
-                      </Option>
-                    ))}
+                    {...ingredients
+                      .filter((f) => f?.name)
+                      .sort((a, b) => (a.name > b.name ? 1 : -1))
+                      .map((ingredient) => (
+                        <Option
+                          key={ingredient._id}
+                          value={ingredient._id}
+                          className={classNames({
+                            hidden:
+                              edit.composition
+                                .map((c) => c.ingredient?._id)
+                                .includes(ingredient._id) ||
+                              ingredient._id ===
+                                compositionItem?.ingredient?._id,
+                          })}
+                        >
+                          {ingredient.name}
+                        </Option>
+                      ))}
                   </Select>
                 </div>
                 <div className="w-full lg:w-auto flex-1 min-w-48">
@@ -324,15 +346,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               </Draggable>
             ))}
           </DraggableGroup>
-          <span className="text-sm">
-            Procurou o ingrediente acima e não achou? Registre{" "}
-            <span
-              className="text-dark-500 font-bold cursor-pointer"
-              onClick={() => setAddIngredientModalOpen(true)}
-            >
-              aqui
-            </span>
-          </span>
         </Fieldset>
         <div className="flex flex-row gap-2">
           <Button onClick={handleCancel}>Cancel</Button>
@@ -371,16 +384,47 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           }}
         />
         <AddIngredientModal
-          store={store}
           ingredients={ingredients}
+          initialSelection={edit.composition.map((ci) => ci.ingredient)}
           open={addIngredientModalOpen}
           onOpenChange={(newValue) => setAddIngredientModalOpen(newValue)}
           portalTarget={() =>
             document.querySelector("#edit-menu-item-form") as HTMLElement
           }
           onIngredientsChange={onIngredientsChange}
-          onStoreIngredientsChange={(ingredients) => {
-            onStoreChange({ ...store, ingredients } as IStore);
+          onSelectionChange={(ingredientsSelection: IIngredientSelection[]) => {
+            const newComposition: IMenuItemCompositionItem[] = [];
+            const selected = ingredientsSelection.filter((f) => f.selected);
+
+            edit.composition.forEach((ci) => {
+              const found = selected.find(
+                (f) => f.ingredient._id === ci.ingredient?._id
+              )?.ingredient;
+              if (found) {
+                newComposition.push(ci);
+              }
+            });
+            selected
+              .filter(
+                (f) =>
+                  !newComposition
+                    .map((m) => m.ingredient._id)
+                    .includes(f.ingredient._id)
+              )
+              .forEach((is) => {
+                newComposition.push({
+                  ...emptyCompositionItem,
+                  ingredient: is.ingredient,
+                });
+              });
+
+            setEdit({
+              ...edit,
+              composition: newComposition.map((m, index) => ({
+                ...m,
+                id: index,
+              })),
+            });
           }}
         />
       </form>

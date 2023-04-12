@@ -33,9 +33,10 @@ interface StoreProps {
 
 const emptyMenuItem: IMenuItem = {
   name: "",
+  price: 0,
   details: {},
   images: {},
-  composition: [{ ingredient: undefined, quantity: 1, essential: false }],
+  composition: [],
 };
 
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
