@@ -1,4 +1,10 @@
-import { ComponentProps, useCallback, useEffect, useState } from "react";
+import {
+  ComponentProps,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import classNames from "classnames";
 import { IoMdCloseCircle } from "react-icons/io";
 import { IoIosAddCircle } from "react-icons/io";
@@ -57,6 +63,11 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
+
+  const addIngredientsInitialSelection = useMemo(
+    () => edit.composition.map((ci) => ci.ingredient),
+    [edit]
+  );
 
   useEffect(() => {
     const compositionIndexed = menuItem.composition?.map((c, index) => ({
@@ -117,7 +128,17 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       onOpenChange(false);
     }
 
-    if (!isEqual(menuItem, edit)) {
+    function clearTransient(menuItem: IMenuItem) {
+      menuItem.composition = menuItem.composition.map((ci) => {
+        delete ci.id;
+        return ci;
+      });
+      return menuItem;
+    }
+
+    const toCheck = clearTransient({ ...edit });
+
+    if (!isEqual(menuItem, toCheck)) {
       const confirmed = confirm("Você tem alterações não salvas. Deseja sair?");
       if (confirmed) {
         cancel();
@@ -134,6 +155,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   return (
     <Modal
       className="!z-40"
+      contentClassName="container"
       open={open}
       onOpenChange={(newValue) => {
         if (!newValue) {
@@ -210,7 +232,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           </div>
         </div>
         <Fieldset className="flex flex-col gap-2" title="Composição">
-          <Button onClick={handleFillIngredients}>
+          <Button className="mb-2" onClick={handleFillIngredients}>
             Gerenciar Ingredientes
           </Button>
           <DraggableGroup className="flex flex-col gap-2">
@@ -385,8 +407,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         />
         <AddIngredientModal
           contentClassName="h-full"
+          store={store}
           ingredients={ingredients}
-          initialSelection={edit.composition.map((ci) => ci.ingredient)}
+          initialSelection={addIngredientsInitialSelection}
           open={addIngredientModalOpen}
           onOpenChange={(newValue) => setAddIngredientModalOpen(newValue)}
           portalTarget={() =>

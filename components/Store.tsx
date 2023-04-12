@@ -241,9 +241,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         ingredients={clientIngredients}
         menuItem={editMenuItemObject}
         onStoreChange={(newStore) => setClientStore(newStore)}
-        onIngredientsChange={(newIngredients) =>
-          setClientIngredients(newIngredients)
-        }
+        onIngredientsChange={(newIngredients) => {
+          setClientIngredients(newIngredients);
+        }}
         onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
           if (cancelled) {
             return;

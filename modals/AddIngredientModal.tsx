@@ -7,7 +7,7 @@ import usePutIngredient from "/hooks/usePutIngredient";
 import removeDiacritics from "/lib/removeDiacritics";
 import toPascalCase from "/lib/toPascalCase";
 import { IIngredient } from "/models/Ingredients";
-import { IStore } from "/models/Store";
+import { IMenuSection, IStore } from "/models/Store";
 import usePutStoreIngredients from "/hooks/usePutStoreIngredients";
 import useGetIngredients from "/hooks/useGetIngredients";
 import useGetStoreIngredients from "/hooks/useGetStoreIngredients";
@@ -16,6 +16,7 @@ import classNames from "classnames";
 import isEqual from "lodash.isequal";
 
 interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
+  store: IStore;
   ingredients: IIngredient[];
   initialSelection: IIngredient[];
   onIngredientsChange?: (ingredients: IIngredient[]) => void;
@@ -28,6 +29,7 @@ export interface IIngredientSelection {
 }
 
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
+  store,
   initialSelection,
   ingredients,
   contentClassName,
@@ -42,6 +44,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   );
   const [additions, setAdditions] = useState<IIngredientSelection[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showMoreIngredients, setShowMoreIngredients] = useState(false);
 
   const getIngredients = useGetIngredients();
   const putIngredient = usePutIngredient();
@@ -63,6 +66,24 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       ),
     [sorted, filter]
   );
+
+  const storeIngredients = useMemo(() => {
+    const ingredients: IIngredient[] = [];
+    function traverseSections(sections: IMenuSection[]) {
+      for (const section of sections) {
+        for (const item of section.items) {
+          ingredients.push(...item.composition.map((c) => c.ingredient));
+        }
+        if (section.sections) {
+          traverseSections(section.sections);
+        }
+      }
+    }
+    traverseSections(store.menu.sections);
+
+    //@ts-ignore
+    return [...new Set(ingredients)];
+  }, [store]);
 
   useEffect(() => {
     const newIngredientsSel = ingredients.map((ingredient) => ({
@@ -134,7 +155,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     <Modal
       {...props}
       contentClassName={classNames(
-        "!overflow-visible flex flex-col",
+        "!overflow-visible flex flex-col container",
         contentClassName
       )}
       onOpenChange={handleOpenChange}
@@ -155,76 +176,130 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           Adicionar
         </Button>
       </div>
-      <div className="flex flex-col gap-4 h-[calc(100%-95px)]">
-        <Fieldset
-          title="Disponíveis"
-          className="flex-1 overflow-y-auto overflow-x-hidden"
-        >
-          <ul className="h-full">
-            {filtered
-              .filter((f) => !f.selected)
-              .map((sel) => (
-                <li
-                  className="flex flex-row items-center text-light-high"
-                  key={sel.ingredient._id}
-                >
-                  <Checkbox
-                    checked={sel.selected}
-                    onChange={(e) =>
-                      setIngredientsSel((ingredientsSel) => {
-                        return [
-                          ...ingredientsSel.filter(
-                            (f) => f.ingredient._id !== sel.ingredient._id
-                          ),
-                          {
-                            ingredient: sel.ingredient,
-                            selected: e.target.checked,
-                          },
-                        ];
-                      })
-                    }
-                  />
-                  <span className="whitespace-nowrap">
-                    {sel.ingredient.name}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </Fieldset>
+      <div className="h-[calc(100%-95px)] flex flex-col sm:flex-row gap-2">
+        <div className="flex-1 contents sm:flex flex-col gap-2">
+          <Fieldset
+            title="Usados na sua loja"
+            className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
+          >
+            <ul className="">
+              {filtered
+                .filter((f) => !f.selected)
+                .filter((f) =>
+                  storeIngredients.map((m) => m._id).includes(f.ingredient._id)
+                )
+                .map((sel) => (
+                  <li
+                    className="flex flex-row items-center text-light-high"
+                    key={sel.ingredient._id}
+                  >
+                    <Checkbox
+                      checked={sel.selected}
+                      onChange={(e) =>
+                        setIngredientsSel((ingredientsSel) => {
+                          return [
+                            ...ingredientsSel.filter(
+                              (f) => f.ingredient._id !== sel.ingredient._id
+                            ),
+                            {
+                              ingredient: sel.ingredient,
+                              selected: e.target.checked,
+                            },
+                          ];
+                        })
+                      }
+                    />
+                    <span className="whitespace-nowrap">
+                      {sel.ingredient.name}
+                    </span>
+                  </li>
+                ))}
+            </ul>
+          </Fieldset>
+          <Fieldset
+            title="Nunca usados"
+            className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
+          >
+            <ul className="">
+              {filtered
+                .filter((f) => !f.selected)
+                .filter(
+                  (f) =>
+                    !storeIngredients
+                      .map((m) => m._id)
+                      .includes(f.ingredient._id)
+                )
+                .map((sel) => (
+                  <li
+                    className="flex flex-row items-center text-light-high"
+                    key={sel.ingredient._id}
+                  >
+                    <Checkbox
+                      checked={sel.selected}
+                      onChange={(e) =>
+                        setIngredientsSel((ingredientsSel) => {
+                          return [
+                            ...ingredientsSel.filter(
+                              (f) => f.ingredient._id !== sel.ingredient._id
+                            ),
+                            {
+                              ingredient: sel.ingredient,
+                              selected: e.target.checked,
+                            },
+                          ];
+                        })
+                      }
+                    />
+                    <span className="whitespace-nowrap">
+                      {sel.ingredient.name}
+                    </span>
+                  </li>
+                ))}
+            </ul>
+          </Fieldset>
+        </div>
+
         <Fieldset
           title="Selecionados"
-          className="flex-1 overflow-y-auto overflow-x-hidden"
+          className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
-          <ul>
-            {ingredientsSel
-              .filter((f) => f.selected)
-              .map((sel) => (
-                <li
-                  className="flex flex-row items-center text-light-high"
-                  key={sel.ingredient._id}
-                >
-                  <Checkbox
-                    checked={sel.selected}
-                    onChange={(e) =>
-                      setIngredientsSel((ingredientsSel) => {
-                        return [
-                          ...ingredientsSel.filter(
-                            (f) => f.ingredient._id !== sel.ingredient._id
-                          ),
-                          {
-                            ingredient: sel.ingredient,
-                            selected: e.target.checked,
-                          },
-                        ];
-                      })
-                    }
-                  />
-                  <span className="whitespace-nowrap">
-                    {sel.ingredient.name}
-                  </span>
-                </li>
-              ))}
-          </ul>
+          {ingredientsSel.filter((f) => f.selected).length > 0 && (
+            <ul>
+              {ingredientsSel
+                .filter((f) => f.selected)
+                .map((sel) => (
+                  <li
+                    className="flex flex-row items-center text-light-high"
+                    key={sel.ingredient._id}
+                  >
+                    <Checkbox
+                      checked={sel.selected}
+                      onChange={(e) =>
+                        setIngredientsSel((ingredientsSel) => {
+                          return [
+                            ...ingredientsSel.filter(
+                              (f) => f.ingredient._id !== sel.ingredient._id
+                            ),
+                            {
+                              ingredient: sel.ingredient,
+                              selected: e.target.checked,
+                            },
+                          ];
+                        })
+                      }
+                    />
+                    <span className="whitespace-nowrap">
+                      {sel.ingredient.name}
+                    </span>
+                  </li>
+                ))}
+            </ul>
+          )}
+          {ingredientsSel.filter((f) => f.selected).length === 0 && (
+            <div className="w-full h-full flex items-center justify-center">
+              Selecine alguns ingredientes para compor seu prato
+            </div>
+          )}
         </Fieldset>
       </div>
       <div className="flex flex-row gap-2 mt-2">

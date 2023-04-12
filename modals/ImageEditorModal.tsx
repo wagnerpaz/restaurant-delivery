@@ -128,11 +128,11 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
                 image.src = uploadedImage as string;
                 image.onload = () => {
                   //RESIZE TO MAX WIDTH 500
-                  // canvas.width = 500;
-                  // canvas.height =
-                  //   (image.naturalHeight / image.naturalWidth) * 500;
-                  canvas.width = image.naturalWidth;
-                  canvas.height = image.naturalHeight;
+                  canvas.width = 500;
+                  canvas.height =
+                    (image.naturalHeight / image.naturalWidth) * 500;
+                  // canvas.width = image.naturalWidth;
+                  // canvas.height = image.naturalHeight;
                   context2d?.drawImage(
                     image,
                     0,

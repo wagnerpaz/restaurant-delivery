@@ -6,4 +6,8 @@
   .react-crop .ReactCrop__child-wrapper {
     @apply h-full w-full min-w-0 min-h-0;
   }
+
+  .custom-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-dark-400 scrollbar-track-dark-200 scrollbar-track-rounded-md scrollbar-thumb-rounded-md;
+  }
 }
