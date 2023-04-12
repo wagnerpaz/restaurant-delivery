@@ -11,6 +11,9 @@ import { IStore } from "/models/Store";
 import usePutStoreIngredients from "/hooks/usePutStoreIngredients";
 import useGetIngredients from "/hooks/useGetIngredients";
 import useGetStoreIngredients from "/hooks/useGetStoreIngredients";
+import Fieldset from "/components/Fieldset";
+import classNames from "classnames";
+import isEqual from "lodash.isequal";
 
 interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
   ingredients: IIngredient[];
@@ -27,6 +30,7 @@ export interface IIngredientSelection {
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   initialSelection,
   ingredients,
+  contentClassName,
   onOpenChange,
   onIngredientsChange = () => {},
   onSelectionChange = () => {},
@@ -100,15 +104,44 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     onOpenChange(false);
   };
 
+  const handleOpenChange = (newValue: boolean) => {
+    if (!newValue) {
+      if (
+        !isEqual(
+          initialSelection,
+          ingredientsSel.filter((is) => is.selected).map((is) => is.ingredient)
+        )
+      ) {
+        console.log(
+          initialSelection,
+          ingredientsSel.filter((is) => is.selected).map((is) => is.ingredient)
+        );
+        const confirmed = confirm(
+          "Você tem alterações não salvas. Deseja sair?"
+        );
+        if (confirmed) {
+          onOpenChange(false);
+        }
+      } else {
+        onOpenChange(false);
+      }
+    } else {
+      onOpenChange(true);
+    }
+  };
+
   return (
     <Modal
       {...props}
-      contentClassName="!overflow-visible flex flex-col"
-      onOpenChange={onOpenChange}
+      contentClassName={classNames(
+        "!overflow-visible flex flex-col",
+        contentClassName
+      )}
+      onOpenChange={handleOpenChange}
     >
-      <div className="flex flex-row gap-2 mb-2">
+      <div className="flex flex-row gap-2 mb-2 w-full">
         <Input
-          containerProps={{ className: "!w-full !min-w-0 max-w-xs" }}
+          containerProps={{ className: "!flex-1 !min-w-0" }}
           label="Ingrediente"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -122,31 +155,80 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           Adicionar
         </Button>
       </div>
-      <ul className="overflow-auto">
-        {filtered.map((sel) => (
-          <li
-            className="flex flex-row items-center text-light-high"
-            key={sel.ingredient._id}
-          >
-            <Checkbox
-              checked={sel.selected}
-              onChange={(e) =>
-                setIngredientsSel((ingredientsSel) => {
-                  return [
-                    ...ingredientsSel.filter(
-                      (f) => f.ingredient._id !== sel.ingredient._id
-                    ),
-                    { ingredient: sel.ingredient, selected: e.target.checked },
-                  ];
-                })
-              }
-            />
-            {sel.ingredient.name}
-          </li>
-        ))}
-      </ul>
+      <div className="flex flex-col gap-4 h-[calc(100%-95px)]">
+        <Fieldset
+          title="Disponíveis"
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+        >
+          <ul className="h-full">
+            {filtered
+              .filter((f) => !f.selected)
+              .map((sel) => (
+                <li
+                  className="flex flex-row items-center text-light-high"
+                  key={sel.ingredient._id}
+                >
+                  <Checkbox
+                    checked={sel.selected}
+                    onChange={(e) =>
+                      setIngredientsSel((ingredientsSel) => {
+                        return [
+                          ...ingredientsSel.filter(
+                            (f) => f.ingredient._id !== sel.ingredient._id
+                          ),
+                          {
+                            ingredient: sel.ingredient,
+                            selected: e.target.checked,
+                          },
+                        ];
+                      })
+                    }
+                  />
+                  <span className="whitespace-nowrap">
+                    {sel.ingredient.name}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </Fieldset>
+        <Fieldset
+          title="Selecionados"
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+        >
+          <ul>
+            {ingredientsSel
+              .filter((f) => f.selected)
+              .map((sel) => (
+                <li
+                  className="flex flex-row items-center text-light-high"
+                  key={sel.ingredient._id}
+                >
+                  <Checkbox
+                    checked={sel.selected}
+                    onChange={(e) =>
+                      setIngredientsSel((ingredientsSel) => {
+                        return [
+                          ...ingredientsSel.filter(
+                            (f) => f.ingredient._id !== sel.ingredient._id
+                          ),
+                          {
+                            ingredient: sel.ingredient,
+                            selected: e.target.checked,
+                          },
+                        ];
+                      })
+                    }
+                  />
+                  <span className="whitespace-nowrap">
+                    {sel.ingredient.name}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </Fieldset>
+      </div>
       <div className="flex flex-row gap-2 mt-2">
-        <Button onClick={() => onOpenChange(false)}>Cancel</Button>
+        <Button onClick={() => handleOpenChange(false)}>Cancel</Button>
         <Button className="flex-1" onClick={handleSave}>
           Salvar
         </Button>

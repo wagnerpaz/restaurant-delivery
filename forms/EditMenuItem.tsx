@@ -384,6 +384,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           }}
         />
         <AddIngredientModal
+          contentClassName="h-full"
           ingredients={ingredients}
           initialSelection={edit.composition.map((ci) => ci.ingredient)}
           open={addIngredientModalOpen}

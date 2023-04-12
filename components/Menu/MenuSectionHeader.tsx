@@ -26,7 +26,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   return (
     <form
       className={classNames(
-        "flex flex-row items-center px-4 h-12 sticky top-[82px] bg-dark-300 text-light-high z-10",
+        "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[82px] bg-dark-300 text-light-high z-10",
         { "mb-2 sm:mb-6": length > 0 },
         className
       )}

@@ -200,7 +200,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             width={50}
             height={50}
           />
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden hidden sm:block">
             <h1 className="hidden md:block font-bold text-xl">
               {clientStore.name}
             </h1>
@@ -216,7 +216,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           </div>
           <Input
             id="search"
-            containerProps={{ className: "!w-full !min-w-0 max-w-xs" }}
+            containerProps={{ className: "!w-full !min-w-0 max-w-xs " }}
             label="Pesquisar"
           ></Input>
           {!session?.user && !loading && (

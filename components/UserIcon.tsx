@@ -20,7 +20,7 @@ const UserIcon = () => {
   return (
     <>
       {session?.user && (
-        <div className="relative w-[40px] h-[40px]">
+        <>
           <Image
             alt="user image"
             src={session.user.image}
@@ -32,7 +32,7 @@ const UserIcon = () => {
           {menuOpened && (
             <div
               ref={container}
-              className="absolute right-0 bg-dark-100 p-2 px-4 rounded-md shadow-lg z-50 mt-2"
+              className="absolute top-0 right-0 bg-dark-100 p-2 px-4 rounded-md shadow-lg z-50 m-4"
             >
               <small className="block">Autenticado como</small>
               <strong>{session.user.email ?? session.user.name}</strong>
@@ -48,7 +48,7 @@ const UserIcon = () => {
               </Button>
             </div>
           )}
-        </div>
+        </>
       )}
     </>
   );

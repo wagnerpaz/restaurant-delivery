@@ -25,7 +25,10 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
           menuItemId,
           req.body,
           { new: true }
-        );
+        )
+          .populate("composition.ingredient")
+          .exec();
+        console.log(serverMenuItem);
         res.status(200).json(serverMenuItem.toObject());
       } else if (req.method === "DELETE") {
         await Store.updateOne(
