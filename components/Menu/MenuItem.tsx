@@ -6,6 +6,8 @@ import { IMenuItemCompositionItem, ISidesItem } from "/models/MenuItem";
 import Button from "/components/Button";
 import EditableSection from "../EditableSection";
 import DbImage from "../DbImage";
+import { useSession } from "next-auth/react";
+import { IUser } from "/models/User";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
@@ -14,6 +16,7 @@ interface MenuItemProps extends ComponentProps<"div"> {
   index: number;
   mainImageId?: string;
   price: number;
+  hidden?: boolean;
   descriptionShort?: string;
   descriptionLong?: string;
   composition?: IMenuItemCompositionItem[];
@@ -37,6 +40,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   index,
   mainImageId,
   price,
+  hidden,
   descriptionShort,
   composition,
   sides,
@@ -50,19 +54,24 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onMainImageChange = () => {},
   ...props
 }) => {
-  return (
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const admin = (session?.user as IUser)?.role === "admin";
+
+  return !admin && hidden ? null : (
     <div
       className={classNames(
-        "flex flex-row sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
+        "sm:flex sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
         {
           "sm:hover:scale-[110%] transition-all": useEffects,
+          "opacity-50": hidden,
         },
         className
       )}
       {...props}
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative float-left sm:float-none">
         <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
           <span className="font-bold text-[#036704]">
             R$
@@ -79,7 +88,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <DbImage
-            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200 rounded-xl"
+            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200 rounded-xl mr-2"
             id={mainImageId}
             width={99999}
             height={99999}
@@ -87,44 +96,60 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         </EditableSection>
       </div>
-      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
-        <div className="flex flex-row justify-between items-center min-h-[36px] flex-wrap">
-          <h3 className="text-md font-bold mr-12 sm:mr-0">{name}</h3>
-          <span className="text-md font-bold mr-12 sm:mr-0 opacity-60 mb-1">
-            {nameDetail}
-          </span>
+      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 sm:flex sm:flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
+        <div className="flex flex-col justify-center flex-wrap min-h-[36px]">
+          <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
+            {name}
+          </h3>
+          {nameDetail && (
+            <span className="text-md font-bold mr-12 sm:mr-0 opacity-60 mb-1">
+              {nameDetail}
+            </span>
+          )}
         </div>
 
         <div className="relative flex-1 pb-2">
-          <span className="block text-xs leading-tight">
-            {descriptionShort}
-          </span>
-          <ul className="text-xs pt-2 opacity-60">
-            {composition
-              ?.map((compositionItem) =>
-                compositionItem.ingredient ? (
-                  <li className="inline" key={compositionItem.ingredient.name}>
-                    {compositionItem.quantity && compositionItem.quantity !== 1
-                      ? `${compositionItem.quantity}x `
-                      : ""}
-                    {compositionItem.ingredient.name}
-                  </li>
-                ) : null
-              )
-              .flatMap((item) => [item, ", "])
-              .slice(0, -1)}
-          </ul>
-          {sides?.length ? (
-            <ul className="text-sm mt-1">
-              <span>Acompanha: </span>
-              {sides
-                ?.map((side) => (
-                  <li className="inline" key={side.menuItem.name}>
-                    {side.menuItem.name}
-                  </li>
-                ))
+          {descriptionShort && (
+            <span className="block text-xs leading-tight">
+              {descriptionShort}
+            </span>
+          )}
+          {(composition?.length || 0) > 0 && (
+            <ul className="text-xs pt-1 opacity-60">
+              {composition
+                ?.map((compositionItem) =>
+                  compositionItem.ingredient ? (
+                    <li
+                      className="inline"
+                      key={compositionItem.ingredient.name}
+                    >
+                      {compositionItem.quantity &&
+                      compositionItem.quantity !== 1
+                        ? `${compositionItem.quantity}x `
+                        : ""}
+                      {compositionItem.ingredient.name}
+                    </li>
+                  ) : null
+                )
                 .flatMap((item) => [item, ", "])
                 .slice(0, -1)}
+            </ul>
+          )}
+          {sides?.length ? (
+            <ul className="flex flex-col text-xs mt-1">
+              {sides?.map((side) => (
+                <li className="block" key={side.menuItem.name}>
+                  {side.quantity && side.quantity !== 1 ? (
+                    <span className="font-bold">{`${side.quantity}x `}</span>
+                  ) : (
+                    ""
+                  )}
+                  {side.menuItem.name}
+                </li>
+                // ))
+                // .flatMap((item) => [item, ", "])
+                // .slice(0, -1)}
+              ))}
             </ul>
           ) : null}
         </div>

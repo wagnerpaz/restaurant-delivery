@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   ComponentProps,
   useCallback,
@@ -6,14 +7,17 @@ import {
   useState,
 } from "react";
 import classNames from "classnames";
-import { IoMdCloseCircle } from "react-icons/io";
-import { IoIosAddCircle } from "react-icons/io";
 import {
   Option,
   Select,
   Input,
   Button,
   Textarea,
+  Tabs,
+  TabsHeader,
+  TabsBody,
+  Tab,
+  TabPanel,
 } from "@material-tailwind/react";
 import isEqual from "lodash.isequal";
 
@@ -22,15 +26,15 @@ import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/Store";
 import { IIngredient } from "/models/Ingredients";
 import MenuItem from "/components/Menu/MenuItem";
-import mongoose from "mongoose";
 import ImageEditorModal from "/modals/ImageEditorModal";
 import AddIngredientModal, {
   IIngredientSelection,
 } from "/modals/AddIngredientModal";
-import { insertAt, replaceAt, swap } from "/lib/immutable";
-import Draggable from "/components/Draggable";
-import DraggableGroup from "/components/DraggableGroup";
 import Modal from "/components/Modal";
+import EditMenuItemCompositionForm, {
+  emptyCompositionItem,
+} from "/forms/EditMenuItemCompositionForm";
+import EditMenuItemSidesForm, { emptySidesItem } from "./EditMenuItemSidesForm";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -41,10 +45,9 @@ interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   onIngredientsChange: (newValue: IIngredient[]) => void;
 }
 
-const emptyCompositionItem: IMenuItemCompositionItem = {
-  ingredient: { name: "" },
-  quantity: 1,
-  essential: false,
+const TABS = {
+  COMPOSITION: "composition",
+  SIDES: "sides",
 };
 
 const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
@@ -64,6 +67,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
+  const [selectedTab, setSelectedTab] = useState(TABS.COMPOSITION);
+
   const addIngredientsInitialSelection = useMemo(
     () => edit.composition.map((ci) => ci.ingredient),
     [edit]
@@ -80,47 +85,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       composition: compositionIndexed,
     } as IMenuItem);
   }, [menuItem]);
-
-  const onFindCompositionItem = useCallback(
-    (id: string) => {
-      const index = edit.composition?.findIndex((f) => f.id === id);
-      return {
-        compositionItem: edit.composition?.[index],
-        index,
-      };
-    },
-    [edit.composition]
-  );
-
-  const onDropCompositionItem = useCallback(
-    (id: string, atIndex: number) => {
-      const { index } = onFindCompositionItem(id);
-      setEdit({
-        ...edit,
-        composition: swap(edit.composition, index, atIndex),
-      } as IMenuItem);
-    },
-    [edit, onFindCompositionItem]
-  );
-
-  const handleModifyCompositionProp =
-    (
-      compositionItem: IMenuItemCompositionItem,
-      compositionItemIndex: number,
-      key: string,
-      getter: (value: any) => any
-    ) =>
-    (value: any) => {
-      const slicedComposition = [...edit.composition];
-      slicedComposition.splice(compositionItemIndex, 1, {
-        ...compositionItem,
-        [key]: getter(value),
-      });
-      setEdit({
-        ...edit,
-        composition: slicedComposition,
-      } as IMenuItem);
-    };
 
   const handleCancel = () => {
     function cancel() {
@@ -152,6 +116,12 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     setAddIngredientModalOpen(true);
   };
 
+  const handleFillSides = () => {
+    if (!edit.sides?.length) {
+      setEdit({ ...edit, sides: [{ ...emptySidesItem }] });
+    }
+  };
+
   return (
     <Modal
       className="!z-40"
@@ -178,6 +148,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             nameDetail={edit.nameDetail}
             mainImageId={edit.images?.main?.toString()}
             price={edit.price}
+            hidden={edit.hidden}
             descriptionShort={edit.details?.short}
             composition={edit.composition}
             sides={edit.sides}
@@ -189,6 +160,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           <div className="w-full lg:flex-1 flex flex-col gap-2">
             <div className="flex flex-row gap-2">
               <Input
+                containerProps={{ className: "!min-w-0" }}
                 label="Nome"
                 value={edit.name}
                 onChange={(e) =>
@@ -199,6 +171,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 }
               />
               <Input
+                containerProps={{ className: "!min-w-0" }}
                 label="Detalhe"
                 value={edit.nameDetail}
                 onChange={(e) =>
@@ -208,6 +181,20 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   } as IMenuItem)
                 }
               />
+              <Select
+                className="flex-1"
+                label="Listado"
+                value={`${!edit.hidden}`}
+                onChange={(value) => {
+                  setEdit({
+                    ...edit,
+                    hidden: !!value,
+                  });
+                }}
+              >
+                <Option value={"true"}>Sim</Option>
+                <Option value={"false"}>Não</Option>
+              </Select>
             </div>
             <Input
               type="number"
@@ -245,144 +232,49 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             </Fieldset>
           </div>
         </div>
-        <Fieldset className="flex flex-col gap-2" title="Composição">
-          <Button className="mb-2" onClick={handleFillIngredients}>
-            Gerenciar Ingredientes
-          </Button>
-          <DraggableGroup className="flex flex-col gap-2">
-            {edit.composition?.map((compositionItem, compositionItemIndex) => (
-              <Draggable
-                className="flex flex-col lg:flex-row gap-2 items-center"
-                id={compositionItem.id}
-                key={compositionItem.id}
-                dragIndicator
-                originalIndex={compositionItemIndex}
-                onFind={onFindCompositionItem}
-                onDrop={onDropCompositionItem}
-              >
-                <div className="w-full lg:w-auto flex-1">
-                  <Select
-                    className="flex-1"
-                    label="Ingrediente"
-                    value={compositionItem.ingredient?._id}
-                    onChange={(value) => {
-                      setEdit({
-                        ...edit,
-                        composition: replaceAt(
-                          edit.composition,
-                          compositionItemIndex,
-                          {
-                            ...edit.composition[compositionItemIndex],
-                            ingredient: ingredients.find(
-                              (f) => f._id === value
-                            ),
-                          }
-                        ),
-                      });
-                    }}
-                  >
-                    {...ingredients
-                      .filter((f) => f?.name)
-                      .sort((a, b) => (a.name > b.name ? 1 : -1))
-                      .map((ingredient) => (
-                        <Option
-                          key={ingredient._id}
-                          value={ingredient._id}
-                          className={classNames({
-                            hidden:
-                              edit.composition
-                                .map((c) => c.ingredient?._id)
-                                .includes(ingredient._id) ||
-                              ingredient._id ===
-                                compositionItem?.ingredient?._id,
-                          })}
-                        >
-                          {ingredient.name}
-                        </Option>
-                      ))}
-                  </Select>
-                </div>
-                <div className="w-full lg:w-auto flex-1 min-w-48">
-                  <Input
-                    type="number"
-                    label="Qtd."
-                    value={compositionItem.quantity}
-                    defaultValue={1}
-                    onChange={handleModifyCompositionProp(
-                      compositionItem,
-                      compositionItemIndex,
-                      "quantity",
-                      (e) => e.target.value
-                    )}
-                  />
-                </div>
-                <div className="w-full lg:w-auto flex-1 min-w-48">
-                  <Select
-                    label="Essencial"
-                    value={`${compositionItem.essential}`}
-                    onChange={handleModifyCompositionProp(
-                      compositionItem,
-                      compositionItemIndex,
-                      "essential",
-                      (value) => value == true
-                    )}
-                  >
-                    <Option key={`true`} value={`true`}>
-                      Sim
-                    </Option>
-                    <Option key={`false`} value={`false`}>
-                      Não
-                    </Option>
-                  </Select>
-                </div>
-                <div className="flex flex-row">
-                  <Button
-                    className="mr-2 text-light-high"
-                    variant="text"
-                    size="sm"
-                    onClick={() =>
-                      setEdit({
-                        ...edit,
-                        composition: [
-                          ...edit.composition?.filter(
-                            (f, i) => i !== compositionItemIndex
-                          ),
-                        ],
-                      } as IMenuItem)
-                    }
-                  >
-                    <IoMdCloseCircle size={24} />
+
+        <Tabs value={selectedTab}>
+          <TabsHeader>
+            <Tab value={TABS.COMPOSITION}>Ingredientes</Tab>
+            <Tab value={TABS.SIDES}>Acompanhamento</Tab>
+          </TabsHeader>
+          <TabsBody>
+            <TabPanel value={TABS.COMPOSITION} className="!px-0">
+              <Fieldset className="flex flex-col gap-2">
+                <div className="flex-1 flex flex-row items-center gap-2">
+                  <Button className="flex-1" onClick={handleFillIngredients}>
+                    Gerenciar Ingredientes
                   </Button>
-                  <Button
-                    className="text-light-high"
-                    variant="text"
-                    size="sm"
-                    onClick={() =>
-                      setEdit({
-                        ...edit,
-                        composition: insertAt(
-                          edit.composition,
-                          compositionItemIndex + 1,
-                          {
-                            ...emptyCompositionItem,
-                            id: `${
-                              edit.composition?.reduce(
-                                (acc, cur) => Math.max(acc, +(cur.id || 0)),
-                                0
-                              ) + 1
-                            }`,
-                          }
-                        ),
-                      } as IMenuItem)
-                    }
-                  >
-                    <IoIosAddCircle className="color" size={24} />
-                  </Button>
+                  <div className="max-w-sm">
+                    <Select label="Exibir Ingredientes">
+                      <Option>Sim</Option>
+                      <Option>Não</Option>
+                    </Select>
+                  </div>
                 </div>
-              </Draggable>
-            ))}
-          </DraggableGroup>
-        </Fieldset>
+                <EditMenuItemCompositionForm
+                  ingredients={ingredients}
+                  composition={edit.composition}
+                  onCompositionChange={(composition) =>
+                    setEdit({ ...edit, composition })
+                  }
+                />
+              </Fieldset>
+            </TabPanel>
+            <TabPanel className="!px-0" value={TABS.SIDES}>
+              <Fieldset className="flex flex-col gap-2">
+                <Button className="flex-1" onClick={handleFillSides}>
+                  Gerenciar Acompanhamento
+                </Button>
+                <EditMenuItemSidesForm
+                  store={store}
+                  sides={edit.sides}
+                  onSidesChange={(sides) => setEdit({ ...edit, sides })}
+                />
+              </Fieldset>
+            </TabPanel>
+          </TabsBody>
+        </Tabs>
         <div className="flex flex-row gap-2">
           <Button onClick={handleCancel}>Cancel</Button>
           <Button
@@ -469,7 +361,5 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     </Modal>
   );
 };
-
-EditMenuItemModal.displayName = "EditMenuItem";
 
 export default EditMenuItemModal;

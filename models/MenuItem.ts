@@ -3,17 +3,18 @@ import { IIngredient } from "./Ingredients";
 
 export interface IMenuItem {
   name: string;
-  nameDetail: string;
-  images: {
+  nameDetail?: string;
+  images?: {
     main?: mongoose.Types.ObjectId;
     others?: mongoose.Types.ObjectId[];
   };
-  details: {
+  details?: {
     short?: string;
     long?: string;
   };
-  price: number;
-  composition: IMenuItemCompositionItem[];
+  price?: number;
+  hidden?: boolean;
+  composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
 }
 
@@ -27,6 +28,7 @@ export interface IMenuItemCompositionItem {
 export interface ISidesItem {
   menuItem: IMenuItem;
   quantity?: number;
+  essential?: boolean;
 }
 
 const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
@@ -51,6 +53,7 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
     long: { type: String, required: false },
   },
   price: Number,
+  hidden: { type: Boolean, required: false },
   composition: [
     {
       ingredient: {
@@ -65,6 +68,7 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
     {
       menuItem: { type: mongoose.Types.ObjectId, ref: "MenuItem" },
       quantity: { type: Number, required: false },
+      essential: { type: Boolean, required: false },
     },
   ],
 });

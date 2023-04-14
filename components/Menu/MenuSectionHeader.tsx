@@ -34,9 +34,9 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
       {...props}
     >
       <div className="flex flex-row container align-center justify-between m-auto font-bold text-xl">
-        <div>
+        <div className="flex flex-row flex-wrap gap-x-2">
           <span>{name}</span>
-          <span className="text-light-medium font-normal ml-2">
+          <span className="text-light-medium font-normal">
             ({length} items)
           </span>
         </div>

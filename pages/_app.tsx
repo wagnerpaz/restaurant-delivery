@@ -69,6 +69,44 @@ export default function App({
               },
             },
           },
+          tabs: {
+            styles: {
+              base: {
+                key: "overflow-visible",
+              },
+            },
+          },
+          tabsHeader: {
+            styles: {
+              base: {
+                key: "bg-dark-400 !text-light-high z-0",
+              },
+            },
+          },
+          tab: {
+            styles: {
+              base: {
+                tab: {
+                  initial: {
+                    key: "!text-light-high",
+                  },
+                  disabled: {
+                    key: "!bg-dark-400",
+                  },
+                },
+                indicator: {
+                  key: "!bg-dark-400",
+                },
+              },
+            },
+          },
+          tabsBody: {
+            styles: {
+              base: {
+                key: "overflow-visible",
+              },
+            },
+          },
         }}
       >
         <SessionProvider session={session}>

@@ -32,7 +32,7 @@ const UserIcon = () => {
           {menuOpened && (
             <div
               ref={container}
-              className="absolute top-0 right-0 bg-dark-100 p-2 px-4 rounded-md shadow-lg z-50 m-4"
+              className="absolute top-14 right-0 bg-dark-100 p-2 px-4 rounded-md shadow-lg z-50 m-4"
             >
               <small className="block">Autenticado como</small>
               <strong>{session.user.email ?? session.user.name}</strong>

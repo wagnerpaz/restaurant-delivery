@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FC, ReactNode, useCallback, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
@@ -10,19 +10,17 @@ import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
 import MenuItem from "/components/Menu/MenuItem";
 import { ILocation, IMenuSection, IStore } from "/models/Store";
-import Modal from "/components/Modal";
-import EditMenuItemModal from "/forms/EditMenuItem";
+import EditMenuItemModal from "/forms/EditMenuItemForm";
 import { IMenuItem } from "/models/MenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { IIngredient } from "/models/Ingredients";
 import { replaceAt, swap } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
-import DraggableGroup from "./DraggableGroup";
-import Draggable from "./Draggable";
-import UserIcon from "./UserIcon";
+import DraggableGroup from "/components/DraggableGroup";
+import Draggable from "/components/Draggable";
+import UserIcon from "/components/UserIcon";
 import { IUser } from "/models/User";
 import useSwapMenuItems from "/hooks/useSwapMenuItems";
-import isEqual from "lodash.isequal";
 
 interface StoreProps {
   store: IStore;
@@ -111,7 +109,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   ) => {
     return sections.map((section, sectionIndex) => (
       <>
-        {(admin ? true : section.items?.length > 0) && (
+        {(admin
+          ? true
+          : section.items?.filter((f) => !f.hidden).length > 0) && (
           <MenuSection
             key={section.name}
             name={[path.map((p) => p.name).join(" | "), section.name]
@@ -141,6 +141,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                     id={menuItem._id}
                     mainImageId={menuItem.images?.main?.toString()}
                     price={menuItem.price}
+                    hidden={menuItem.hidden}
                     descriptionShort={menuItem.details?.short}
                     composition={menuItem.composition}
                     sides={menuItem.sides}
@@ -196,7 +197,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       <header className="bg-dark-500 text-light-high sticky top-0 shadow-lg z-20">
         <div className="flex flex-row items-center gap-4 px-6 py-4">
           <Image
-            className="rounded-md"
+            className="rounded-md w-[50px] h-[50px]"
             src={`/api/download?id=${clientStore.logo}`}
             alt={`${clientStore.name} logo`}
             width={50}
