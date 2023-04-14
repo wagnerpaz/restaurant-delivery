@@ -199,7 +199,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 }
               />
               <Input
-                className="opacity-60"
                 label="Detalhe"
                 value={edit.nameDetail}
                 onChange={(e) =>
