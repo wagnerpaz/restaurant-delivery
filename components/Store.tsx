@@ -137,9 +137,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                 >
                   <MenuItem
                     name={menuItem.name}
+                    nameDetail={menuItem.nameDetail}
                     id={menuItem._id}
                     mainImageId={menuItem.images?.main?.toString()}
                     price={menuItem.price}
+                    descriptionShort={menuItem.details?.short}
                     composition={menuItem.composition}
                     sides={menuItem.sides}
                     index={menuItemIndex}

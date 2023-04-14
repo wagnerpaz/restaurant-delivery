@@ -3,6 +3,7 @@ import { IIngredient } from "./Ingredients";
 
 export interface IMenuItem {
   name: string;
+  nameDetail: string;
   images: {
     main?: mongoose.Types.ObjectId;
     others?: mongoose.Types.ObjectId[];
@@ -30,6 +31,7 @@ export interface ISidesItem {
 
 const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
   name: String,
+  nameDetail: String,
   images: {
     main: {
       type: mongoose.Types.ObjectId,

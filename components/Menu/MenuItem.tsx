@@ -10,9 +10,12 @@ import DbImage from "../DbImage";
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
   name: string;
+  nameDetail?: string;
   index: number;
   mainImageId?: string;
   price: number;
+  descriptionShort?: string;
+  descriptionLong?: string;
   composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
   editable?: boolean;
@@ -30,9 +33,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
   children,
   id,
   name,
+  nameDetail,
   index,
   mainImageId,
   price,
+  descriptionShort,
   composition,
   sides,
   editable = false,
@@ -83,11 +88,17 @@ const MenuItem: React.FC<MenuItemProps> = ({
         </EditableSection>
       </div>
       <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 flex flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
-        <div className="flex flex-row justify-between items-center min-h-[36px]">
-          <h3 className="text-md font-bold mr-12">{name}</h3>
+        <div className="flex flex-row justify-between items-center min-h-[36px] flex-wrap">
+          <h3 className="text-md font-bold mr-12 sm:mr-0">{name}</h3>
+          <span className="text-md font-bold mr-12 sm:mr-0 opacity-60 mb-1">
+            {nameDetail}
+          </span>
         </div>
 
         <div className="relative flex-1 pb-2">
+          <span className="block text-xs leading-tight">
+            {descriptionShort}
+          </span>
           <ul className="text-xs pt-2 opacity-60">
             {composition
               ?.map((compositionItem) =>

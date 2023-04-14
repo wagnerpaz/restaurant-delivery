@@ -1,5 +1,6 @@
 import { ParsedUrlQuery } from "querystring";
 
+import sectionsPopulate from "./lib/sectionsPopulate";
 import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
 import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
@@ -16,25 +17,6 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
 
   const { params } = context;
   const { storeSlug, locationSlug } = params as ParsedUrlQuery;
-
-  const sectionsPopulate = (append?: any) => {
-    const populate = [
-      {
-        path: "items",
-        populate: [
-          { path: "composition", populate: { path: "ingredient" } },
-          { path: "sides", populate: { path: "menuItem" } },
-        ],
-      },
-    ];
-    if (append) {
-      populate.push(append);
-    }
-    return {
-      path: "sections",
-      populate,
-    };
-  };
 
   const populate = {
     path: "menu",

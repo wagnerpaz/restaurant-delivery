@@ -44,7 +44,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   );
   const [additions, setAdditions] = useState<IIngredientSelection[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showMoreIngredients, setShowMoreIngredients] = useState(false);
 
   const getIngredients = useGetIngredients();
   const putIngredient = usePutIngredient();
@@ -72,7 +71,12 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     function traverseSections(sections: IMenuSection[]) {
       for (const section of sections) {
         for (const item of section.items) {
-          ingredients.push(...item.composition.map((c) => c.ingredient));
+          const compositionIngredients = item.composition.map(
+            (c) => c.ingredient
+          );
+          if (compositionIngredients.length > 0) {
+            ingredients.push(...compositionIngredients);
+          }
         }
         if (section.sections) {
           traverseSections(section.sections);
@@ -82,7 +86,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     traverseSections(store.menu.sections);
 
     //@ts-ignore
-    return [...new Set(ingredients)];
+    return [...new Set(ingredients)].filter((el) => el);
   }, [store]);
 
   useEffect(() => {
@@ -93,8 +97,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         .filter((f) => f)
         .includes(ingredient._id),
     }));
-    setIngredientsSel(newIngredientsSel);
-  }, [initialSelection, ingredients]);
+    setIngredientsSel([...newIngredientsSel, ...additions]);
+  }, [initialSelection, ingredients, additions]);
 
   const handleAdd = () => {
     const confirmation =
@@ -118,12 +122,26 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
 
   const handleSave = async () => {
     await putIngredient(additions.map((a) => a.ingredient));
-    onIngredientsChange(await getIngredients());
-    onSelectionChange(ingredientsSel);
+    const newIngredients = await getIngredients();
+    onIngredientsChange(newIngredients);
+    onSelectionChange(
+      ingredientsSel.map((i) => ({
+        ...i,
+        ingredient: newIngredients.find(
+          (f: IIngredient) => i.ingredient.name === f.name
+        ),
+      }))
+    );
 
     setAdditions([]);
     onOpenChange(false);
   };
+
+  function reset() {
+    setIngredientsSel((is) => is.map((m) => ({ ...m, selected: false })));
+    setAdditions([]);
+    setFilter("");
+  }
 
   const handleOpenChange = (newValue: boolean) => {
     if (!newValue) {
@@ -150,6 +168,20 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       onOpenChange(true);
     }
   };
+
+  console.log(storeIngredients);
+
+  const inStoreFiltered = filtered
+    .filter((f) => !f.selected)
+    .filter((f) =>
+      storeIngredients.map((m) => m._id).includes(f.ingredient._id)
+    );
+
+  const notInStoreFiltered = filtered
+    .filter((f) => !f.selected)
+    .filter(
+      (f) => !storeIngredients.map((m) => m._id).includes(f.ingredient._id)
+    );
 
   return (
     <Modal
@@ -182,16 +214,12 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
             title="Usados na sua loja"
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
-            <ul className="">
-              {filtered
-                .filter((f) => !f.selected)
-                .filter((f) =>
-                  storeIngredients.map((m) => m._id).includes(f.ingredient._id)
-                )
-                .map((sel) => (
+            {inStoreFiltered.length > 0 && (
+              <ul className="">
+                {inStoreFiltered.map((sel) => (
                   <li
                     className="flex flex-row items-center text-light-high"
-                    key={sel.ingredient._id}
+                    key={sel.ingredient.name}
                   >
                     <Checkbox
                       checked={sel.selected}
@@ -199,7 +227,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
-                              (f) => f.ingredient._id !== sel.ingredient._id
+                              (f) => f.ingredient.name !== sel.ingredient.name
                             ),
                             {
                               ingredient: sel.ingredient,
@@ -214,25 +242,29 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                     </span>
                   </li>
                 ))}
-            </ul>
+              </ul>
+            )}
+            {inStoreFiltered.length === 0 && !filter && (
+              <div className="w-full h-full flex items-center justify-center">
+                Nenhum ingrediente
+              </div>
+            )}
+            {inStoreFiltered.length === 0 && filter && (
+              <div className="w-full h-full flex items-center justify-center">
+                Nenhum ingrediente encontrado com este filtro.
+              </div>
+            )}
           </Fieldset>
           <Fieldset
             title="Nunca usados"
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
-            <ul className="">
-              {filtered
-                .filter((f) => !f.selected)
-                .filter(
-                  (f) =>
-                    !storeIngredients
-                      .map((m) => m._id)
-                      .includes(f.ingredient._id)
-                )
-                .map((sel) => (
+            {notInStoreFiltered.length > 0 && (
+              <ul className="">
+                {notInStoreFiltered.map((sel) => (
                   <li
                     className="flex flex-row items-center text-light-high"
-                    key={sel.ingredient._id}
+                    key={sel.ingredient.name}
                   >
                     <Checkbox
                       checked={sel.selected}
@@ -240,7 +272,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
-                              (f) => f.ingredient._id !== sel.ingredient._id
+                              (f) => f.ingredient.name !== sel.ingredient.name
                             ),
                             {
                               ingredient: sel.ingredient,
@@ -255,7 +287,18 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                     </span>
                   </li>
                 ))}
-            </ul>
+              </ul>
+            )}
+            {notInStoreFiltered.length === 0 && !filter && (
+              <div className="w-full h-full flex items-center justify-center">
+                Nenhum ingrediente
+              </div>
+            )}
+            {notInStoreFiltered.length === 0 && filter && (
+              <div className="w-full h-full flex items-center justify-center">
+                Nenhum ingrediente encontrado com este filtro.
+              </div>
+            )}
           </Fieldset>
         </div>
 
@@ -270,7 +313,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                 .map((sel) => (
                   <li
                     className="flex flex-row items-center text-light-high"
-                    key={sel.ingredient._id}
+                    key={sel.ingredient.name}
                   >
                     <Checkbox
                       checked={sel.selected}
@@ -278,7 +321,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
-                              (f) => f.ingredient._id !== sel.ingredient._id
+                              (f) => f.ingredient.name !== sel.ingredient.name
                             ),
                             {
                               ingredient: sel.ingredient,
@@ -297,13 +340,20 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           )}
           {ingredientsSel.filter((f) => f.selected).length === 0 && (
             <div className="w-full h-full flex items-center justify-center">
-              Selecine alguns ingredientes para compor seu prato
+              Selecione alguns ingredientes para compor seu prato
             </div>
           )}
         </Fieldset>
       </div>
       <div className="flex flex-row gap-2 mt-2">
-        <Button onClick={() => handleOpenChange(false)}>Cancel</Button>
+        <Button
+          onClick={() => {
+            handleOpenChange(false);
+            reset();
+          }}
+        >
+          Cancel
+        </Button>
         <Button className="flex-1" onClick={handleSave}>
           Salvar
         </Button>

@@ -175,8 +175,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             className="w-full sm:!w-80"
             id={edit._id}
             name={edit.name}
+            nameDetail={edit.nameDetail}
             mainImageId={edit.images?.main?.toString()}
             price={edit.price}
+            descriptionShort={edit.details?.short}
             composition={edit.composition}
             sides={edit.sides}
             index={-1}
@@ -185,16 +187,29 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             onEditClick={() => setEditImageModalOpen(true)}
           />
           <div className="w-full lg:flex-1 flex flex-col gap-2">
-            <Input
-              label="Nome"
-              value={edit.name}
-              onChange={(e) =>
-                setEdit({
-                  ...edit,
-                  name: e.target.value,
-                } as IMenuItem)
-              }
-            />
+            <div className="flex flex-row gap-2">
+              <Input
+                label="Nome"
+                value={edit.name}
+                onChange={(e) =>
+                  setEdit({
+                    ...edit,
+                    name: e.target.value,
+                  } as IMenuItem)
+                }
+              />
+              <Input
+                className="opacity-60"
+                label="Detalhe"
+                value={edit.nameDetail}
+                onChange={(e) =>
+                  setEdit({
+                    ...edit,
+                    nameDetail: e.target.value,
+                  } as IMenuItem)
+                }
+              />
+            </div>
             <Input
               type="number"
               label="Preço"
