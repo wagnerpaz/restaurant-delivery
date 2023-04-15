@@ -47,6 +47,7 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
       store: storeObject,
       selectedLocation: storeObject.locations[0],
       ingredients: ingredientsObjects,
+      ...(storeObject.theme && { theme: storeObject.theme }),
     },
   };
 };

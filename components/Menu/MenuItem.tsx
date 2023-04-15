@@ -61,7 +61,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   return !admin && hidden ? null : (
     <div
       className={classNames(
-        "sm:flex sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-dark-500 bg-light-high border-light-high border-4 group cursor-pointer z-0",
+        "sm:flex sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0",
         {
           "sm:hover:scale-[110%] transition-all": useEffects,
           "opacity-50": hidden,
@@ -72,8 +72,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
       onClick={onClick}
     >
       <div className="relative float-left sm:float-none">
-        <div className="absolute top-0 right-0 bg-light-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
-          <span className="font-bold text-[#036704]">
+        <div className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
+          <span className="font-bold text-money">
             R$
             {(Math.round((price || 0) * 100) / 100)
               .toFixed(2)
@@ -81,14 +81,14 @@ const MenuItem: React.FC<MenuItemProps> = ({
           </span>
         </div>
         <EditableSection
-          iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-light-high p-2 rounded-full"
+          iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
           hideEdit={!editable}
           hideDelete={!editable}
           onEditClick={onEditClick}
           onDeleteClick={onDeleteClick}
         >
           <DbImage
-            className="w-32 h-32 sm:w-full sm:h-full bg-dark-200 rounded-xl mr-2"
+            className="w-32 h-32 sm:w-full sm:h-full bg-main-200 rounded-xl mr-2"
             id={mainImageId}
             width={99999}
             height={99999}
@@ -96,7 +96,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         </EditableSection>
       </div>
-      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 sm:flex sm:flex-col bg-light-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
+      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
         <div className="flex flex-col justify-center flex-wrap min-h-[36px]">
           <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
             {name}
@@ -156,7 +156,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       </div>
       <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
         <Button
-          className="w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center"
+          className="w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
           variant="contained"
         >
           <FaShoppingCart className="text-xl" />

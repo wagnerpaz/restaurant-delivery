@@ -16,7 +16,7 @@ const SelectOption: React.FC<SelectOptionProps> = ({
         <a
           href="#"
           className={classNames(
-            active ? "bg-dark-300 text-light-high" : "text-light-medium",
+            active ? "bg-main-300 text-contrast-high" : "text-contrast-medium",
             "block px-4 py-2 text-sm"
           )}
         >

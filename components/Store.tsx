@@ -194,7 +194,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           editMenuItemModalOpen,
       })}
     >
-      <header className="bg-dark-500 text-light-high sticky top-0 shadow-lg z-20">
+      <header className="bg-hero text-hero-a11y-high sticky top-0 shadow-lg z-20">
         <div className="flex flex-row items-center gap-4 px-6 py-4">
           <Image
             className="rounded-md w-[50px] h-[50px]"
@@ -207,8 +207,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             <h1 className="hidden md:block font-bold text-xl">
               {clientStore.name}
             </h1>
-            <address className="hidden md:block text-sm text-light-medium overflow-hidden w-full text-ellipsis whitespace-nowrap">
-              <span className="font-bold mr-2 text-light-high">
+            <address className="hidden md:block text-sm text-hero-a11y-medium overflow-hidden w-full text-ellipsis whitespace-nowrap">
+              <span className="font-bold mr-2 text-hero-a11y-high">
                 {selectedLocation.city} - {selectedLocation.state}
               </span>
               <span>

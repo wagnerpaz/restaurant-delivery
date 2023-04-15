@@ -218,7 +218,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               <ul className="">
                 {inStoreFiltered.map((sel) => (
                   <li
-                    className="flex flex-row items-center text-light-high"
+                    className="flex flex-row items-center text-contrast-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
@@ -263,7 +263,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
               <ul className="">
                 {notInStoreFiltered.map((sel) => (
                   <li
-                    className="flex flex-row items-center text-light-high"
+                    className="flex flex-row items-center text-contrast-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
@@ -312,7 +312,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                 .filter((f) => f.selected)
                 .map((sel) => (
                   <li
-                    className="flex flex-row items-center text-light-high"
+                    className="flex flex-row items-center text-contrast-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox

@@ -180,7 +180,7 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
           </div>
           <div className="flex flex-row">
             <Button
-              className="mr-2 text-light-high"
+              className="mr-2 text-contrast-high"
               variant="text"
               size="sm"
               onClick={() =>
@@ -192,7 +192,7 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
               <IoMdCloseCircle size={24} />
             </Button>
             <Button
-              className="text-light-high"
+              className="text-contrast-high"
               variant="text"
               size="sm"
               onClick={() =>

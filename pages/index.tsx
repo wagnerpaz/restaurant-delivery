@@ -14,7 +14,7 @@ interface HomeProps {
 const Home: NextPage<HomeProps> = ({ stores }) => {
   return (
     <main>
-      <header className="bg-dark-500">
+      <header className="bg-main-500">
         <div className="container mx-auto flex items-center justify-center">
           <Image
             className="mx-6 w-[200px] h-[150px] object-cover"

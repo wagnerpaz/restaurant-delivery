@@ -19,13 +19,13 @@ const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   return (
-    <div className={classNames("text-light-high", containerClassName)}>
+    <div className={classNames("text-contrast-high", containerClassName)}>
       {label && (
         <label className="inline-block ml-2 font-bold mb-1">{label}</label>
       )}
       <div
         className={classNames(
-          "flex flex-row items-center gap-2 bg-dark-200 rounded-md px-4 py-1 border-dark-400 border-[1px]",
+          "flex flex-row items-center gap-2 bg-main-200 rounded-md px-4 py-1 border-main-400 border-[1px]",
           controlClassName
         )}
       >

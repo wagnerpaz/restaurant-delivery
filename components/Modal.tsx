@@ -29,7 +29,7 @@ const Modal: React.FC<ModalProps> = ({
     ? createPortal(
         <>
           <div
-            className="fixed top-0 left-0 w-full h-full bg-dark-500 opacity-70"
+            className="fixed top-0 left-0 w-full h-full bg-main-500 opacity-70"
             {...props}
           />
           <div
@@ -42,7 +42,7 @@ const Modal: React.FC<ModalProps> = ({
             <div
               ref={container}
               className={classNames(
-                "max-w-full max-h-full bg-dark-100 p-4 rounded-2xl overflow-auto custom-scrollbar",
+                "max-w-full max-h-full bg-main-100 p-4 rounded-2xl overflow-auto custom-scrollbar",
                 contentClassName
               )}
             >

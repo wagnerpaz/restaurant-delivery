@@ -16,10 +16,10 @@ export default function Example({
       {label && (
         <label className="inline-block ml-2 mb-1 font-bold">{label}</label>
       )}
-      <Menu.Button className="inline-flex w-full gap-x-1.5 rounded-md bg-dark-200 px-3 py-2 text-sm text-light-high shadow-sm ring-1 ring-inset ring-dark-400 hover:bg-dark-300">
+      <Menu.Button className="inline-flex w-full gap-x-1.5 rounded-md bg-main-200 px-3 py-2 text-sm text-contrast-high shadow-sm ring-1 ring-inset ring-main-400 hover:bg-main-300">
         <span className="flex-1 text-start">{extractLabel(value)}</span>
         <FaChevronDown
-          className="-mr-1 h-5 w-5 text-dark-400"
+          className="-mr-1 h-5 w-5 text-main-400"
           aria-hidden="true"
         />
       </Menu.Button>
@@ -33,7 +33,7 @@ export default function Example({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-dark-200 shadow-lg ring-1 ring-dark-400 focus:outline-none">
+        <Menu.Items className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-main-200 shadow-lg ring-1 ring-main-400 focus:outline-none">
           <div className="py-1 overflow-auto h-52">{children}</div>
         </Menu.Items>
       </Transition>
