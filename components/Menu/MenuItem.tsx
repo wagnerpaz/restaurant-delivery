@@ -139,11 +139,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
             <ul className="flex flex-col text-xs mt-1">
               {sides?.map((side) => (
                 <li className="block" key={side.menuItem.name}>
-                  {side.quantity && side.quantity !== 1 ? (
-                    <span className="font-bold">{`${side.quantity}x `}</span>
-                  ) : (
-                    ""
-                  )}
+                  <span className="font-bold">{`${side.quantity}x `}</span>
                   {side.menuItem.name}
                 </li>
                 // ))

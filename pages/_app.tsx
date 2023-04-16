@@ -33,7 +33,9 @@ export default function App({
     contrastA11yMedium = "#323949",
     contrastA11yLow = "#3d3e51",
     money = "#036704",
-  } = theme || {};
+  } = theme?.colors || {};
+  const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
+    theme?.patterns || {};
   console.log({
     hero,
     heroA11yHigh,
@@ -54,6 +56,7 @@ export default function App({
     contrastA11yMedium,
     contrastA11yLow,
     money,
+    heroPattern,
   });
   const heroColorVar = getRGBColor(hero, "hero");
   const heroA11yHighColorVar = getRGBColor(heroA11yHigh, "hero-a11y-high");
@@ -97,6 +100,8 @@ export default function App({
 
   const moneyColorVar = getRGBColor(money, "money");
 
+  const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
+
   return (
     <>
       <Head>
@@ -121,7 +126,8 @@ export default function App({
              ${contrastA11yHighColorVar}
              ${contrastA11yMediumColorVar}
              ${contrastA11yLowColorVar}
-             ${moneyColorVar}}
+             ${moneyColorVar}
+             ${heroPatternVar}}
           `}
         </style>
       </Head>

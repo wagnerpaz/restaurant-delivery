@@ -4,10 +4,11 @@ const withMT = require("@material-tailwind/react/utils/withMT");
 module.exports = withMT({
   content: [
     "./pages/**/*.{html,ts,tsx}",
-    "./components/**/*.{html,ts,tsx}",
+    "./components/**/*.{html,ts,tsx,jsx}",
     "./forms/**/*.{html,ts,tsx}",
     "./modals/**/*.{html,ts,tsx}",
     "./config/**/*.{html,ts,tsx}",
+    "./node_modules/react-tailwindcss-select/dist/index.esm.js",
   ],
   theme: {
     fontFamily: {
@@ -39,7 +40,7 @@ module.exports = withMT({
     container: {},
     extend: {
       backgroundImage: {
-        "hero-pattern": "url('/istockphoto-515373062-612x612.jpg')",
+        "hero-pattern": "var(--pattern-hero)",
       },
     },
   },

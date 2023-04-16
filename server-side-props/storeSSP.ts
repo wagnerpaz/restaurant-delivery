@@ -33,7 +33,7 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     .exec();
 
   // Convert the store object to a plain JavaScript object
-  const storeObject = serializeJson(store?.toObject());
+  const storeObject = store && serializeJson(store?.toObject());
 
   const ingredients: IIngredient[] = await Ingredients.find();
   const ingredientsObjects = ingredients?.map((o) =>
@@ -44,10 +44,12 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   return {
     props: {
       ...input.props,
-      store: storeObject,
-      selectedLocation: storeObject.locations[0],
+      ...(storeObject && { store: storeObject }),
+      ...(storeObject?.locations?.[0] && {
+        selectedLocation: storeObject.locations[0],
+      }),
       ingredients: ingredientsObjects,
-      ...(storeObject.theme && { theme: storeObject.theme }),
+      ...(storeObject?.theme && { theme: storeObject.theme }),
     },
   };
 };

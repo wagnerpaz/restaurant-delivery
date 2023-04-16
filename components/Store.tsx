@@ -21,6 +21,9 @@ import Draggable from "/components/Draggable";
 import UserIcon from "/components/UserIcon";
 import { IUser } from "/models/User";
 import useSwapMenuItems from "/hooks/useSwapMenuItems";
+import DbImage from "./DbImage";
+import AddStoreModal from "/modals/AddStoreModal";
+import usePutStore from "/hooks/usePutStore";
 
 interface StoreProps {
   store: IStore;
@@ -40,6 +43,7 @@ const emptyMenuItem: IMenuItem = {
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [clientStore, setClientStore] = useState(store);
   const [clientIngredients, setClientIngredients] = useState(ingredients);
+  const clientLocation = selectedLocation || clientStore?.locations?.[0];
 
   const [editMenuItemModalOpen, setEditMenuItemModalOpen] = useState(false);
   const [editMenuItemIndex, setEditMenuItemIndex] = useState(-1);
@@ -49,6 +53,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [editMenuItemSectionIndex, setEditMenuItemSectionIndex] = useState([
     -1,
   ]);
+
+  const [addStoreModalOpen, setAddStoreModalOpen] = useState(!store);
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -61,6 +67,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     ? Draggable
     : ({ children }: { children: React.ReactNode }) => children;
 
+  const putStore = usePutStore();
   const putMenuItem = usePutMenuItem();
   const deleteMenuItem = useDeleteMenuItem();
   const swapMenuItems = useSwapMenuItems();
@@ -114,9 +121,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           : section.items?.filter((f) => !f.hidden).length > 0) && (
           <MenuSection
             key={section.name}
-            name={[path.map((p) => p.name).join(" | "), section.name]
+            name={[path.map((p) => p.name).join(" • "), section.name]
               .filter((f) => f)
-              .join(" | ")}
+              .join(" • ")}
             length={section.items.length}
             onAddClick={() => {
               setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
@@ -196,24 +203,27 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     >
       <header className="bg-hero text-hero-a11y-high sticky top-0 shadow-lg z-20">
         <div className="flex flex-row items-center gap-4 px-6 py-4">
-          <Image
+          <DbImage
             className="rounded-md w-[50px] h-[50px]"
-            src={`/api/download?id=${clientStore.logo}`}
-            alt={`${clientStore.name} logo`}
+            id={clientStore?.logo}
+            alt={`${clientStore?.name} logo`}
             width={50}
             height={50}
           />
           <div className="flex-1 overflow-hidden hidden sm:block">
             <h1 className="hidden md:block font-bold text-xl">
-              {clientStore.name}
+              {clientStore?.name || "Nome da sua loja"}
             </h1>
             <address className="hidden md:block text-sm text-hero-a11y-medium overflow-hidden w-full text-ellipsis whitespace-nowrap">
               <span className="font-bold mr-2 text-hero-a11y-high">
-                {selectedLocation.city} - {selectedLocation.state}
+                {clientLocation?.city || "[Cidade]"} -{" "}
+                {clientLocation?.state || "[ES]"}
               </span>
               <span>
-                {selectedLocation.address} {selectedLocation.number},{" "}
-                {selectedLocation.neighborhood}, {selectedLocation.postalCode}
+                {clientLocation?.address || "[Endereço]"}{" "}
+                {clientLocation?.number || "[Número]"},{" "}
+                {clientLocation?.neighborhood || "[Bairro]"},{" "}
+                {clientLocation?.postalCode || "[CEP]"}
               </span>
             </address>
           </div>
@@ -235,7 +245,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         </div>
       </header>
       <main>
-        <Menu>{renderMenuSections(clientStore.menu.sections)}</Menu>
+        <Menu>{renderMenuSections(clientStore?.menu?.sections)}</Menu>
       </main>
       <EditMenuItemModal
         open={editMenuItemModalOpen}
@@ -280,6 +290,20 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           setEditMenuItemSectionIndex([-1]);
           setEditMenuItemModalOpen(false);
         }}
+      />
+      <AddStoreModal
+        store={clientStore}
+        onStoreChange={async (value, shouldSave) => {
+          setClientStore(value);
+          if (shouldSave) {
+            await putStore(value);
+            setAddStoreModalOpen(false);
+          }
+        }}
+        portalTarget={() => null}
+        noAutoClose
+        open={addStoreModalOpen}
+        onOpenChange={(value) => setAddStoreModalOpen(value)}
       />
     </div>
   );

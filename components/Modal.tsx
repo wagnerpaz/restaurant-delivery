@@ -6,8 +6,9 @@ import { createPortal } from "react-dom";
 interface ModalProps extends ComponentProps<"div"> {
   open: boolean;
   contentClassName?: string;
+  noAutoClose?: boolean;
   onOpenChange: (newValue: boolean) => void;
-  portalTarget?: () => HTMLElement;
+  portalTarget?: () => HTMLElement | null;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -15,6 +16,7 @@ const Modal: React.FC<ModalProps> = ({
   contentClassName,
   children,
   open,
+  noAutoClose,
   portalTarget,
   onOpenChange,
   ...props
@@ -22,36 +24,41 @@ const Modal: React.FC<ModalProps> = ({
   const container = useRef<HTMLDivElement>(null);
 
   useOnClickOutside(container, () => {
-    onOpenChange(false);
+    !noAutoClose && onOpenChange(false);
   });
 
+  const portalTargetValue = portalTarget?.();
+
+  const render = (
+    <>
+      <div
+        className="fixed top-0 left-0 w-full h-full bg-main-500 opacity-70"
+        {...props}
+      />
+      <div
+        className={classNames(
+          "fixed inset-0 container mx-auto m-4 z-50 flex items-center justify-center",
+          className
+        )}
+        {...props}
+      >
+        <div
+          ref={container}
+          className={classNames(
+            "max-w-full max-h-full bg-main-100 p-4 rounded-2xl overflow-auto custom-scrollbar",
+            contentClassName
+          )}
+        >
+          {children}
+        </div>
+      </div>
+    </>
+  );
+
   return open
-    ? createPortal(
-        <>
-          <div
-            className="fixed top-0 left-0 w-full h-full bg-main-500 opacity-70"
-            {...props}
-          />
-          <div
-            className={classNames(
-              "fixed inset-0 container mx-auto m-4 z-50 flex items-center justify-center",
-              className
-            )}
-            {...props}
-          >
-            <div
-              ref={container}
-              className={classNames(
-                "max-w-full max-h-full bg-main-100 p-4 rounded-2xl overflow-auto custom-scrollbar",
-                contentClassName
-              )}
-            >
-              {children}
-            </div>
-          </div>
-        </>,
-        portalTarget?.() || document.body
-      )
+    ? portalTargetValue
+      ? createPortal(render, portalTargetValue)
+      : render
     : null;
 };
 
