@@ -14,24 +14,22 @@ export default function App({
   pageProps: { session, theme, ...pageProps },
 }: AppProps) {
   const {
-    hero = "#212129",
-    heroA11yHigh = "#DCDCDC",
-    heroA11yMedium = "#949494",
-    heroA11yLow = "#5E5E5E",
-    main100 = "#4c5265",
-    main200 = "#40445a",
-    main300 = "#3d3e51",
-    main400 = "#323949",
-    main500 = "#212129",
-    contrastHigh = "#DCDCDC",
-    contrastMedium = "#949494",
-    contrastLow = "#5E5E5E",
-    mainA11yHigh = "#DCDCDC",
-    mainA11yMedium = "#949494",
-    mainA11yLow = "#5E5E5E",
-    contrastA11yHigh = "#212129",
-    contrastA11yMedium = "#323949",
-    contrastA11yLow = "#3d3e51",
+    hero = "#BE3144",
+    heroA11yHigh = "#FFFFFF",
+    heroA11yMedium = "#F2F2F2",
+    heroA11yLow = "#E6E6E6",
+    main100 = "#FFFFFF",
+    main200 = "#F2F2F2",
+    main300 = "#949494",
+    mainA11yHigh = "#010101",
+    mainA11yMedium = "#1C1C1C",
+    mainA11yLow = "#4A4A4A",
+    contrastHigh = "#FFFFFF",
+    contrastMedium = "#F2F2F2",
+    contrastLow = "#E6E6E6",
+    contrastA11yHigh = "#010101",
+    contrastA11yMedium = "#1C1C1C",
+    contrastA11yLow = "#4A4A4A",
     money = "#036704",
   } = theme?.colors || {};
   const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
@@ -44,8 +42,6 @@ export default function App({
     main100,
     main200,
     main300,
-    main400,
-    main500,
     contrastHigh,
     contrastMedium,
     contrastLow,
@@ -69,10 +65,6 @@ export default function App({
   const main100ColorVar = getRGBColor(main100, "main-100");
   const main200ColorVar = getRGBColor(main200, "main-200");
   const main300ColorVar = getRGBColor(main300, "main-300");
-  const main400ColorVar = getRGBColor(main400, "main-400");
-  const main500ColorVar = getRGBColor(main500, "main-500");
-
-  const menuColorVar = getRGBColor(main500, "menu");
 
   const contrastHighColorVar = getRGBColor(contrastHigh, "contrast-high");
   const contrastMediumColorVar = getRGBColor(contrastMedium, "contrast-medium");
@@ -114,9 +106,6 @@ export default function App({
              ${main100ColorVar}
              ${main200ColorVar}
              ${main300ColorVar}
-             ${main400ColorVar}
-             ${main500ColorVar}
-             ${menuColorVar}
              ${contrastHighColorVar}
              ${contrastMediumColorVar}
              ${contrastLowColorVar}

@@ -14,7 +14,7 @@ const Fieldset: React.FC<FieldsetProps> = ({
   return (
     <fieldset
       className={classNames(
-        "p-4 border-[1px] border-main-400 rounded-md text-contrast-high",
+        "p-4 border-[1px] border-main-300 rounded-md text-main-a11y-medium",
         className
       )}
       {...props}

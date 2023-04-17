@@ -14,13 +14,13 @@ interface HomeProps {
 const Home: NextPage<HomeProps> = ({ stores }) => {
   return (
     <main>
-      <header className="bg-main-500">
+      <header className="bg-hero shadow-lg">
         <div className="container mx-auto flex items-center justify-center">
           <Image
-            className="mx-6 w-[200px] h-[150px] object-cover"
+            className="m-6 w-[200px] object-cover"
             src="/logo.png"
-            width={500}
-            height={500}
+            width={99999}
+            height={99999}
             alt="Rappid logo"
           />
         </div>
@@ -33,7 +33,7 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
             href={`/store/${store.slug}`}
           >
             <DbImage
-              className="rounded-2xl w-[200px] h-[200px] bg-white"
+              className="rounded-2xl w-[200px] h-[200px] bg-white border-hero shadow-md"
               id={store.logo?.toString()}
               width={200}
               height={200}

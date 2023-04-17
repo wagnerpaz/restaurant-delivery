@@ -8,7 +8,7 @@
   }
 
   .custom-scrollbar {
-    @apply scrollbar-thin scrollbar-thumb-main-400 scrollbar-track-main-200 scrollbar-track-rounded-md scrollbar-thumb-rounded-md;
+    @apply scrollbar-thin scrollbar-thumb-hero scrollbar-track-main-300 scrollbar-track-rounded-md scrollbar-thumb-rounded-md;
   }
 
   .btn-select {

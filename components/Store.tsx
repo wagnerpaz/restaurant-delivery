@@ -196,7 +196,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   return (
     <div
-      className={classNames("font-lato", {
+      className={classNames("font-lato custom-scrollbar", {
         "fixed top-0 left-0 w-full h-full overflow-hidden":
           editMenuItemModalOpen,
       })}
@@ -291,20 +291,22 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           setEditMenuItemModalOpen(false);
         }}
       />
-      <AddStoreModal
-        store={clientStore}
-        onStoreChange={async (value, shouldSave) => {
-          setClientStore(value);
-          if (shouldSave) {
-            await putStore(value);
-            setAddStoreModalOpen(false);
-          }
-        }}
-        portalTarget={() => null}
-        noAutoClose
-        open={addStoreModalOpen}
-        onOpenChange={(value) => setAddStoreModalOpen(value)}
-      />
+      {addStoreModalOpen && (
+        <AddStoreModal
+          store={clientStore}
+          onStoreChange={async (value, shouldSave) => {
+            setClientStore(value);
+            if (shouldSave) {
+              await putStore(value);
+              setAddStoreModalOpen(false);
+            }
+          }}
+          portalTarget={() => null}
+          noAutoClose
+          open={addStoreModalOpen}
+          onOpenChange={(value) => setAddStoreModalOpen(value)}
+        />
+      )}
     </div>
   );
 };

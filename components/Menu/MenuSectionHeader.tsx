@@ -26,17 +26,17 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   return (
     <form
       className={classNames(
-        "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[82px] bg-main-300 text-contrast-high z-10 shadow-md",
+        "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[82px] bg-main-100 text-main-a11y-high z-10 shadow-md",
         { "mb-2 sm:mb-6": length > 0 },
         className
       )}
       onClick={(e) => e.preventDefault()}
       {...props}
     >
-      <div className="flex flex-row container align-center justify-between m-auto font-bold text-xl">
+      <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">
         <div className="flex flex-row flex-wrap gap-x-2">
           <span>{name}</span>
-          <span className="text-contrast-medium font-normal">
+          <span className="text-main-a11y-medium font-normal">
             ({length} items)
           </span>
         </div>

@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
   const render = (
     <>
       <div
-        className="fixed top-0 left-0 w-full h-full bg-main-500 opacity-70"
+        className="fixed top-0 left-0 w-full h-full bg-main-a11y-medium opacity-70 z-20"
         {...props}
       />
       <div

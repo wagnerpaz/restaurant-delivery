@@ -47,7 +47,7 @@ export default {
     styles: {
       base: {
         initial: {
-          key: "!bg-main-300 !shadow-none",
+          key: "!bg-main-300 !shadow-none !text-main-a11y-high",
         },
       },
     },
@@ -62,7 +62,7 @@ export default {
   tabsHeader: {
     styles: {
       base: {
-        key: "bg-main-400 !text-main-a11y-high z-0",
+        key: "bg-main-200 !text-main-a11y-high z-0",
       },
     },
   },
@@ -74,11 +74,11 @@ export default {
             key: "!text-main-a11y-high",
           },
           disabled: {
-            key: "!bg-main-400",
+            key: "!bg-main-300",
           },
         },
         indicator: {
-          key: "!bg-main-400",
+          key: "!bg-main-300",
         },
       },
     },
