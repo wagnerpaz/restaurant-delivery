@@ -1,18 +1,13 @@
-import { Button, Input, Option, Select } from "@material-tailwind/react";
+import { Button, Input, Select as SelectSimple } from "@chakra-ui/react";
+import { Select } from "chakra-react-select";
 import classNames from "classnames";
-import React, {
-  cloneElement,
-  ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { ComponentProps, useCallback, useMemo } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import DbImage from "/components/DbImage";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
+import FormControl from "/components/FormControl";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
-import { IIngredient } from "/models/Ingredients";
 import { IMenuItem, ISidesItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
 
@@ -100,55 +95,58 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
           onDrop={onDropSidesItem}
         >
           <div className="w-full lg:w-auto flex-1">
-            <Select
-              className="flex-1"
-              label="Item do menu"
-              value={sidesItem.menuItem?._id}
-              selected={(element) =>
-                element &&
-                React.cloneElement(element, {
-                  className: "flex items-center px-0 gap-2 pointer-events-none",
-                })
-              }
-              onChange={(value) => {
-                onSidesChange(
-                  replaceAt(sides, sidesItemIndex, {
-                    ...sides[sidesItemIndex],
-                    menuItem: storeMenuItems.find((f) => f._id === value),
-                  })
-                );
-              }}
-            >
-              {...storeMenuItems
-                .filter((f) => f?.name)
-                .sort((a, b) => (a.name > b.name ? 1 : -1))
-                .map((menuItem) => (
-                  <Option
-                    key={menuItem._id}
-                    value={menuItem._id}
-                    className={classNames("flex flex-row items-center gap-2", {
-                      hidden:
-                        sides
-                          .map((c) => c.menuItem?._id)
-                          .includes(menuItem._id) ||
-                        menuItem._id === sidesItem?.menuItem?._id,
-                    })}
-                  >
-                    <DbImage
-                      className="rounded-md"
-                      id={menuItem.images?.main}
-                      width={30}
-                      height={30}
-                    />
-                    {menuItem.name}
-                  </Option>
-                ))}
-            </Select>
+            <FormControl className="flex-1" label="Item do menu">
+              <Select
+                useBasicStyles
+                menuPortalTarget={document.body}
+                menuPlacement="auto"
+                value={{
+                  value: sidesItem.menuItem?._id,
+                  label: (
+                    <div className="flex flex-row items-center gap-2">
+                      <DbImage
+                        className="rounded-md"
+                        id={sidesItem.menuItem.images?.main?.toString()}
+                        width={30}
+                        height={30}
+                        alt="acompanhamento foto"
+                      />
+                      {sidesItem.menuItem.name}
+                    </div>
+                  ),
+                }}
+                options={[...storeMenuItems]
+                  .filter((f) => f?.name)
+                  .sort((a, b) => (a.name > b.name ? 1 : -1))
+                  .map((menuItem) => ({
+                    value: menuItem._id,
+                    label: (
+                      <div className="flex flex-row items-center gap-2">
+                        <DbImage
+                          className="rounded-md"
+                          id={menuItem.images?.main?.toString()}
+                          width={30}
+                          height={30}
+                          alt="acompanhamento foto"
+                        />
+                        {menuItem.name}
+                      </div>
+                    ),
+                  }))}
+                onChange={(value) => {
+                  onSidesChange(
+                    replaceAt(sides, sidesItemIndex, {
+                      ...sides[sidesItemIndex],
+                      menuItem: storeMenuItems.find((f) => f._id === value),
+                    })
+                  );
+                }}
+              />
+            </FormControl>
           </div>
-          <div className="w-full lg:w-auto flex-1 min-w-48">
+          <FormControl className="w-24" label="Qtd.">
             <Input
               type="number"
-              label="Qtd."
               value={sidesItem.quantity}
               defaultValue={1}
               onChange={handleModifySidesProp(
@@ -158,10 +156,9 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                 (e) => e.target.value
               )}
             />
-          </div>
-          <div className="w-full lg:w-auto flex-1 min-w-48">
-            <Select
-              label="Essencial"
+          </FormControl>
+          <FormControl className="w-24" label="Essencial">
+            <SelectSimple
               value={`${sidesItem.essential}`}
               onChange={handleModifySidesProp(
                 sidesItem,
@@ -170,18 +167,17 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                 (value) => value == true
               )}
             >
-              <Option key={`true`} value={`true`}>
+              <option key={`true`} value={`true`}>
                 Sim
-              </Option>
-              <Option key={`false`} value={`false`}>
+              </option>
+              <option key={`false`} value={`false`}>
                 Não
-              </Option>
-            </Select>
-          </div>
+              </option>
+            </SelectSimple>
+          </FormControl>
           <div className="flex flex-row">
             <Button
               className="mr-2 text-contrast-high"
-              variant="text"
               size="sm"
               onClick={() =>
                 onSidesChange([
@@ -193,7 +189,6 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
             </Button>
             <Button
               className="text-contrast-high"
-              variant="text"
               size="sm"
               onClick={() =>
                 onSidesChange(

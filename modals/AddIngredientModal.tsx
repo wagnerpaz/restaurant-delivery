@@ -1,4 +1,3 @@
-import { Button, Checkbox, Input } from "@material-tailwind/react";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { HiPlus } from "react-icons/hi";
 
@@ -8,12 +7,12 @@ import removeDiacritics from "/lib/removeDiacritics";
 import toPascalCase from "/lib/toPascalCase";
 import { IIngredient } from "/models/Ingredients";
 import { IMenuSection, IStore } from "/models/Store";
-import usePutStoreIngredients from "/hooks/usePutStoreIngredients";
 import useGetIngredients from "/hooks/useGetIngredients";
-import useGetStoreIngredients from "/hooks/useGetStoreIngredients";
 import Fieldset from "/components/Fieldset";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
+import { Button, Checkbox, Input } from "@chakra-ui/react";
+import FormControl from "/components/FormControl";
 
 interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -97,8 +96,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         .filter((f) => f)
         .includes(ingredient._id),
     }));
-    setIngredientsSel([...newIngredientsSel, ...additions]);
-  }, [initialSelection, ingredients, additions]);
+    setIngredientsSel([...newIngredientsSel]);
+  }, [initialSelection, ingredients]);
 
   const handleAdd = () => {
     const confirmation =
@@ -125,7 +124,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     const newIngredients = await getIngredients();
     onIngredientsChange(newIngredients);
     onSelectionChange(
-      ingredientsSel.map((i) => ({
+      [...ingredientsSel, ...additions].map((i) => ({
         ...i,
         ingredient: newIngredients.find(
           (f: IIngredient) => i.ingredient.name === f.name
@@ -169,8 +168,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     }
   };
 
-  console.log(storeIngredients);
-
   const inStoreFiltered = filtered
     .filter((f) => !f.selected)
     .filter((f) =>
@@ -193,12 +190,9 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       onOpenChange={handleOpenChange}
     >
       <div className="flex flex-row gap-2 mb-2 w-full">
-        <Input
-          containerProps={{ className: "!flex-1 !min-w-0" }}
-          label="Ingrediente"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
+        <FormControl className="flex-1 min-w-fit" label="Ingrediente">
+          <Input value={filter} onChange={(e) => setFilter(e.target.value)} />
+        </FormControl>
         <Button
           className="flex flex-row gap-2 items-center"
           disabled={!filter || filtered.length > 0}
@@ -215,10 +209,10 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
             {inStoreFiltered.length > 0 && (
-              <ul className="">
+              <ul className="flex flex-col gap-2">
                 {inStoreFiltered.map((sel) => (
                   <li
-                    className="flex flex-row items-center text-contrast-high"
+                    className="flex flex-row items-center gap-4 text-main-a11y-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
@@ -260,10 +254,10 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
             {notInStoreFiltered.length > 0 && (
-              <ul className="">
+              <ul className="flex flex-col gap-2">
                 {notInStoreFiltered.map((sel) => (
                   <li
-                    className="flex flex-row items-center text-contrast-high"
+                    className="flex flex-row items-center gap-4 text-main-a11y-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
@@ -306,17 +300,18 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           title="Selecionados"
           className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
-          {ingredientsSel.filter((f) => f.selected).length > 0 && (
-            <ul>
-              {ingredientsSel
+          {[...ingredientsSel, ...additions].filter((f) => f.selected).length >
+            0 && (
+            <ul className="flex flex-col gap-2">
+              {[...ingredientsSel, ...additions]
                 .filter((f) => f.selected)
                 .map((sel) => (
                   <li
-                    className="flex flex-row items-center text-contrast-high"
+                    className="flex flex-row items-center gap-4 text-main-a11y-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
-                      checked={sel.selected}
+                      defaultChecked
                       onChange={(e) =>
                         setIngredientsSel((ingredientsSel) => {
                           return [
@@ -338,7 +333,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                 ))}
             </ul>
           )}
-          {ingredientsSel.filter((f) => f.selected).length === 0 && (
+          {[...ingredientsSel, ...additions].filter((f) => f.selected)
+            .length === 0 && (
             <div className="w-full h-full flex items-center justify-center">
               Selecione alguns ingredientes para compor seu prato
             </div>

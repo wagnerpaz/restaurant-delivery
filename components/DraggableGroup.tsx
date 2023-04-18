@@ -26,7 +26,7 @@ const DraggableGroupContent: React.FC<DraggableGroupContentProps> = ({
   }));
 
   return (
-    <div ref={drop} className={classNames("contents", className)}>
+    <div ref={drop} className={classNames(className)}>
       {children}
     </div>
   );

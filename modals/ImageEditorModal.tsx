@@ -1,7 +1,6 @@
 import { ComponentProps, useState } from "react";
 import classNames from "classnames";
 import mongoose from "mongoose";
-import { Button, Input } from "@material-tailwind/react";
 import ReactCrop, {
   Crop,
   PixelCrop,
@@ -14,6 +13,8 @@ import DbImage from "/components/DbImage";
 import Modal from "/components/Modal";
 import { imgPreview } from "/lib/image-crop/imgPreview";
 import usePutUpload from "/hooks/usePutUpload";
+import { Button, Input } from "@chakra-ui/react";
+import FormControl from "/components/FormControl";
 
 interface DbImageEditorProps extends ComponentProps<typeof Modal> {
   upload: {
@@ -113,39 +114,40 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
           )}
         </div>
         <div className="flex gap-4">
-          <Input
-            className="flex-1"
-            label="Arquivo de Imagem"
-            type="file"
-            onChange={function (evt) {
-              const reader = new FileReader();
-              reader.addEventListener("load", () => {
-                //RECIEVE THE ORIGINAL IMAGE
-                const uploadedImage = reader.result;
-                const canvas = document.createElement("canvas");
-                const context2d = canvas.getContext("2d");
-                const image = new Image();
-                image.src = uploadedImage as string;
-                image.onload = () => {
-                  //RESIZE TO MAX WIDTH 500
-                  canvas.width = 500;
-                  canvas.height =
-                    (image.naturalHeight / image.naturalWidth) * 500;
-                  // canvas.width = image.naturalWidth;
-                  // canvas.height = image.naturalHeight;
-                  context2d?.drawImage(
-                    image,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height
-                  );
-                  setCachedImage(`${canvas.toDataURL("image/png")}`);
-                };
-              });
-              reader.readAsDataURL((evt.target.files as FileList)[0]);
-            }}
-          />
+          <FormControl className="flex-1 min-w-fit" label="Arquivo de Imagem">
+            <Input
+              className="flex-1"
+              type="file"
+              onChange={function (evt) {
+                const reader = new FileReader();
+                reader.addEventListener("load", () => {
+                  //RECIEVE THE ORIGINAL IMAGE
+                  const uploadedImage = reader.result;
+                  const canvas = document.createElement("canvas");
+                  const context2d = canvas.getContext("2d");
+                  const image = new Image();
+                  image.src = uploadedImage as string;
+                  image.onload = () => {
+                    //RESIZE TO MAX WIDTH 500
+                    canvas.width = 500;
+                    canvas.height =
+                      (image.naturalHeight / image.naturalWidth) * 500;
+                    // canvas.width = image.naturalWidth;
+                    // canvas.height = image.naturalHeight;
+                    context2d?.drawImage(
+                      image,
+                      0,
+                      0,
+                      canvas.width,
+                      canvas.height
+                    );
+                    setCachedImage(`${canvas.toDataURL("image/png")}`);
+                  };
+                });
+                reader.readAsDataURL((evt.target.files as FileList)[0]);
+              }}
+            />
+          </FormControl>
           <Button className="block" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

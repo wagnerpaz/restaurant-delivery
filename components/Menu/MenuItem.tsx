@@ -63,7 +63,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       className={classNames(
         "sm:flex sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
         {
-          "sm:hover:scale-[110%] transition-all": useEffects,
+          "sm:hover:scale-[105%] transition-all": useEffects,
           "opacity-50": hidden,
         },
         className

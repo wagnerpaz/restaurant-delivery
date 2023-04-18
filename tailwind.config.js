@@ -1,8 +1,15 @@
-const withMT = require("@material-tailwind/react/utils/withMT");
-
 /** @type {import('tailwindcss').Config} */
-module.exports = withMT({
+module.exports = {
+  mode: "jit",
   content: [
+    "./pages/**/*.{html,ts,tsx}",
+    "./components/**/*.{html,ts,tsx,jsx}",
+    "./forms/**/*.{html,ts,tsx}",
+    "./modals/**/*.{html,ts,tsx}",
+    "./config/**/*.{html,ts,tsx}",
+    "./node_modules/react-tailwindcss-select/dist/index.esm.js",
+  ],
+  purge: [
     "./pages/**/*.{html,ts,tsx}",
     "./components/**/*.{html,ts,tsx,jsx}",
     "./forms/**/*.{html,ts,tsx}",
@@ -45,4 +52,4 @@ module.exports = withMT({
     },
   },
   plugins: [require("tailwind-scrollbar")({ nocompatible: true })],
-});
+};

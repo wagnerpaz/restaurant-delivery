@@ -28,7 +28,7 @@ const DbImage: React.FC<DbImageProps> = ({
     </Image>
   ) : (
     <Image
-      className={classNames("border-2 border-main-300", className)}
+      className={classNames("", className)}
       alt={`${alt} (no photo)`}
       {...props}
       src="/no-image-icon-4.png"

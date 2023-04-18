@@ -27,7 +27,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
     <form
       className={classNames(
         "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[82px] bg-main-100 text-main-a11y-high z-10 shadow-md",
-        { "mb-2 sm:mb-6": length > 0 },
+        { "mb-4 sm:mb-6": length > 0 },
         className
       )}
       onClick={(e) => e.preventDefault()}
@@ -42,7 +42,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
         </div>
         {admin && (
           <Button
-            className="ml-4 justify-self-end"
+            className="ml-4 justify-self-end text-main-a11y-high"
             variant="text"
             onClick={onAddClick}
           >

@@ -45,7 +45,7 @@ const Modal: React.FC<ModalProps> = ({
         <div
           ref={container}
           className={classNames(
-            "max-w-full max-h-full bg-main-100 p-4 rounded-2xl overflow-auto custom-scrollbar",
+            "max-w-full max-h-full bg-main-200 p-4 rounded-2xl overflow-auto custom-scrollbar",
             contentClassName
           )}
         >

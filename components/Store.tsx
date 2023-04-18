@@ -1,9 +1,7 @@
-import Image from "next/image";
 import { FC, useCallback, useState } from "react";
 import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
-import { Button, Input } from "@material-tailwind/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import Menu from "/components/Menu/Menu";
@@ -24,6 +22,8 @@ import useSwapMenuItems from "/hooks/useSwapMenuItems";
 import DbImage from "./DbImage";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
+import { Button, Input } from "@chakra-ui/react";
+import FormControl from "./FormControl";
 
 interface StoreProps {
   store: IStore;
@@ -132,7 +132,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               setEditMenuItemModalOpen(true);
             }}
           >
-            <AdminDraggableGroup editable={admin}>
+            <AdminDraggableGroup className="contents" editable={admin}>
               {section.items.map((menuItem, menuItemIndex) => (
                 <AdminDraggable
                   containerClassName="h-full"
@@ -229,8 +229,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           </div>
           <Input
             id="search"
-            containerProps={{ className: "!w-full !min-w-0 max-w-xs " }}
-            label="Pesquisar"
+            className="!w-full !min-w-0 max-w-xs !bg-main-100"
+            placeholder="Pesquisar..."
           ></Input>
           {!session?.user && !loading && (
             <Button

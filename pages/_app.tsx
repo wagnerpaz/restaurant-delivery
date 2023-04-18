@@ -1,18 +1,75 @@
 import type { AppProps } from "next/app";
-import { ThemeProvider } from "@material-tailwind/react";
 import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
-
-import materialTailwindTheme from "/config/materialTailwindTheme";
+import {
+  ChakraProvider,
+  extendTheme,
+  withDefaultColorScheme,
+} from "@chakra-ui/react";
 
 import "/styles/globals.css";
 import "react-image-crop/dist/ReactCrop.css";
 import { getRGBColor } from "/lib/getRGBColor";
+import { useEffect, useState } from "react";
+
+const activeLabelStyles = {
+  transform: "scale(0.85) translateY(-32px)",
+};
+
+export const chakraTheme = extendTheme(
+  {
+    components: {
+      Form: {
+        variants: {
+          floating: {
+            container: {
+              _focusWithin: {
+                label: {
+                  ...activeLabelStyles,
+                },
+              },
+              label: {
+                ...activeLabelStyles,
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                position: "absolute",
+                backgroundColor: "white",
+                pointerEvents: "none",
+                mx: 3,
+                px: 1,
+                my: 2,
+                transformOrigin: "left top",
+              },
+            },
+          },
+        },
+      },
+      Input: {
+        defaultProps: {
+          focusBorderColor: "gray.500",
+        },
+      },
+      Textarea: {
+        defaultProps: {
+          focusBorderColor: "gray.500",
+        },
+      },
+      Select: {
+        defaultProps: {
+          focusBorderColor: "gray.500",
+        },
+      },
+    },
+  },
+  withDefaultColorScheme({ colorScheme: "blackAlpha" })
+);
 
 export default function App({
   Component,
   pageProps: { session, theme, ...pageProps },
 }: AppProps) {
+  console.log("theme", theme);
   const {
     hero = "#BE3144",
     heroA11yHigh = "#FFFFFF",
@@ -21,39 +78,20 @@ export default function App({
     main100 = "#FFFFFF",
     main200 = "#F2F2F2",
     main300 = "#949494",
-    mainA11yHigh = "#010101",
-    mainA11yMedium = "#1C1C1C",
-    mainA11yLow = "#4A4A4A",
+    mainA11yHigh = "#0e1111",
+    mainA11yMedium = "#4c5e5e",
+    mainA11yLow = "#e2e8f0",
     contrastHigh = "#FFFFFF",
     contrastMedium = "#F2F2F2",
     contrastLow = "#E6E6E6",
-    contrastA11yHigh = "#010101",
-    contrastA11yMedium = "#1C1C1C",
-    contrastA11yLow = "#4A4A4A",
+    contrastA11yHigh = "#0e1111",
+    contrastA11yMedium = "#232b2b",
+    contrastA11yLow = "#353839",
     money = "#036704",
   } = theme?.colors || {};
   const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
     theme?.patterns || {};
-  console.log({
-    hero,
-    heroA11yHigh,
-    heroA11yMedium,
-    heroA11yLow,
-    main100,
-    main200,
-    main300,
-    contrastHigh,
-    contrastMedium,
-    contrastLow,
-    mainA11yHigh,
-    mainA11yMedium,
-    mainA11yLow,
-    contrastA11yHigh,
-    contrastA11yMedium,
-    contrastA11yLow,
-    money,
-    heroPattern,
-  });
+
   const heroColorVar = getRGBColor(hero, "hero");
   const heroA11yHighColorVar = getRGBColor(heroA11yHigh, "hero-a11y-high");
   const heroA11yMediumColorVar = getRGBColor(
@@ -94,6 +132,12 @@ export default function App({
 
   const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
 
+  const [pageLoaded, setPageLoaded] = useState(false);
+
+  useEffect(() => {
+    setPageLoaded(true);
+  }, []);
+
   return (
     <>
       <Head>
@@ -125,11 +169,24 @@ export default function App({
         className="font-lato bg-main-100 fixed top-0 left-0 w-full h-full -z-10"
       />
       <div className="bg-hero-pattern bg-repeat opacity-10 fixed top-0 left-0 w-full h-full -z-10" />
-      <ThemeProvider value={materialTailwindTheme}>
+      <ChakraProvider theme={chakraTheme}>
         <SessionProvider session={session}>
           <Component {...pageProps} />
         </SessionProvider>
-      </ThemeProvider>
+      </ChakraProvider>
+      {!pageLoaded && (
+        <div
+          style={{
+            backgroundColor: "white",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 99999,
+          }}
+        />
+      )}
     </>
   );
 }

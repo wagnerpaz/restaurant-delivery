@@ -1,5 +1,3 @@
-import { Button, Input, Option, Select } from "@material-tailwind/react";
-import classNames from "classnames";
 import { ComponentProps, useCallback } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import Draggable from "/components/Draggable";
@@ -7,6 +5,10 @@ import DraggableGroup from "/components/DraggableGroup";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
 import { IIngredient } from "/models/Ingredients";
 import { IMenuItemCompositionItem } from "/models/MenuItem";
+import { Select } from "chakra-react-select";
+import { Select as SimpleSelect } from "@chakra-ui/react";
+import FormControl from "/components/FormControl";
+import { Button, Input } from "@chakra-ui/react";
 
 interface EditMenuItemCompositionFormProps
   extends ComponentProps<typeof DraggableGroup> {
@@ -60,10 +62,10 @@ const EditMenuItemCompositionForm: React.FC<
     };
 
   return (
-    <DraggableGroup className="flex flex-col gap-2">
+    <DraggableGroup className="flex flex-col gap-5">
       {composition?.map((compositionItem, compositionItemIndex) => (
         <Draggable
-          className="flex flex-col lg:flex-row gap-2 items-center"
+          className="flex flex-col lg:flex-row gap-4 items-center"
           id={compositionItem.id}
           key={compositionItem.id}
           dragIndicator
@@ -71,12 +73,24 @@ const EditMenuItemCompositionForm: React.FC<
           onFind={onFindCompositionItem}
           onDrop={onDropCompositionItem}
         >
-          <div className="w-full lg:w-auto flex-1">
+          <FormControl className="flex-1 min-w-fit" label="Ingrediente">
             <Select
-              className="flex-1"
-              label="Ingrediente"
-              value={compositionItem.ingredient?._id}
-              onChange={(value) => {
+              useBasicStyles
+              menuPortalTarget={document.body}
+              menuPlacement="auto"
+              value={{
+                value: compositionItem.ingredient?._id,
+                label: compositionItem.ingredient?.name,
+              }}
+              options={ingredients
+                .filter((f) => f?.name)
+                .sort((a, b) => (a.name > b.name ? 1 : -1))
+                .filter(
+                  (i) =>
+                    !composition.map((c) => c.ingredient?._id).includes(i._id)
+                )
+                .map((m) => ({ value: m._id, label: m.name }))}
+              onChange={({ value }) => {
                 onCompositionChange(
                   replaceAt(composition, compositionItemIndex, {
                     ...composition[compositionItemIndex],
@@ -84,31 +98,11 @@ const EditMenuItemCompositionForm: React.FC<
                   })
                 );
               }}
-            >
-              {...ingredients
-                .filter((f) => f?.name)
-                .sort((a, b) => (a.name > b.name ? 1 : -1))
-                .map((ingredient) => (
-                  <Option
-                    key={ingredient._id}
-                    value={ingredient._id}
-                    className={classNames({
-                      hidden:
-                        composition
-                          .map((c) => c.ingredient?._id)
-                          .includes(ingredient._id) ||
-                        ingredient._id === compositionItem?.ingredient?._id,
-                    })}
-                  >
-                    {ingredient.name}
-                  </Option>
-                ))}
-            </Select>
-          </div>
-          <div className="w-full lg:w-auto flex-1 min-w-48">
+            ></Select>
+          </FormControl>
+          <FormControl className="w-20" label="Qtd.">
             <Input
               type="number"
-              label="Qtd."
               value={compositionItem.quantity}
               defaultValue={1}
               onChange={handleModifyCompositionProp(
@@ -118,10 +112,9 @@ const EditMenuItemCompositionForm: React.FC<
                 (e) => e.target.value
               )}
             />
-          </div>
-          <div className="w-full lg:w-auto flex-1 min-w-48">
-            <Select
-              label="Essencial"
+          </FormControl>
+          <FormControl className="w-24" label="Essencial">
+            <SimpleSelect
               value={`${compositionItem.essential}`}
               onChange={handleModifyCompositionProp(
                 compositionItem,
@@ -130,19 +123,17 @@ const EditMenuItemCompositionForm: React.FC<
                 (value) => value == true
               )}
             >
-              <Option key={`true`} value={`true`}>
+              <option key={`true`} value={`true`}>
                 Sim
-              </Option>
-              <Option key={`false`} value={`false`}>
+              </option>
+              <option key={`false`} value={`false`}>
                 Não
-              </Option>
-            </Select>
-          </div>
+              </option>
+            </SimpleSelect>
+          </FormControl>
           <div className="flex flex-row">
             <Button
-              className="mr-2 text-contrast-high"
-              variant="text"
-              size="sm"
+              className="mr-2 text-main-a11y-high h-full"
               onClick={() =>
                 onCompositionChange([
                   ...composition?.filter((f, i) => i !== compositionItemIndex),
@@ -152,9 +143,7 @@ const EditMenuItemCompositionForm: React.FC<
               <IoMdCloseCircle size={24} />
             </Button>
             <Button
-              className="text-contrast-high"
-              variant="text"
-              size="sm"
+              className="text-main-a11y-high"
               onClick={() =>
                 onCompositionChange(
                   insertAt(composition, compositionItemIndex + 1, {

@@ -1,25 +1,18 @@
 import mongoose from "mongoose";
-import {
-  ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
-import {
-  Option,
-  Select,
-  Input,
-  Button,
-  Textarea,
-  Tabs,
-  TabsHeader,
-  TabsBody,
-  Tab,
-  TabPanel,
-} from "@material-tailwind/react";
 import isEqual from "lodash.isequal";
+import {
+  Button,
+  Input,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Textarea,
+} from "@chakra-ui/react";
+import { Select } from "@chakra-ui/react";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
 import Fieldset from "/components/Fieldset";
@@ -35,6 +28,7 @@ import EditMenuItemCompositionForm, {
   emptyCompositionItem,
 } from "/forms/EditMenuItemCompositionForm";
 import EditMenuItemSidesForm, { emptySidesItem } from "./EditMenuItemSidesForm";
+import FormControl from "/components/FormControl";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -44,11 +38,6 @@ interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   onStoreChange: (newValue: IStore) => void;
   onIngredientsChange: (newValue: IIngredient[]) => void;
 }
-
-const TABS = {
-  COMPOSITION: "composition",
-  SIDES: "sides",
-};
 
 const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   className,
@@ -66,8 +55,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
-
-  const [selectedTab, setSelectedTab] = useState(TABS.COMPOSITION);
 
   const addIngredientsInitialSelection = useMemo(
     () => edit.composition.map((ci) => ci.ingredient),
@@ -140,7 +127,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         className={classNames("flex flex-col gap-4", className)}
         onSubmit={(e) => e.preventDefault()}
       >
-        <div className="flex flex-col lg:flex-row items-center gap-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           <MenuItem
             className="w-full sm:!w-80"
             id={edit._id}
@@ -157,100 +144,109 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             onClick={() => {}}
             onEditClick={() => setEditImageModalOpen(true)}
           />
-          <div className="w-full lg:flex-1 flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <Input
-                containerProps={{ className: "!min-w-0" }}
-                label="Nome"
-                value={edit.name}
-                onChange={(e) =>
-                  setEdit({
-                    ...edit,
-                    name: e.target.value,
-                  } as IMenuItem)
-                }
-              />
-              <Input
-                containerProps={{ className: "!min-w-0" }}
-                label="Detalhe"
-                value={edit.nameDetail}
-                onChange={(e) =>
-                  setEdit({
-                    ...edit,
-                    nameDetail: e.target.value,
-                  } as IMenuItem)
-                }
-              />
-              <Select
-                className="flex-1"
-                label="Listado"
-                value={`${!edit.hidden}`}
-                onChange={(value) => {
-                  setEdit({
-                    ...edit,
-                    hidden: !!value,
-                  });
-                }}
-              >
-                <Option value={"true"}>Sim</Option>
-                <Option value={"false"}>Não</Option>
-              </Select>
+          <div className="w-full lg:flex-1 flex flex-col gap-5">
+            <div className="flex flex-row gap-2 mt-4">
+              <FormControl className="flex-1 min-w-fit" label="Nome">
+                <Input
+                  value={edit.name}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      name: e.target.value,
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
+              <FormControl className="flex-1 min-w-fit" label="Detalhe">
+                <Input
+                  value={edit.nameDetail}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      nameDetail: e.target.value,
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
+              <FormControl className="flex-1 min-w-fit" label="Listado">
+                <Select
+                  className="flex-1"
+                  value={`${!edit.hidden}`}
+                  onChange={(value) => {
+                    setEdit({
+                      ...edit,
+                      hidden: !!value,
+                    });
+                  }}
+                >
+                  <option value={"true"}>Sim</option>
+                  <option value={"false"}>Não</option>
+                </Select>
+              </FormControl>
             </div>
-            <Input
-              type="number"
-              label="Preço"
-              value={`${edit.price}`}
-              onChange={(e) =>
-                setEdit({
-                  ...edit,
-                  price: +e.target.value,
-                } as IMenuItem)
-              }
-            />
-            <Fieldset className="flex flex-col gap-2 mt-2" title="Detalhes">
+            <FormControl className="min-w-fit" label="Preço">
               <Input
-                label="Descrição curta"
-                value={edit.details?.short}
+                type="number"
+                value={`${edit.price}`}
                 onChange={(e) =>
                   setEdit({
                     ...edit,
-                    details: { ...edit.details, short: e.target.value },
+                    price: +e.target.value,
                   } as IMenuItem)
                 }
               />
-              <Textarea
-                label="Descrição longa"
-                value={edit.details?.long}
-                rows={10}
-                onChange={(e) =>
-                  setEdit({
-                    ...edit,
-                    details: { ...edit.details, long: e.target.value },
-                  } as IMenuItem)
-                }
-              />
+            </FormControl>
+            <Fieldset className="flex flex-col gap-5 mt-2" title="Detalhes">
+              <FormControl className="flex-1 min-w-fit" label="Descrição curta">
+                <Input
+                  value={edit.details?.short}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      details: { ...edit.details, short: e.target.value },
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
+              <FormControl className="flex-1 min-w-fit" label="Descrição longa">
+                <Textarea
+                  value={edit.details?.long}
+                  rows={10}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      details: { ...edit.details, long: e.target.value },
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
             </Fieldset>
           </div>
         </div>
 
-        <Tabs value={selectedTab}>
-          <TabsHeader>
-            <Tab value={TABS.COMPOSITION}>Ingredientes</Tab>
-            <Tab value={TABS.SIDES}>Acompanhamento</Tab>
-          </TabsHeader>
-          <TabsBody>
-            <TabPanel value={TABS.COMPOSITION} className="!px-0">
+        <Tabs>
+          <TabList>
+            <Tab>Ingredientes</Tab>
+            <Tab>Acompanhamento</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
-                <div className="flex-1 flex flex-row items-center gap-2">
+                <div className="flex-1 flex flex-row items-center gap-4  mb-4">
                   <Button className="flex-1" onClick={handleFillIngredients}>
                     Gerenciar Ingredientes
                   </Button>
-                  <div className="max-w-sm">
-                    <Select label="Exibir Ingredientes">
-                      <Option>Sim</Option>
-                      <Option>Não</Option>
+                  <FormControl
+                    className="min-w-[180px]"
+                    label="Exibir Ingredientes"
+                  >
+                    <Select
+                    //label="Exibir Ingredientes"
+                    >
+                      <option>Sim</option>
+                      <option>Não</option>
                     </Select>
-                  </div>
+                  </FormControl>
                 </div>
                 <EditMenuItemCompositionForm
                   ingredients={ingredients}
@@ -261,9 +257,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 />
               </Fieldset>
             </TabPanel>
-            <TabPanel className="!px-0" value={TABS.SIDES}>
+            <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
-                <Button className="flex-1" onClick={handleFillSides}>
+                <Button className="mb-4" onClick={handleFillSides}>
                   Gerenciar Acompanhamento
                 </Button>
                 <EditMenuItemSidesForm
@@ -273,7 +269,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 />
               </Fieldset>
             </TabPanel>
-          </TabsBody>
+          </TabPanels>
         </Tabs>
         <div className="flex flex-row gap-2">
           <Button onClick={handleCancel}>Cancel</Button>
