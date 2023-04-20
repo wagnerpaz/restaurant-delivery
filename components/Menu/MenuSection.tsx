@@ -4,9 +4,12 @@ import classNames from "classnames";
 import MenuSectionHeader from "./MenuSectionHeader";
 
 interface MenuSectionProps extends ComponentProps<"section"> {
-  name: string;
-  length: number;
-  onAddClick: () => void;
+  name?: string;
+  length?: number;
+  isNew?: boolean;
+  onAddMenuItemClick?: () => void;
+  onAddSectionClick?: () => void;
+  onEditSectionClick?: () => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
@@ -14,12 +17,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   children,
   name,
   length,
-  onAddClick,
+  isNew,
+  onAddMenuItemClick,
+  onAddSectionClick,
+  onEditSectionClick,
   ...props
 }) => {
   return (
     <>
-      <MenuSectionHeader name={name} length={length} onAddClick={onAddClick} />
+      <MenuSectionHeader
+        name={name}
+        length={length}
+        isNew={isNew}
+        onAddMenuItemClick={onAddMenuItemClick}
+        onAddSectionClick={onAddSectionClick}
+        onEditSectionClick={onEditSectionClick}
+      />
       <section
         className={classNames(
           "sm:container sm:m-auto px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6",

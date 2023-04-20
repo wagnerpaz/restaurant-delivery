@@ -8,6 +8,7 @@ interface ModalProps extends ComponentProps<"div"> {
   contentClassName?: string;
   noAutoClose?: boolean;
   onOpenChange: (newValue: boolean) => void;
+  onEsc?: (e: KeyboardEvent) => void;
   portalTarget?: () => HTMLElement | null;
 }
 
@@ -19,6 +20,7 @@ const Modal: React.FC<ModalProps> = ({
   noAutoClose,
   portalTarget,
   onOpenChange,
+  onEsc = () => onOpenChange(!open),
   ...props
 }) => {
   const container = useRef<HTMLDivElement>(null);
@@ -40,6 +42,11 @@ const Modal: React.FC<ModalProps> = ({
           "fixed inset-0 container mx-auto m-4 z-50 flex items-center justify-center",
           className
         )}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onEsc(e);
+          }
+        }}
         {...props}
       >
         <div

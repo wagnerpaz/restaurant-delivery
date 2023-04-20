@@ -232,8 +232,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           <TabPanels>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
-                <div className="flex-1 flex flex-row items-center gap-4  mb-4">
-                  <Button className="flex-1" onClick={handleFillIngredients}>
+                <div className="flex-1 flex flex-row items-center justify-between gap-4  mb-4">
+                  <Button variant="outline" onClick={handleFillIngredients}>
                     Gerenciar Ingredientes
                   </Button>
                   <FormControl
@@ -259,9 +259,15 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             </TabPanel>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
-                <Button className="mb-4" onClick={handleFillSides}>
-                  Gerenciar Acompanhamento
-                </Button>
+                <div>
+                  <Button
+                    className="mb-4"
+                    variant="outline"
+                    onClick={handleFillSides}
+                  >
+                    Gerenciar Acompanhamento
+                  </Button>
+                </div>
                 <EditMenuItemSidesForm
                   store={store}
                   sides={edit.sides}
@@ -271,10 +277,12 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             </TabPanel>
           </TabPanels>
         </Tabs>
-        <div className="flex flex-row gap-2">
-          <Button onClick={handleCancel}>Cancel</Button>
+        <div className="flex flex-row justify-end gap-2">
+          <Button className="w-32" variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
           <Button
-            className="flex-1"
+            className="w-32"
             onClick={() => {
               //remove empty ingredients
               edit.composition = edit.composition?.filter(
@@ -322,6 +330,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             const newComposition: IMenuItemCompositionItem[] = [];
             const selected = ingredientsSelection.filter((f) => f.selected);
 
+            console.log("selected", selected);
             edit.composition.forEach((ci) => {
               const found = selected.find(
                 (f) => f.ingredient._id === ci.ingredient?._id
@@ -330,6 +339,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 newComposition.push(ci);
               }
             });
+
             selected
               .filter(
                 (f) =>

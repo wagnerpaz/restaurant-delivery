@@ -142,9 +142,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
                   <span className="font-bold">{`${side.quantity}x `}</span>
                   {side.menuItem.name}
                 </li>
-                // ))
-                // .flatMap((item) => [item, ", "])
-                // .slice(0, -1)}
               ))}
             </ul>
           ) : null}

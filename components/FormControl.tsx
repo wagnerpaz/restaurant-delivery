@@ -6,13 +6,21 @@ import {
   Box,
 } from "@chakra-ui/react";
 import classNames from "classnames";
+import { ReactNode } from "react";
 
-export default function FormControl({
+interface FormControlProps {
+  labelClassName?: string;
+  className?: string;
+  children: ReactNode;
+  label: string;
+}
+
+const FormControl: React.FC<FormControlProps> = ({
   labelClassName,
   className,
   children,
   label,
-}) {
+}) => {
   return (
     <Box className={classNames("bg-main-100 rounded-md", className)}>
       <ChakraFormControl className="text-main-a11y-high" variant="floating">
@@ -20,7 +28,7 @@ export default function FormControl({
         {/* It is important that the Label comes after the Control due to css selectors */}
         <FormLabel
           className={classNames(
-            "text-main-a11y-medium !bg-transparent",
+            "text-main-a11y-medium !bg-[transparent]",
             labelClassName
           )}
         >
@@ -31,4 +39,6 @@ export default function FormControl({
       </ChakraFormControl>
     </Box>
   );
-}
+};
+
+export default FormControl;

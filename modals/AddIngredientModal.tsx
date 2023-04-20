@@ -1,4 +1,4 @@
-import { ComponentProps, useEffect, useMemo, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useRef, useState } from "react";
 import { HiPlus } from "react-icons/hi";
 
 import Modal from "/components/Modal";
@@ -37,6 +37,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   onSelectionChange = () => {},
   ...props
 }) => {
+  const filterRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState("");
   const [ingredientsSel, setIngredientsSel] = useState<IIngredientSelection[]>(
     []
@@ -44,7 +45,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   const [additions, setAdditions] = useState<IIngredientSelection[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const getIngredients = useGetIngredients();
   const putIngredient = usePutIngredient();
 
   const sorted = useMemo(
@@ -120,13 +120,15 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   };
 
   const handleSave = async () => {
-    await putIngredient(additions.map((a) => a.ingredient));
-    const newIngredients = await getIngredients();
-    onIngredientsChange(newIngredients);
+    const additionIngredients = await putIngredient(
+      additions.map((a) => a.ingredient)
+    );
+    console.log("additionIngredients", additionIngredients);
+    onIngredientsChange([...ingredients, ...additionIngredients]);
     onSelectionChange(
       [...ingredientsSel, ...additions].map((i) => ({
         ...i,
-        ingredient: newIngredients.find(
+        ingredient: [...ingredients, ...additionIngredients].find(
           (f: IIngredient) => i.ingredient.name === f.name
         ),
       }))
@@ -188,10 +190,19 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         contentClassName
       )}
       onOpenChange={handleOpenChange}
+      onEsc={(e) => {
+        e.stopPropagation();
+        setFilter("");
+        filterRef.current?.focus();
+      }}
     >
       <div className="flex flex-row gap-2 mb-2 w-full">
         <FormControl className="flex-1 min-w-fit" label="Ingrediente">
-          <Input value={filter} onChange={(e) => setFilter(e.target.value)} />
+          <Input
+            ref={filterRef}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
         </FormControl>
         <Button
           className="flex flex-row gap-2 items-center"
@@ -217,7 +228,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   >
                     <Checkbox
                       checked={sel.selected}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        filterRef.current?.focus();
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
@@ -228,8 +240,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                               selected: e.target.checked,
                             },
                           ];
-                        })
-                      }
+                        });
+                      }}
                     />
                     <span className="whitespace-nowrap">
                       {sel.ingredient.name}
@@ -262,7 +274,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   >
                     <Checkbox
                       checked={sel.selected}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        filterRef.current?.focus();
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
@@ -273,8 +286,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                               selected: e.target.checked,
                             },
                           ];
-                        })
-                      }
+                        });
+                      }}
                     />
                     <span className="whitespace-nowrap">
                       {sel.ingredient.name}
@@ -312,7 +325,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                   >
                     <Checkbox
                       defaultChecked
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        filterRef.current?.focus();
                         setIngredientsSel((ingredientsSel) => {
                           return [
                             ...ingredientsSel.filter(
@@ -323,8 +337,8 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                               selected: e.target.checked,
                             },
                           ];
-                        })
-                      }
+                        });
+                      }}
                     />
                     <span className="whitespace-nowrap">
                       {sel.ingredient.name}

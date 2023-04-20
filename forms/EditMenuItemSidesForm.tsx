@@ -1,6 +1,5 @@
 import { Button, Input, Select as SelectSimple } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
-import classNames from "classnames";
 import React, { ComponentProps, useCallback, useMemo } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import DbImage from "/components/DbImage";
@@ -46,6 +45,8 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
     //@ts-ignore
     return [...menuItems.filter((el) => el)];
   }, [store]);
+
+  console.log(storeMenuItems);
 
   const onFindSidesItem = useCallback(
     (id: string) => {
@@ -133,7 +134,7 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                       </div>
                     ),
                   }))}
-                onChange={(value) => {
+                onChange={({ value }) => {
                   onSidesChange(
                     replaceAt(sides, sidesItemIndex, {
                       ...sides[sidesItemIndex],

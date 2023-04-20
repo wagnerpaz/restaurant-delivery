@@ -5,14 +5,19 @@ import { IIngredient } from "/models/Ingredients";
 
 const usePutIngredient = () => {
   const call = async (ingredient: IIngredient | IIngredient[]) => {
-    const handleIngredient = (ingredient: IIngredient) => {
+    const handleIngredient = async (ingredient: IIngredient) => {
       if (ingredient._id) {
-        return axiosInstance.put(
+        const response = await axiosInstance.put(
           `/api/ingredient/${ingredient._id}`,
           ingredient
         );
+        return response.data;
       } else {
-        return axiosInstance.post(`/api/ingredient`, ingredient);
+        const response = await axiosInstance.post(
+          `/api/ingredient`,
+          ingredient
+        );
+        return response.data;
       }
     };
 
@@ -22,7 +27,7 @@ const usePutIngredient = () => {
       for (const ingredient of ingredients) {
         promises.push(handleIngredient(ingredient));
       }
-      return await Promise.all(ingredients);
+      return await Promise.all(promises);
     } else {
       return await handleIngredient(ingredient);
     }

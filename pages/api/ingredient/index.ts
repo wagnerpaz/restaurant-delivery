@@ -10,7 +10,7 @@ async function createIngredient(req: NextApiRequest, res: NextApiResponse) {
 
     if (req.method === "POST") {
       const result = await Ingredients.create(req.body);
-      res.status(200).json(result);
+      res.status(200).json(result.toObject());
     } else if (req.method === "GET") {
       const found = await Ingredients.find();
       const serialized = serializeJson(found.map((f) => f.toObject()));
