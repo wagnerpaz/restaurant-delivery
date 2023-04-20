@@ -11,6 +11,7 @@ import { IUser } from "/models/User";
 interface MenuSectionHeaderProps extends ComponentProps<"form"> {
   name?: string;
   length?: number;
+  totalLength?: number;
   isNew?: boolean;
   onAddMenuItemClick?: () => void;
   onAddSectionClick?: () => void;
@@ -22,6 +23,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   children,
   name,
   length,
+  totalLength,
   isNew,
   onAddMenuItemClick = () => {},
   onAddSectionClick = () => {},
@@ -45,9 +47,16 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
       <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">
         <div className="flex flex-row flex-wrap gap-x-2">
           {name && <span>{name}</span>}
-          {length ? (
+          {length === totalLength ? (
             <span className="text-main-a11y-medium font-normal">
-              ({length} items)
+              ({length} item{(totalLength || 0) > 1 ? "s" : ""})
+            </span>
+          ) : null}
+
+          {length !== totalLength ? (
+            <span className="text-main-a11y-medium font-normal">
+              ({length} de {totalLength} item{(totalLength || 0) > 1 ? "s" : ""}
+              )
             </span>
           ) : null}
         </div>

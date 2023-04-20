@@ -6,6 +6,7 @@ import MenuSectionHeader from "./MenuSectionHeader";
 interface MenuSectionProps extends ComponentProps<"section"> {
   name?: string;
   length?: number;
+  totalLength?: number;
   isNew?: boolean;
   onAddMenuItemClick?: () => void;
   onAddSectionClick?: () => void;
@@ -17,6 +18,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   children,
   name,
   length,
+  totalLength,
   isNew,
   onAddMenuItemClick,
   onAddSectionClick,
@@ -28,6 +30,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       <MenuSectionHeader
         name={name}
         length={length}
+        totalLength={totalLength}
         isNew={isNew}
         onAddMenuItemClick={onAddMenuItemClick}
         onAddSectionClick={onAddSectionClick}

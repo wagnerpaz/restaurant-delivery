@@ -8,6 +8,7 @@ import EditableSection from "../EditableSection";
 import DbImage from "../DbImage";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/User";
+import getHighlightedText from "/lib/getHighlightedText";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
@@ -23,6 +24,7 @@ interface MenuItemProps extends ComponentProps<"div"> {
   sides?: ISidesItem[];
   editable?: boolean;
   useEffects?: boolean;
+  search?: string;
   portalTargetEditModal?: () => HTMLElement;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
@@ -46,6 +48,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   sides,
   editable = false,
   useEffects = false,
+  search = "",
   portalTargetEditModal,
   onEditClick,
   onDeleteClick,
@@ -99,11 +102,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
       <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
         <div className="flex flex-col justify-center flex-wrap min-h-[36px]">
           <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
-            {name}
+            {getHighlightedText(name, search)}
           </h3>
           {nameDetail && (
             <span className="text-md font-bold mr-12 sm:mr-0 opacity-60 mb-1">
-              {nameDetail}
+              {getHighlightedText(nameDetail, search)}
             </span>
           )}
         </div>
@@ -111,7 +114,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
         <div className="relative flex-1 pb-2">
           {descriptionShort && (
             <span className="block text-xs leading-tight">
-              {descriptionShort}
+              {getHighlightedText(descriptionShort, search)}
             </span>
           )}
           {(composition?.length || 0) > 0 && (

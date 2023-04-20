@@ -3,6 +3,7 @@ import { RiUser3Fill } from "react-icons/ri";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { FaSearch } from "react-icons/fa";
 
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
@@ -24,12 +25,13 @@ import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import { Button, Input } from "@chakra-ui/react";
 import FormControl from "./FormControl";
-import AddMenuSecitionModal from "/modals/AddMenuSectionModal";
+import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import Image from "next/image";
 import Link from "next/link";
+import searchIncludes from "../lib/searchIncludes";
 
 interface StoreProps {
   store: IStore;
@@ -56,6 +58,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [clientStore, setClientStore] = useState(store);
   const [clientIngredients, setClientIngredients] = useState(ingredients);
   const clientLocation = selectedLocation || clientStore?.locations?.[0];
+
+  const [search, setSearch] = useState("");
+  const [searchMobileVisible, setSearchMobileVisible] = useState(false);
 
   const [editMenuItemModalOpen, setEditMenuItemModalOpen] = useState(false);
   const [editMenuItemIndex, setEditMenuItemIndex] = useState(-1);
@@ -134,22 +139,30 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     sections: IMenuSection[] = [],
     path: IMenuSection[] = [],
     indexPath: number[] = []
-  ) => {
+  ): React.ReactNode => {
     return sections.map((section, sectionIndex) => {
-      console.log(path.map((p) => p.name).join(" • "), section?.name);
       const sectionName = [path.map((p) => p.name).join(" • "), section.name]
         .filter((f) => f)
         .join(" • ");
 
+      const visibleItems = section.items
+        ?.filter((f) => !f.hidden)
+        .filter(
+          (f) =>
+            search.length < 3 ||
+            searchIncludes(f.name, search) ||
+            searchIncludes(f.nameDetail, search) ||
+            searchIncludes(f.details?.short, search)
+        );
+
       return (
         <>
-          {(admin
-            ? true
-            : section.items?.filter((f) => !f.hidden).length > 0) && (
+          {(admin ? true : visibleItems.length > 0) && (
             <MenuSection
               key={section.name}
               name={sectionName}
-              length={section.items.length}
+              length={visibleItems.length}
+              totalLength={section.items?.length || 0}
               onAddMenuItemClick={() => {
                 setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
                 setEditMenuItemIndex(-1);
@@ -172,7 +185,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               }}
             >
               <AdminDraggableGroup className="contents" editable={admin}>
-                {section.items.map((menuItem, menuItemIndex) => (
+                {visibleItems.map((menuItem, menuItemIndex) => (
                   <AdminDraggable
                     containerClassName="h-full"
                     key={menuItem._id}
@@ -194,6 +207,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                       index={menuItemIndex}
                       editable={admin}
                       useEffects
+                      search={search}
                       onEditClick={() => {
                         setEditMenuItemObject({ ...menuItem } as IMenuItem);
                         setEditMenuItemIndex(menuItemIndex);
@@ -243,7 +257,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       })}
     >
       <header className="bg-hero text-hero-a11y-high sticky top-0 shadow-lg z-20">
-        <div className="flex flex-row items-center gap-4 px-6 py-4">
+        <div className="flex flex-row items-center gap-2 px-6 py-4">
           <DbImage
             className="rounded-md w-[50px] h-[50px]"
             id={clientStore?.logo}
@@ -268,11 +282,23 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               </span>
             </address>
           </div>
+          <div className="flex-1" />
           <Input
             id="search"
-            className="!w-full !min-w-0 max-w-xs !bg-main-100"
+            className="!w-full !min-w-0 max-w-xs !bg-main-100 !text-main-a11y-high hidden sm:block"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Pesquisar..."
           ></Input>
+          <Button
+            className="sm:!hidden"
+            onClick={() => {
+              setSearchMobileVisible(!searchMobileVisible);
+              setSearch("");
+            }}
+          >
+            <FaSearch />
+          </Button>
           {!session?.user && !loading && (
             <Button
               className="flex flex-row gap-2 items-center"
@@ -285,17 +311,28 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           <UserIcon />
         </div>
       </header>
+      {searchMobileVisible && (
+        <Input
+          id="search-mobile"
+          className="!w-full !min-w-0 !bg-main-100 !text-main-a11y-high !rounded-none"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Pesquisar..."
+        ></Input>
+      )}
       <main>
         <Menu>{renderMenuSections(clientStore?.menu?.sections)}</Menu>
-        <MenuSection
-          isNew
-          onAddSectionClick={() => {
-            setEditNewSectionModalOpen(true);
-            setEditNewSectionIndex([-1]);
-            setEditNewSectionParentName("");
-            setEditNewSectionMode("ADD");
-          }}
-        />
+        {admin && (
+          <MenuSection
+            isNew
+            onAddSectionClick={() => {
+              setEditNewSectionModalOpen(true);
+              setEditNewSectionIndex([-1]);
+              setEditNewSectionParentName("");
+              setEditNewSectionMode("ADD");
+            }}
+          />
+        )}
       </main>
       <footer className="bg-comanda-hero p-6 absolute h-40 bottom-0 w-full flex flex-row items-center">
         <Link href="/">
@@ -372,7 +409,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         />
       )}
       {editNewSectionModalOpen && (
-        <AddMenuSecitionModal
+        <AddMenuSectionModal
           portalTarget={() => null}
           noAutoClose
           mode={editNewSectionMode}
