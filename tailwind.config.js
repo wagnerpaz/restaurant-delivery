@@ -22,6 +22,7 @@ module.exports = {
       lato: ["Lato"],
     },
     colors: {
+      "comanda-hero": "#BE3144",
       hero: "var(--color-hero)",
       "hero-a11y-high": "var(--color-hero-a11y-high)",
       "hero-a11y-medium": "var(--color-hero-a11y-medium)",

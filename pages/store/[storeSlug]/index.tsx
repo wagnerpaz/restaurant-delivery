@@ -1,4 +1,5 @@
 import { GetServerSideProps, NextPage } from "next";
+import Head from "next/head";
 
 import { ssrHelpers } from "/lib/ssrHelpers";
 import { ILocation, IStore } from "/models/Store";
@@ -18,11 +19,21 @@ const StorePage: NextPage<StorePageProps> = ({
   ingredients,
 }) => {
   return (
-    <Store
-      store={store}
-      selectedLocation={selectedLocation}
-      ingredients={ingredients}
-    />
+    <>
+      <Head>
+        <link
+          rel="icon"
+          type="image/x-icon"
+          href={`/api/download?id=${store.logo}`}
+        />
+        <title>{store.name}</title>
+      </Head>
+      <Store
+        store={store}
+        selectedLocation={selectedLocation}
+        ingredients={ingredients}
+      />
+    </>
   );
 };
 

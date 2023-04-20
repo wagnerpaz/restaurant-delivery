@@ -28,6 +28,8 @@ import AddMenuSecitionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
+import Image from "next/image";
+import Link from "next/link";
 
 interface StoreProps {
   store: IStore;
@@ -235,7 +237,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   return (
     <div
-      className={classNames("font-lato custom-scrollbar", {
+      className={classNames("font-lato custom-scrollbar min-h-screen pb-40", {
         "fixed top-0 left-0 w-full h-full overflow-hidden":
           editMenuItemModalOpen,
       })}
@@ -295,6 +297,17 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           }}
         />
       </main>
+      <footer className="bg-comanda-hero p-6 absolute h-40 bottom-0 w-full flex flex-row items-center">
+        <Link href="/">
+          <Image
+            className="w-[200px]"
+            src="/logo.png"
+            width={99999}
+            height={99999}
+            alt="Rappid logo"
+          />
+        </Link>
+      </footer>
       <EditMenuItemModal
         open={editMenuItemModalOpen}
         onOpenChange={(newValue) => setEditMenuItemModalOpen(newValue)}
