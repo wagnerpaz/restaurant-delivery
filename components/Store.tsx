@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
@@ -55,7 +55,9 @@ const emptyMenuSection: IMenuSection = {
 };
 
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
+  const searchMobileRef = useRef<HTMLInputElement>();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
 
   const [clientStore, setClientStore] = useState(store);
   const [clientIngredients, setClientIngredients] = useState(ingredients);
@@ -99,6 +101,31 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const putMenuSection = usePutStoreMenuSection();
   const putMenuSectionSection = usePutStoreMenuSectionSection();
   const swapMenuItems = useSwapMenuItems();
+
+  console.log("isSearchMobileInScreen", isSearchMobileInScreen);
+
+  useEffect(() => {
+    if (searchMobileVisible) {
+      searchMobileRef.current?.focus();
+    }
+  }, [searchMobileVisible]);
+
+  useEffect(() => {
+    const cachedRef = searchMobileRef.current,
+      observer = new IntersectionObserver(
+        ([e]) => setIsSearchMobileInScreen(e.intersectionRatio >= 1),
+        { threshold: [1] }
+      );
+
+    if (cachedRef) {
+      observer.observe(cachedRef);
+
+      // unmount
+      return function () {
+        observer.unobserve(cachedRef);
+      };
+    }
+  }, [searchMobileVisible]);
 
   const onFindMenuItem = useCallback(
     (sectionIndex: number[]) => (id: string) => {
@@ -294,15 +321,24 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             id="search"
             className="!w-full !min-w-0 max-w-xs !bg-main-100 !text-main-a11y-high hidden sm:block"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
             placeholder="Pesquisar..."
           ></Input>
           <Button
             className="sm:!hidden !px-0"
             variant="text"
             onClick={() => {
-              setSearchMobileVisible(!searchMobileVisible);
-              setSearch("");
+              if (searchMobileVisible) {
+                if (!isSearchMobileInScreen) {
+                  searchMobileRef.current?.focus();
+                } else {
+                  setSearchMobileVisible(false);
+                }
+              } else {
+                setSearchMobileVisible(true);
+              }
             }}
           >
             <FaSearch size={22} />
@@ -319,6 +355,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       </header>
       {searchMobileVisible && (
         <Input
+          ref={searchMobileRef}
           id="search-mobile"
           className="!w-full !min-w-0 !bg-main-100 !text-main-a11y-high !rounded-none"
           value={search}
