@@ -2,12 +2,16 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 
 import connectToDatabase from "/lib/mongoose";
+import Ingredients from "/models/Ingredients";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
+    //load dependant schemas
+    Ingredients.name;
+
     const session = await getServerSession(req, res, authOptions);
 
     const storeId = req.query.storeId as string;
