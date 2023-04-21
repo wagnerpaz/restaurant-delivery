@@ -4,13 +4,17 @@ import Head from "next/head";
 import {
   ChakraProvider,
   extendTheme,
+  useToast,
   withDefaultColorScheme,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { VscError } from "react-icons/vsc";
+
+import { getRGBColor } from "/lib/getRGBColor";
 
 import "/styles/globals.css";
 import "react-image-crop/dist/ReactCrop.css";
-import { getRGBColor } from "/lib/getRGBColor";
-import { useEffect, useState } from "react";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",
@@ -65,7 +69,7 @@ export const chakraTheme = extendTheme(
   withDefaultColorScheme({ colorScheme: "blackAlpha" })
 );
 
-export default function App({
+function App({
   Component,
   pageProps: { session, theme, ...pageProps },
 }: AppProps) {
@@ -169,11 +173,13 @@ export default function App({
         className="font-lato bg-main-100 fixed top-0 left-0 w-full h-full -z-10"
       />
       <div className="bg-hero-pattern bg-repeat opacity-10 fixed top-0 left-0 w-full h-full -z-10" />
-      <ChakraProvider theme={chakraTheme}>
-        <SessionProvider session={session}>
-          <Component {...pageProps} />
-        </SessionProvider>
-      </ChakraProvider>
+      <MyErrorBoundary>
+        <ChakraProvider theme={chakraTheme}>
+          <SessionProvider session={session}>
+            <Component {...pageProps} />
+          </SessionProvider>
+        </ChakraProvider>
+      </MyErrorBoundary>
       {!pageLoaded && (
         <div
           style={{
@@ -190,3 +196,36 @@ export default function App({
     </>
   );
 }
+
+function MyErrorBoundary({ children }) {
+  const toast = useToast();
+
+  function handleOnCatch(error, errorInfo) {
+    // display a toast notification for the error
+    // I THINK THIS IS NOT WORKING
+    toast({
+      title: error.message,
+      status: "error",
+      duration: 9000,
+      isClosable: true,
+    });
+
+    console.error(error, errorInfo);
+  }
+
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="w-screen h-screen flex flex-col items-center justify-center text-xl font-bold text-main-a11y-high">
+          <VscError size={60} />
+          Ops.. ocorreu um error crítico.
+        </div>
+      }
+      onError={handleOnCatch}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+
+export default App;

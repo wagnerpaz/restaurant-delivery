@@ -16,7 +16,8 @@ interface MenuItemProps extends ComponentProps<"div"> {
   nameDetail?: string;
   index: number;
   mainImageId?: string;
-  price: number;
+  price?: number;
+  pricePromotional?: number;
   hidden?: boolean;
   descriptionShort?: string;
   descriptionLong?: string;
@@ -42,6 +43,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   index,
   mainImageId,
   price,
+  pricePromotional,
   hidden,
   descriptionShort,
   composition,
@@ -61,6 +63,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
+  const priceNew = pricePromotional ? pricePromotional : price;
+  const priceOld = pricePromotional ? price : undefined;
+
   return !admin && hidden ? null : (
     <div
       className={classNames(
@@ -75,13 +80,21 @@ const MenuItem: React.FC<MenuItemProps> = ({
       onClick={onClick}
     >
       <div className="relative float-left sm:float-none">
-        <div className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-[10px] sm:!pt-2s">
+        <div className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-2 sm:!pt-2s flex flex-col sm:flex-row-reverse justify-start sm:items-baseline text-end gap-x-2">
           <span className="font-bold text-money">
             R$
-            {(Math.round((price || 0) * 100) / 100)
+            {(Math.round((priceNew || 0) * 100) / 100)
               .toFixed(2)
               .replace(".", ",")}
           </span>
+          {priceOld && (
+            <span className="font-bold line-through text-xs text-contrast-a11y-medium">
+              R$
+              {(Math.round((priceOld || 0) * 100) / 100)
+                .toFixed(2)
+                .replace(".", ",")}
+            </span>
+          )}
         </div>
         <EditableSection
           iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"

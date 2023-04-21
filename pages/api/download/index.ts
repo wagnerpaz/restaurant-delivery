@@ -34,7 +34,7 @@ async function downloadImage(req: NextApiRequest, res: NextApiResponse) {
     downloadStream.pipe(res);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).json(err);
   }
 }
 

@@ -24,7 +24,7 @@ import useSwapMenuItems from "/hooks/useSwapMenuItems";
 import DbImage from "./DbImage";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
-import { Button, Input } from "@chakra-ui/react";
+import { Button, Input, useToast } from "@chakra-ui/react";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
@@ -33,6 +33,7 @@ import Image from "next/image";
 import Link from "next/link";
 import searchIncludes from "../lib/searchIncludes";
 import MainMenuDrawer from "./MainMenuDrawer";
+import defaultToastError from "/config/defaultToastError";
 
 interface StoreProps {
   store: IStore;
@@ -56,6 +57,8 @@ const emptyMenuSection: IMenuSection = {
 };
 
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
+  const toast = useToast();
+
   const searchMobileRef = useRef<HTMLInputElement>();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
@@ -102,8 +105,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const putMenuSection = usePutStoreMenuSection();
   const putMenuSectionSection = usePutStoreMenuSectionSection();
   const swapMenuItems = useSwapMenuItems();
-
-  console.log("isSearchMobileInScreen", isSearchMobileInScreen);
 
   useEffect(() => {
     if (searchMobileVisible) {
@@ -234,6 +235,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                           id={menuItem._id}
                           mainImageId={menuItem.images?.main?.toString()}
                           price={menuItem.price}
+                          pricePromotional={menuItem.pricePromotional}
                           hidden={menuItem.hidden}
                           descriptionShort={menuItem.details?.short}
                           composition={menuItem.composition}
@@ -256,18 +258,22 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                               `Deseja excluir o item "${menuItem.name}"?`
                             );
                             if (confirmed) {
-                              await deleteMenuItem(
-                                clientStore,
-                                [...indexPath, sectionIndex],
-                                menuItem
-                              );
-                              const cloneStore = cloneDeep(clientStore);
-                              const section =
-                                cloneStore.menu.sections[sectionIndex];
-                              section.items = section.items.filter(
-                                (f) => f._id !== menuItem._id
-                              );
-                              setClientStore(cloneStore);
+                              try {
+                                await deleteMenuItem(
+                                  clientStore,
+                                  [...indexPath, sectionIndex],
+                                  menuItem
+                                );
+                                const cloneStore = cloneDeep(clientStore);
+                                const section =
+                                  cloneStore.menu.sections[sectionIndex];
+                                section.items = section.items.filter(
+                                  (f) => f._id !== menuItem._id
+                                );
+                                setClientStore(cloneStore);
+                              } catch (err: any) {
+                                toast(defaultToastError(err));
+                              }
                             }
                           }}
                         />
@@ -424,33 +430,37 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             return;
           }
 
-          const serverMenuItem = await putMenuItem(
-            clientStore,
-            newMenuItem,
-            editMenuSectionIndex
-          );
+          try {
+            const serverMenuItem = await putMenuItem(
+              clientStore,
+              newMenuItem,
+              editMenuSectionIndex
+            );
 
-          const cloneStore = cloneDeep(clientStore);
-          const menu = cloneStore.menu;
+            const cloneStore = cloneDeep(clientStore);
+            const menu = cloneStore.menu;
 
-          let curSection = menu as IMenuSection;
-          for (const index of editMenuSectionIndex) {
-            curSection = curSection.sections[index];
+            let curSection = menu as IMenuSection;
+            for (const index of editMenuSectionIndex) {
+              curSection = curSection.sections[index];
+            }
+            curSection.items = replaceAt(
+              curSection.items,
+              editMenuItemIndex >= 0
+                ? editMenuItemIndex
+                : curSection.items.length,
+              serverMenuItem
+            );
+
+            setClientStore(cloneStore);
+
+            setEditMenuItemObject({ ...emptyMenuItem });
+            setEditMenuItemIndex(-1);
+            setEditMenuSectionIndex([-1]);
+            setEditMenuItemModalOpen(false);
+          } catch (err: any) {
+            toast(defaultToastError(err));
           }
-          curSection.items = replaceAt(
-            curSection.items,
-            editMenuItemIndex >= 0
-              ? editMenuItemIndex
-              : curSection.items.length,
-            serverMenuItem
-          );
-
-          setClientStore(cloneStore);
-
-          setEditMenuItemObject({ ...emptyMenuItem });
-          setEditMenuItemIndex(-1);
-          setEditMenuSectionIndex([-1]);
-          setEditMenuItemModalOpen(false);
         }}
       />
       {addStoreModalOpen && (
@@ -458,10 +468,13 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           store={clientStore}
           onStoreChange={async (value, shouldSave) => {
             if (shouldSave) {
-              const serverStore = await putStore(value);
-              console.log(serverStore);
-              setClientStore(serverStore);
-              setAddStoreModalOpen(false);
+              try {
+                const serverStore = await putStore(value);
+                setClientStore(serverStore);
+                setAddStoreModalOpen(false);
+              } catch (err: any) {
+                toast(defaultToastError(err));
+              }
             } else {
               setClientStore(value);
             }
@@ -482,48 +495,52 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           open={editNewSectionModalOpen}
           onOpenChange={(value) => setEditNewSectionModalOpen(value)}
           onSave={async (value) => {
-            if (editNewSectionMode === "EDIT") {
-              await putMenuSection(clientStore, value, editNewSectionIndex);
-            } else {
-              if (editNewSectionIndex[0] >= 0) {
-                await putMenuSectionSection(
-                  clientStore,
-                  editNewSectionIndex,
-                  value
-                );
+            try {
+              if (editNewSectionMode === "EDIT") {
+                await putMenuSection(clientStore, value, editNewSectionIndex);
               } else {
-                await putMenuSection(clientStore, value);
-              }
-            }
-
-            const cloneStore = cloneDeep(clientStore);
-
-            let sections;
-            let section = cloneStore.menu as IMenuSection;
-            if (editNewSectionMode === "ADD") {
-              if (editNewSectionIndex[0] >= 0) {
-                for (const index of editNewSectionIndex) {
-                  section = section.sections[index];
+                if (editNewSectionIndex[0] >= 0) {
+                  await putMenuSectionSection(
+                    clientStore,
+                    editNewSectionIndex,
+                    value
+                  );
+                } else {
+                  await putMenuSection(clientStore, value);
                 }
-                sections = section.sections;
-                sections.push(value);
-              } else {
-                sections = cloneStore.menu.sections;
-                sections.push(value);
               }
-            } else {
-              if (editNewSectionIndex[0] >= 0) {
-                for (const index of editNewSectionIndex) {
-                  section = section.sections[index];
+
+              const cloneStore = cloneDeep(clientStore);
+
+              let sections;
+              let section = cloneStore.menu as IMenuSection;
+              if (editNewSectionMode === "ADD") {
+                if (editNewSectionIndex[0] >= 0) {
+                  for (const index of editNewSectionIndex) {
+                    section = section.sections[index];
+                  }
+                  sections = section.sections;
+                  sections.push(value);
+                } else {
+                  sections = cloneStore.menu.sections;
+                  sections.push(value);
                 }
               } else {
-                section = section.sections[0];
+                if (editNewSectionIndex[0] >= 0) {
+                  for (const index of editNewSectionIndex) {
+                    section = section.sections[index];
+                  }
+                } else {
+                  section = section.sections[0];
+                }
+                console.log(section, value);
+                Object.assign(section, value);
               }
-              console.log(section, value);
-              Object.assign(section, value);
-            }
 
-            setClientStore(cloneStore);
+              setClientStore(cloneStore);
+            } catch (err: any) {
+              toast(defaultToastError(err));
+            }
 
             setEditNewSectionModalOpen(false);
             setEditNewSectionIndex([-1]);
@@ -540,24 +557,28 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             );
 
             if (confirmed) {
-              await deleteMenuSection(clientStore, editNewSectionIndex);
+              try {
+                await deleteMenuSection(clientStore, editNewSectionIndex);
 
-              const cloneStore = cloneDeep(clientStore);
+                const cloneStore = cloneDeep(clientStore);
 
-              const indexSpliced = [...editNewSectionIndex];
-              const lastIndex = indexSpliced.splice(-1)[0];
+                const indexSpliced = [...editNewSectionIndex];
+                const lastIndex = indexSpliced.splice(-1)[0];
 
-              let section = cloneStore.menu as IMenuSection;
-              for (const index of indexSpliced) {
-                section = section.sections[index];
+                let section = cloneStore.menu as IMenuSection;
+                for (const index of indexSpliced) {
+                  section = section.sections[index];
+                }
+                section.sections = removeAt(section.sections, lastIndex);
+
+                setClientStore(cloneStore);
+
+                setEditNewSectionModalOpen(false);
+                setEditNewSectionIndex([-1]);
+                setEditNewSectionParentName("");
+              } catch (err: any) {
+                toast(defaultToastError(err));
               }
-              section.sections = removeAt(section.sections, lastIndex);
-
-              setClientStore(cloneStore);
-
-              setEditNewSectionModalOpen(false);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
             }
           }}
         />

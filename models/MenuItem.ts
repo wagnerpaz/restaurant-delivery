@@ -13,6 +13,7 @@ export interface IMenuItem {
     long?: string;
   };
   price?: number;
+  pricePromotional?: number;
   hidden?: boolean;
   composition?: IMenuItemCompositionItem[];
   sides?: ISidesItem[];
@@ -32,7 +33,7 @@ export interface ISidesItem {
 }
 
 const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
-  name: String,
+  name: { type: String, required: true },
   nameDetail: String,
   images: {
     main: {
@@ -52,7 +53,8 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
     short: { type: String, required: false },
     long: { type: String, required: false },
   },
-  price: Number,
+  price: { type: Number, required: true },
+  pricePromotional: { type: Number, required: false },
   hidden: { type: Boolean, required: false },
   composition: [
     {

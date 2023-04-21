@@ -13,6 +13,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
+import { BsFillInfoCircleFill } from "react-icons/bs";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
 import Fieldset from "/components/Fieldset";
@@ -135,6 +136,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             nameDetail={edit.nameDetail}
             mainImageId={edit.images?.main?.toString()}
             price={edit.price}
+            pricePromotional={edit.pricePromotional}
             hidden={edit.hidden}
             descriptionShort={edit.details?.short}
             composition={edit.composition}
@@ -184,18 +186,52 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 </Select>
               </FormControl>
             </div>
-            <FormControl className="min-w-fit" label="Preço">
-              <Input
-                type="number"
-                value={`${edit.price}`}
-                onChange={(e) =>
-                  setEdit({
-                    ...edit,
-                    price: +e.target.value,
-                  } as IMenuItem)
-                }
-              />
-            </FormControl>
+            <div className="flex flex-row gap-2">
+              <FormControl className="min-w-fit flex-1" label="Preço">
+                <Input
+                  type="number"
+                  value={`${edit.price}`}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      price: +e.target.value,
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
+              <FormControl
+                className="min-w-fit flex-1"
+                label="Preço Promocional"
+              >
+                <Input
+                  type="number"
+                  value={`${edit.pricePromotional}`}
+                  onChange={(e) =>
+                    setEdit({
+                      ...edit,
+                      pricePromotional: +e.target.value,
+                    } as IMenuItem)
+                  }
+                />
+              </FormControl>
+              <FormControl
+                className="min-w-fit flex-1"
+                label="Preço Sugerido (Combo)"
+              >
+                <Input
+                  type="number"
+                  value={edit.sides?.reduce(
+                    (acc, curr) =>
+                      Math.round(
+                        acc + (curr.menuItem?.price || 0) * curr.quantity * 100,
+                        2
+                      ) / 100,
+                    0
+                  )}
+                  disabled
+                />
+              </FormControl>
+            </div>
             <Fieldset className="flex flex-col gap-5 mt-2" title="Detalhes">
               <FormControl className="flex-1 min-w-fit" label="Descrição curta">
                 <Input
@@ -227,12 +263,23 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         <Tabs>
           <TabList>
             <Tab>Ingredientes</Tab>
-            <Tab>Acompanhamento</Tab>
+            <Tab>Combo</Tab>
           </TabList>
           <TabPanels>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
                 <div className="flex-1 flex flex-row items-center justify-between gap-4  mb-4">
+                  <div className="flex-1 flex flex-row items-center gap-2">
+                    <BsFillInfoCircleFill
+                      className="text-main-a11y-medium"
+                      size={24}
+                    />
+                    <span className="text-xs">
+                      Ingredientes servem para informar ao cliente o que contém
+                      no prato. São também usados na busca e na opção de retirar
+                      ingredientes do prato (ex. Não quero ervilha)
+                    </span>
+                  </div>
                   <Button variant="outline" onClick={handleFillIngredients}>
                     Gerenciar Ingredientes
                   </Button>
@@ -240,9 +287,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                     className="min-w-[180px]"
                     label="Exibir Ingredientes"
                   >
-                    <Select
-                    //label="Exibir Ingredientes"
-                    >
+                    <Select>
                       <option>Sim</option>
                       <option>Não</option>
                     </Select>
@@ -259,13 +304,19 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             </TabPanel>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
-                <div>
-                  <Button
-                    className="mb-4"
-                    variant="outline"
-                    onClick={handleFillSides}
-                  >
-                    Gerenciar Acompanhamento
+                <div className="flex flex-row items-center mb-4">
+                  <div className="flex-1 flex flex-row items-center gap-2">
+                    <BsFillInfoCircleFill
+                      className="text-main-a11y-medium"
+                      size={24}
+                    />
+                    <span className="text-xs">
+                      Combos servem para vender um conjunto de itens em um único
+                      pacote.
+                    </span>
+                  </div>
+                  <Button variant="outline" onClick={handleFillSides}>
+                    Gerenciar Combo
                   </Button>
                 </div>
                 <EditMenuItemSidesForm

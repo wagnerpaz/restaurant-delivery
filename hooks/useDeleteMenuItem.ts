@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import axiosInstance from "/lib/axiosInstance";
 import { IMenuItem } from "/models/MenuItem";
 import { IStore } from "/models/Store";

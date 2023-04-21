@@ -45,7 +45,7 @@ async function swapMenuItems(req: NextApiRequest, res: NextApiResponse) {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).json(err);
   }
 }
 

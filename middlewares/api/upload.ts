@@ -23,7 +23,7 @@ const upload = (
       form.parse(req, async (err, fields, files) => {
         if (err) {
           console.error(err);
-          res.status(500).json({ message: "Server error" });
+          res.status(500).json(err);
           return;
         }
 
@@ -55,7 +55,7 @@ const upload = (
           onSuccess(req, res, result);
         } catch (err) {
           console.error(err);
-          res.status(500).json({ message: "Server error" });
+          res.status(500).json(err);
         }
       });
     } else {

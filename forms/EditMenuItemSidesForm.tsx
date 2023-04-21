@@ -110,7 +110,7 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                         id={sidesItem.menuItem.images?.main?.toString()}
                         width={30}
                         height={30}
-                        alt="acompanhamento foto"
+                        alt="menu item foto"
                       />
                       {sidesItem.menuItem.name}
                     </div>
@@ -128,9 +128,9 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                           id={menuItem.images?.main?.toString()}
                           width={30}
                           height={30}
-                          alt="acompanhamento foto"
+                          alt="menu item foto"
                         />
-                        {menuItem.name}
+                        {menuItem.name} ({menuItem.nameDetail})
                       </div>
                     ),
                   }))}
