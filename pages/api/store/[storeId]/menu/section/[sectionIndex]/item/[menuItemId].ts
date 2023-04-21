@@ -1,14 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import axiosInstance from "/lib/axiosInstance";
 
 import connectToDatabase from "/lib/mongoose";
+import Ingredients from "/models/Ingredients";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
+    Ingredients.name;
+
     const storeId = req.query.storeId as string;
     const sectionIndex = req.query.sectionIndex as string;
     const menuItemId = req.query.menuItemId as string;
@@ -28,7 +30,6 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
         )
           .populate("composition.ingredient")
           .exec();
-        console.log(serverMenuItem);
         res.status(200).json(serverMenuItem.toObject());
       } else if (req.method === "DELETE") {
         await Store.updateOne(

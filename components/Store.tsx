@@ -143,19 +143,17 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         .filter((f) => f)
         .join(" • ");
 
-      const visibleItems = section.items
-        ?.filter((f) => !f.hidden)
-        .filter(
-          (f) =>
-            search.length < 3 ||
-            searchIncludes(f.name, search) ||
-            searchIncludes(f.nameDetail, search) ||
-            searchIncludes(f.details?.short, search)
-        );
+      const foundItems = section.items.filter(
+        (f) =>
+          search.length < 3 ||
+          searchIncludes(f.name, search) ||
+          searchIncludes(f.nameDetail, search) ||
+          searchIncludes(f.details?.short, search)
+      );
 
       return (
         <>
-          {(admin ? true : visibleItems.length > 0) && (
+          {(admin ? true : foundItems.length > 0) && (
             <>
               <a
                 id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
@@ -164,7 +162,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               <MenuSection
                 key={section.name}
                 name={sectionName}
-                length={visibleItems.length}
+                length={foundItems.length}
                 totalLength={section.items?.length || 0}
                 onAddMenuItemClick={() => {
                   setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
@@ -188,57 +186,62 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                 }}
               >
                 <AdminDraggableGroup className="contents" editable={admin}>
-                  {visibleItems.map((menuItem, menuItemIndex) => (
-                    <AdminDraggable
-                      containerClassName="h-full"
-                      key={menuItem._id}
-                      id={menuItem._id}
-                      originalIndex={menuItemIndex}
-                      onFind={onFindMenuItem([...indexPath, sectionIndex])}
-                      onDrop={onDropMenuItem([...indexPath, sectionIndex])}
-                    >
-                      <MenuItem
-                        name={menuItem.name}
-                        nameDetail={menuItem.nameDetail}
+                  {foundItems
+                    .filter((f) => admin || !f.hidden)
+                    .map((menuItem, menuItemIndex) => (
+                      <AdminDraggable
+                        containerClassName="h-full"
+                        key={menuItem._id}
                         id={menuItem._id}
-                        mainImageId={menuItem.images?.main?.toString()}
-                        price={menuItem.price}
-                        hidden={menuItem.hidden}
-                        descriptionShort={menuItem.details?.short}
-                        composition={menuItem.composition}
-                        sides={menuItem.sides}
-                        index={menuItemIndex}
-                        editable={admin}
-                        useEffects
-                        search={search}
-                        onEditClick={() => {
-                          setEditMenuItemObject({ ...menuItem } as IMenuItem);
-                          setEditMenuItemIndex(menuItemIndex);
-                          setEditMenuSectionIndex([...indexPath, sectionIndex]);
-                          setEditMenuItemModalOpen(true);
-                        }}
-                        onDeleteClick={() => {
-                          const confirmed = confirm(
-                            `Deseja excluir o item "${menuItem.name}"?`
-                          );
-                          if (confirmed) {
-                            deleteMenuItem(
-                              clientStore,
-                              [...indexPath, sectionIndex],
-                              menuItem
+                        originalIndex={menuItemIndex}
+                        onFind={onFindMenuItem([...indexPath, sectionIndex])}
+                        onDrop={onDropMenuItem([...indexPath, sectionIndex])}
+                      >
+                        <MenuItem
+                          name={menuItem.name}
+                          nameDetail={menuItem.nameDetail}
+                          id={menuItem._id}
+                          mainImageId={menuItem.images?.main?.toString()}
+                          price={menuItem.price}
+                          hidden={menuItem.hidden}
+                          descriptionShort={menuItem.details?.short}
+                          composition={menuItem.composition}
+                          sides={menuItem.sides}
+                          index={menuItemIndex}
+                          editable={admin}
+                          useEffects
+                          search={search}
+                          onEditClick={() => {
+                            setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                            setEditMenuItemIndex(menuItemIndex);
+                            setEditMenuSectionIndex([
+                              ...indexPath,
+                              sectionIndex,
+                            ]);
+                            setEditMenuItemModalOpen(true);
+                          }}
+                          onDeleteClick={() => {
+                            const confirmed = confirm(
+                              `Deseja excluir o item "${menuItem.name}"?`
                             );
-                            const cloneStore = cloneDeep(clientStore);
-                            const section =
-                              cloneStore.menu.sections[sectionIndex];
-                            section.items = section.items.filter(
-                              (f) => f._id !== menuItem._id
-                            );
-                            setClientStore(cloneStore);
-                          }
-                        }}
-                      />
-                    </AdminDraggable>
-                  ))}
+                            if (confirmed) {
+                              deleteMenuItem(
+                                clientStore,
+                                [...indexPath, sectionIndex],
+                                menuItem
+                              );
+                              const cloneStore = cloneDeep(clientStore);
+                              const section =
+                                cloneStore.menu.sections[sectionIndex];
+                              section.items = section.items.filter(
+                                (f) => f._id !== menuItem._id
+                              );
+                              setClientStore(cloneStore);
+                            }
+                          }}
+                        />
+                      </AdminDraggable>
+                    ))}
                 </AdminDraggableGroup>
               </MenuSection>
             </>
