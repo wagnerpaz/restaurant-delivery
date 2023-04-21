@@ -117,8 +117,19 @@ const MenuItem: React.FC<MenuItemProps> = ({
               {getHighlightedText(descriptionShort, search)}
             </span>
           )}
+          {sides?.length ? (
+            <ul className="flex flex-col text-xs mt-1">
+              {sides?.map((side) => (
+                <li className="block" key={side.menuItem.name}>
+                  <span className="font-bold">{`${side.quantity}x `}</span>
+                  {side.menuItem.name}
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {(composition?.length || 0) > 0 && (
             <ul className="text-xs pt-1 opacity-60">
+              <span>Ingredientes: </span>
               {composition
                 ?.map((compositionItem) =>
                   compositionItem.ingredient ? (
@@ -138,16 +149,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
                 .slice(0, -1)}
             </ul>
           )}
-          {sides?.length ? (
-            <ul className="flex flex-col text-xs mt-1">
-              {sides?.map((side) => (
-                <li className="block" key={side.menuItem.name}>
-                  <span className="font-bold">{`${side.quantity}x `}</span>
-                  {side.menuItem.name}
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </div>
       </div>
       <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">

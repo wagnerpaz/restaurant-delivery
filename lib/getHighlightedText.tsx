@@ -10,7 +10,6 @@ export default function getHighlightedText(text: string, highlight: string) {
     .toLowerCase()
     .split(new RegExp(`(${removeDiacritics(highlight).toLowerCase()})`, "gi"));
 
-  console.log(parts);
   let reconciliatedCurrIndex = 0;
   for (let partIndex = 0; partIndex < parts.length; partIndex++) {
     const part = parts[partIndex];

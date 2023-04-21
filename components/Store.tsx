@@ -1,5 +1,5 @@
 import { FC, useCallback, useState } from "react";
-import { RiUser3Fill } from "react-icons/ri";
+import { HiMenu } from "react-icons/hi";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -24,7 +24,6 @@ import DbImage from "./DbImage";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import { Button, Input } from "@chakra-ui/react";
-import FormControl from "./FormControl";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
@@ -32,6 +31,7 @@ import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import Image from "next/image";
 import Link from "next/link";
 import searchIncludes from "../lib/searchIncludes";
+import MainMenuDrawer from "./MainMenuDrawer";
 
 interface StoreProps {
   store: IStore;
@@ -55,6 +55,8 @@ const emptyMenuSection: IMenuSection = {
 };
 
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [clientStore, setClientStore] = useState(store);
   const [clientIngredients, setClientIngredients] = useState(ingredients);
   const clientLocation = selectedLocation || clientStore?.locations?.[0];
@@ -131,10 +133,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     [clientStore, onFindMenuItem, swapMenuItems]
   );
 
-  const handleSignIn = () => {
-    signIn();
-  };
-
   const renderMenuSections = (
     sections: IMenuSection[] = [],
     path: IMenuSection[] = [],
@@ -158,86 +156,92 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       return (
         <>
           {(admin ? true : visibleItems.length > 0) && (
-            <MenuSection
-              key={section.name}
-              name={sectionName}
-              length={visibleItems.length}
-              totalLength={section.items?.length || 0}
-              onAddMenuItemClick={() => {
-                setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
-                setEditMenuItemIndex(-1);
-                setEditMenuSectionIndex([...indexPath, sectionIndex]);
-                setEditMenuItemModalOpen(true);
-              }}
-              onAddSectionClick={() => {
-                setEditNewSectionIndex([...indexPath, sectionIndex]);
-                setEditNewSectionModalOpen(true);
-                setEditNewSectionParentName(sectionName);
-                setEditNewSectionObject({ ...emptyMenuSection });
-                setEditNewSectionMode("ADD");
-              }}
-              onEditSectionClick={() => {
-                setEditNewSectionIndex([...indexPath, sectionIndex]);
-                setEditNewSectionModalOpen(true);
-                setEditNewSectionParentName(sectionName);
-                setEditNewSectionObject(section);
-                setEditNewSectionMode("EDIT");
-              }}
-            >
-              <AdminDraggableGroup className="contents" editable={admin}>
-                {visibleItems.map((menuItem, menuItemIndex) => (
-                  <AdminDraggable
-                    containerClassName="h-full"
-                    key={menuItem._id}
-                    id={menuItem._id}
-                    originalIndex={menuItemIndex}
-                    onFind={onFindMenuItem([...indexPath, sectionIndex])}
-                    onDrop={onDropMenuItem([...indexPath, sectionIndex])}
-                  >
-                    <MenuItem
-                      name={menuItem.name}
-                      nameDetail={menuItem.nameDetail}
+            <>
+              <a
+                id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
+                className="relative -top-[80px]"
+              />
+              <MenuSection
+                key={section.name}
+                name={sectionName}
+                length={visibleItems.length}
+                totalLength={section.items?.length || 0}
+                onAddMenuItemClick={() => {
+                  setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
+                  setEditMenuItemIndex(-1);
+                  setEditMenuSectionIndex([...indexPath, sectionIndex]);
+                  setEditMenuItemModalOpen(true);
+                }}
+                onAddSectionClick={() => {
+                  setEditNewSectionIndex([...indexPath, sectionIndex]);
+                  setEditNewSectionModalOpen(true);
+                  setEditNewSectionParentName(sectionName);
+                  setEditNewSectionObject({ ...emptyMenuSection });
+                  setEditNewSectionMode("ADD");
+                }}
+                onEditSectionClick={() => {
+                  setEditNewSectionIndex([...indexPath, sectionIndex]);
+                  setEditNewSectionModalOpen(true);
+                  setEditNewSectionParentName(sectionName);
+                  setEditNewSectionObject(section);
+                  setEditNewSectionMode("EDIT");
+                }}
+              >
+                <AdminDraggableGroup className="contents" editable={admin}>
+                  {visibleItems.map((menuItem, menuItemIndex) => (
+                    <AdminDraggable
+                      containerClassName="h-full"
+                      key={menuItem._id}
                       id={menuItem._id}
-                      mainImageId={menuItem.images?.main?.toString()}
-                      price={menuItem.price}
-                      hidden={menuItem.hidden}
-                      descriptionShort={menuItem.details?.short}
-                      composition={menuItem.composition}
-                      sides={menuItem.sides}
-                      index={menuItemIndex}
-                      editable={admin}
-                      useEffects
-                      search={search}
-                      onEditClick={() => {
-                        setEditMenuItemObject({ ...menuItem } as IMenuItem);
-                        setEditMenuItemIndex(menuItemIndex);
-                        setEditMenuSectionIndex([...indexPath, sectionIndex]);
-                        setEditMenuItemModalOpen(true);
-                      }}
-                      onDeleteClick={() => {
-                        const confirmed = confirm(
-                          `Deseja excluir o item "${menuItem.name}"?`
-                        );
-                        if (confirmed) {
-                          deleteMenuItem(
-                            clientStore,
-                            [...indexPath, sectionIndex],
-                            menuItem
+                      originalIndex={menuItemIndex}
+                      onFind={onFindMenuItem([...indexPath, sectionIndex])}
+                      onDrop={onDropMenuItem([...indexPath, sectionIndex])}
+                    >
+                      <MenuItem
+                        name={menuItem.name}
+                        nameDetail={menuItem.nameDetail}
+                        id={menuItem._id}
+                        mainImageId={menuItem.images?.main?.toString()}
+                        price={menuItem.price}
+                        hidden={menuItem.hidden}
+                        descriptionShort={menuItem.details?.short}
+                        composition={menuItem.composition}
+                        sides={menuItem.sides}
+                        index={menuItemIndex}
+                        editable={admin}
+                        useEffects
+                        search={search}
+                        onEditClick={() => {
+                          setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                          setEditMenuItemIndex(menuItemIndex);
+                          setEditMenuSectionIndex([...indexPath, sectionIndex]);
+                          setEditMenuItemModalOpen(true);
+                        }}
+                        onDeleteClick={() => {
+                          const confirmed = confirm(
+                            `Deseja excluir o item "${menuItem.name}"?`
                           );
-                          const cloneStore = cloneDeep(clientStore);
-                          const section =
-                            cloneStore.menu.sections[sectionIndex];
-                          section.items = section.items.filter(
-                            (f) => f._id !== menuItem._id
-                          );
-                          setClientStore(cloneStore);
-                        }
-                      }}
-                    />
-                  </AdminDraggable>
-                ))}
-              </AdminDraggableGroup>
-            </MenuSection>
+                          if (confirmed) {
+                            deleteMenuItem(
+                              clientStore,
+                              [...indexPath, sectionIndex],
+                              menuItem
+                            );
+                            const cloneStore = cloneDeep(clientStore);
+                            const section =
+                              cloneStore.menu.sections[sectionIndex];
+                            section.items = section.items.filter(
+                              (f) => f._id !== menuItem._id
+                            );
+                            setClientStore(cloneStore);
+                          }
+                        }}
+                      />
+                    </AdminDraggable>
+                  ))}
+                </AdminDraggableGroup>
+              </MenuSection>
+            </>
           )}
           {renderMenuSections(
             section.sections || [],
@@ -257,7 +261,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       })}
     >
       <header className="bg-hero text-hero-a11y-high sticky top-0 shadow-lg z-20">
-        <div className="flex flex-row items-center gap-2 px-6 py-4">
+        <div className="flex flex-row items-center gap-2 px-3 sm:px-6 py-4">
           <DbImage
             className="rounded-md w-[50px] h-[50px]"
             id={clientStore?.logo}
@@ -291,23 +295,22 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             placeholder="Pesquisar..."
           ></Input>
           <Button
-            className="sm:!hidden"
+            className="sm:!hidden !px-0"
+            variant="text"
             onClick={() => {
               setSearchMobileVisible(!searchMobileVisible);
               setSearch("");
             }}
           >
-            <FaSearch />
+            <FaSearch size={22} />
           </Button>
-          {!session?.user && !loading && (
-            <Button
-              className="flex flex-row gap-2 items-center"
-              onClick={handleSignIn}
-            >
-              <RiUser3Fill />
-              Entrar
-            </Button>
-          )}
+          <Button
+            className="flex flex-row gap-2 items-center !px-0  "
+            variant="text"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <HiMenu size={36} />
+          </Button>
           <UserIcon />
         </div>
       </header>
@@ -345,6 +348,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           />
         </Link>
       </footer>
+      <MainMenuDrawer
+        store={clientStore}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
       <EditMenuItemModal
         open={editMenuItemModalOpen}
         onOpenChange={(newValue) => setEditMenuItemModalOpen(newValue)}
