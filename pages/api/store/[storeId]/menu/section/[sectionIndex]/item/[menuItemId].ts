@@ -41,7 +41,6 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
             },
           }
         );
-        await MenuItem.deleteOne({ _id: menuItemId });
 
         const store = await Store.findById(storeId);
         let section = store.menu;

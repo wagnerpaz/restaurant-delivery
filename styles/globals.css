@@ -11,3 +11,8 @@
     @apply scrollbar-thin scrollbar-thumb-hero scrollbar-track-main-300 scrollbar-track-rounded-md scrollbar-thumb-rounded-md;
   }
 }
+
+:root {
+  --header-height: 5rem;
+  --footer-height: 10rem;
+}

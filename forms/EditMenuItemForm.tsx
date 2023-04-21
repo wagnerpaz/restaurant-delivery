@@ -330,7 +330,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             const newComposition: IMenuItemCompositionItem[] = [];
             const selected = ingredientsSelection.filter((f) => f.selected);
 
-            console.log("selected", selected);
             edit.composition.forEach((ci) => {
               const found = selected.find(
                 (f) => f.ingredient._id === ci.ingredient?._id

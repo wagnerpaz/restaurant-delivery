@@ -4,6 +4,7 @@ import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { FaSearch } from "react-icons/fa";
+import { MdNoFood } from "react-icons/md";
 
 import Menu from "/components/Menu/Menu";
 import MenuSection from "/components/Menu/MenuSection";
@@ -160,6 +161,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     [clientStore, onFindMenuItem, swapMenuItems]
   );
 
+  const foundItemsCount = useRef(0);
+
   const renderMenuSections = (
     sections: IMenuSection[] = [],
     path: IMenuSection[] = [],
@@ -177,10 +180,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           searchIncludes(f.nameDetail, search) ||
           searchIncludes(f.details?.short, search)
       );
+      foundItemsCount.current += foundItems.length;
 
       return (
         <>
-          {(admin ? true : foundItems.length > 0) && (
+          {foundItems.length > 0 && (
             <>
               <a
                 id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
@@ -247,12 +251,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                             ]);
                             setEditMenuItemModalOpen(true);
                           }}
-                          onDeleteClick={() => {
+                          onDeleteClick={async () => {
                             const confirmed = confirm(
                               `Deseja excluir o item "${menuItem.name}"?`
                             );
                             if (confirmed) {
-                              deleteMenuItem(
+                              await deleteMenuItem(
                                 clientStore,
                                 [...indexPath, sectionIndex],
                                 menuItem
@@ -290,8 +294,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           editMenuItemModalOpen,
       })}
     >
-      <header className="bg-hero text-hero-a11y-high sticky top-0 shadow-lg z-20">
-        <div className="flex flex-row items-center gap-2 px-3 sm:px-6 py-4">
+      <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-lg z-20 flex flex-row items-center w-full">
+        <div className="flex flex-row items-center gap-2 px-3 sm:px-6 w-full">
           <DbImage
             className="rounded-md w-[50px] h-[50px]"
             id={clientStore?.logo}
@@ -325,6 +329,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               setSearch(e.target.value);
             }}
             placeholder="Pesquisar..."
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setSearch("");
+              }
+            }}
           ></Input>
           <Button
             className="sm:!hidden !px-0"
@@ -364,7 +373,14 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         ></Input>
       )}
       <main>
+        {(foundItemsCount.current = 0) || ""}
         <Menu>{renderMenuSections(clientStore?.menu?.sections)}</Menu>
+        {foundItemsCount.current === 0 && (
+          <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
+            <MdNoFood size={42} />
+            Ops... nenhum produto encontrado!
+          </span>
+        )}
         {admin && (
           <MenuSection
             isNew
@@ -377,7 +393,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           />
         )}
       </main>
-      <footer className="bg-comanda-hero p-6 absolute h-40 bottom-0 w-full flex flex-row items-center">
+      <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
         <Link href="/">
           <Image
             className="w-[200px]"
