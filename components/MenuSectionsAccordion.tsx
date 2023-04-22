@@ -24,20 +24,25 @@ const MenuSectionsAccordion: React.FC<MenuSectionsAccordionProps> = ({
   ): React.ReactNode => {
     return sections.map((section, sectionIndex) => (
       <>
-        <Button
-          key={section.name}
-          className={classNames("!rounded-none !justify-start border-b-[1px]", {
-            "!ml-8": path.length === 1,
-          })}
-          onClick={() => {
-            router.push(
-              "#menu-section-" + [...indexPath, sectionIndex].join("-")
-            );
-            onCloseDrawer();
-          }}
-        >
-          {section.name}
-        </Button>
+        {section.items.length > 0 && (
+          <Button
+            key={section.name}
+            className={classNames(
+              "!rounded-none !justify-start border-b-[1px]",
+              {
+                "!ml-8": path.length === 1,
+              }
+            )}
+            onClick={() => {
+              router.push(
+                "#menu-section-" + [...indexPath, sectionIndex].join("-")
+              );
+              onCloseDrawer();
+            }}
+          >
+            {section.name}
+          </Button>
+        )}
         {renderMenuSections(
           section.sections || [],
           [...path, section],

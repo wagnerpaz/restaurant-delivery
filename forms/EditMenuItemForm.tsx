@@ -263,6 +263,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         <Tabs>
           <TabList>
             <Tab>Ingredientes</Tab>
+            <Tab>Customizar</Tab>
             <Tab>Combo</Tab>
           </TabList>
           <TabPanels>
@@ -301,6 +302,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </Fieldset>
+            </TabPanel>
+            <TabPanel className="!px-0">
+              <Fieldset className="flex flex-col gap-2"></Fieldset>
             </TabPanel>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">

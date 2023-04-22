@@ -90,8 +90,8 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
               crop={crop}
               onChange={(c) => setCrop(c)}
               aspect={1}
-              minWidth={500}
-              minHeight={500}
+              // minWidth={500}
+              // minHeight={500}
               keepSelection
             >
               {/* eslint-disable-next-line @next/next/no-img-element*/}

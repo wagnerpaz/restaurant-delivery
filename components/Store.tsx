@@ -34,6 +34,7 @@ import Link from "next/link";
 import searchIncludes from "../lib/searchIncludes";
 import MainMenuDrawer from "./MainMenuDrawer";
 import defaultToastError from "/config/defaultToastError";
+import OrderMenuItemDetailsModal from "/modals/OrderMenuItemDetails";
 
 interface StoreProps {
   store: IStore;
@@ -86,6 +87,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [editNewSectionMode, setEditNewSectionMode] = useState("");
 
   const [addStoreModalOpen, setAddStoreModalOpen] = useState(!clientStore);
+
+  const [orderMenuItemDetailsOpen, setOrderMenuItemDetailsOpen] =
+    useState(false);
+  const [orderMenuItemDetailObject, setOrderMenuItemDetailObject] = useState<
+    IMenuItem | undefined
+  >();
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -185,7 +192,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
       return (
         <>
-          {foundItems.length > 0 && (
+          {(foundItems.length > 0 || admin) && (
             <>
               <a
                 id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
@@ -244,6 +251,10 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                           editable={admin}
                           useEffects
                           search={search}
+                          onClick={() => {
+                            setOrderMenuItemDetailsOpen(true);
+                            setOrderMenuItemDetailObject(menuItem);
+                          }}
                           onEditClick={() => {
                             setEditMenuItemObject({ ...menuItem } as IMenuItem);
                             setEditMenuItemIndex(menuItemIndex);
@@ -297,7 +308,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     <div
       className={classNames("font-lato custom-scrollbar min-h-screen pb-40", {
         "fixed top-0 left-0 w-full h-full overflow-hidden":
-          editMenuItemModalOpen,
+          editMenuItemModalOpen ||
+          addStoreModalOpen ||
+          orderMenuItemDetailsOpen,
       })}
     >
       <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-lg z-20 flex flex-row items-center w-full">
@@ -381,7 +394,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       <main>
         {(foundItemsCount.current = 0) || ""}
         <Menu>{renderMenuSections(clientStore?.menu?.sections)}</Menu>
-        {foundItemsCount.current === 0 && (
+        {foundItemsCount.current === 0 && !admin && (
           <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
             <MdNoFood size={42} />
             Ops... nenhum produto encontrado!
@@ -463,6 +476,14 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           }
         }}
       />
+      {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
+        <OrderMenuItemDetailsModal
+          portalTarget={() => document.body}
+          menuItem={orderMenuItemDetailObject}
+          open={orderMenuItemDetailsOpen}
+          onOpenChange={(value) => setOrderMenuItemDetailsOpen(value)}
+        />
+      )}
       {addStoreModalOpen && (
         <AddStoreModal
           store={clientStore}

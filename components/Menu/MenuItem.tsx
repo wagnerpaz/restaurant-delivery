@@ -9,6 +9,7 @@ import DbImage from "../DbImage";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/User";
 import getHighlightedText from "/lib/getHighlightedText";
+import MoneyDisplay from "../MoneyDisplay";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
@@ -69,33 +70,24 @@ const MenuItem: React.FC<MenuItemProps> = ({
   return !admin && hidden ? null : (
     <div
       className={classNames(
-        "sm:flex sm:flex-col h-full relative rounded-2xl sm:rounded-tr-none overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
+        "sm:flex sm:flex-col h-full relative rounded-2xl  overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
         {
           "sm:hover:scale-[105%] transition-all": useEffects,
           "opacity-50": hidden,
+          "sm:rounded-tr-none": priceNew,
         },
         className
       )}
       {...props}
-      onClick={onClick}
     >
       <div className="relative float-left sm:float-none">
-        <div className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-2 sm:!pt-2s flex flex-col sm:flex-row-reverse justify-start sm:items-baseline text-end gap-x-2">
-          <span className="font-bold text-money">
-            R$
-            {(Math.round((priceNew || 0) * 100) / 100)
-              .toFixed(2)
-              .replace(".", ",")}
-          </span>
-          {priceOld && (
-            <span className="font-bold line-through text-xs text-contrast-a11y-medium">
-              R$
-              {(Math.round((priceOld || 0) * 100) / 100)
-                .toFixed(2)
-                .replace(".", ",")}
-            </span>
-          )}
-        </div>
+        {priceNew ? (
+          <MoneyDisplay
+            className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-2 text-end"
+            oldValue={priceOld}
+            value={priceNew}
+          />
+        ) : null}
         <EditableSection
           iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
           hideEdit={!editable}
@@ -131,7 +123,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
             </span>
           )}
           {sides?.length ? (
-            <ul className="flex flex-col text-xs mt-1">
+            <ul className="flex flex-col text-xs mt-2 pt-2 border-t-[1px] border-contrast-a11y-low">
               {sides?.map((side) => (
                 <li className="block" key={side.menuItem.name}>
                   <span className="font-bold">{`${side.quantity}x `}</span>
@@ -168,6 +160,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
         <Button
           className="w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
           variant="contained"
+          onClick={onClick}
         >
           <FaShoppingCart className="text-xl" />
           <span className="hidden sm:inline-block">Adicionar</span>

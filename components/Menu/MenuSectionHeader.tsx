@@ -46,8 +46,35 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
     >
       <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">
         <div className="flex flex-row flex-wrap gap-x-2">
+          {admin && !isNew && (
+            <>
+              <RiEditFill
+                className="cursor-pointer"
+                size={24}
+                title="Editar Seção"
+                onClick={onEditSectionClick}
+              />
+              <FaCodeBranch
+                className="mt-1 cursor-pointer"
+                size={20}
+                title="Adicionar Sub-Seção do Menu"
+                onClick={onAddSectionClick}
+              />
+            </>
+          )}
+          {admin && isNew && (
+            <div className="flex flex-row gap-3 items-center text-sm">
+              <IoIosAddCircle
+                className="mt-1 cursor-pointer"
+                size={24}
+                title="Adicionar Seção do Menu"
+                onClick={onAddSectionClick}
+              />
+            </div>
+          )}
+
           {name && <span>{name}</span>}
-          {length === totalLength ? (
+          {length === totalLength && length > 0 ? (
             <span className="text-main-a11y-medium font-normal">
               ({length} item{(totalLength || 0) > 1 ? "s" : ""})
             </span>
@@ -60,35 +87,14 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
             </span>
           ) : null}
         </div>
+
         {admin && !isNew && (
           <div className="flex flex-row gap-3 items-center text-sm">
-            <RiEditFill
-              className="cursor-pointer"
-              size={24}
-              title="Editar Seção"
-              onClick={onEditSectionClick}
-            />
-            <FaCodeBranch
-              className="mt-1 cursor-pointer"
-              size={20}
-              title="Adicionar Sub-Seção do Menu"
-              onClick={onAddSectionClick}
-            />
             <IoFastFood
               className="cursor-pointer"
               size={24}
               onClick={onAddMenuItemClick}
               title="Adicionar Item do Menu"
-            />
-          </div>
-        )}
-        {admin && isNew && (
-          <div className="flex flex-row gap-3 items-center text-sm">
-            <IoIosAddCircle
-              className="mt-1 cursor-pointer"
-              size={24}
-              title="Adicionar Seção do Menu"
-              onClick={onAddSectionClick}
             />
           </div>
         )}

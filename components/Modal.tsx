@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 
 interface ModalProps extends ComponentProps<"div"> {
   open: boolean;
+  backgroundClassName?: string;
   contentClassName?: string;
   noAutoClose?: boolean;
   onOpenChange: (newValue: boolean) => void;
@@ -14,6 +15,7 @@ interface ModalProps extends ComponentProps<"div"> {
 
 const Modal: React.FC<ModalProps> = ({
   className,
+  backgroundClassName,
   contentClassName,
   children,
   open,
@@ -34,7 +36,10 @@ const Modal: React.FC<ModalProps> = ({
   const render = (
     <>
       <div
-        className="fixed top-0 left-0 w-full h-full bg-main-a11y-medium opacity-70 z-20"
+        className={classNames(
+          "fixed top-0 left-0 w-full h-full bg-main-a11y-medium opacity-70 z-20",
+          backgroundClassName
+        )}
         {...props}
       />
       <div
