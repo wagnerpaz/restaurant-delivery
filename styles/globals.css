@@ -2,13 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 @layer components {
   .react-crop .ReactCrop__child-wrapper {
     @apply h-full w-full min-w-0 min-h-0;
   }
 
   .custom-scrollbar {
-    @apply scrollbar-thin scrollbar-thumb-hero scrollbar-track-main-300 scrollbar-track-rounded-md scrollbar-thumb-rounded-md;
+    @apply scrollbar-thin scrollbar-thumb-hero scrollbar-track-main-300; /*scrollbar-track-rounded-md scrollbar-thumb-rounded-md;*/
   }
 }
 

@@ -25,12 +25,6 @@ const Modal: React.FC<ModalProps> = ({
   onEsc = () => onOpenChange(!open),
   ...props
 }) => {
-  const container = useRef<HTMLDivElement>(null);
-
-  useOnClickOutside(container, () => {
-    !noAutoClose && onOpenChange(false);
-  });
-
   const portalTargetValue = portalTarget?.();
 
   const render = (
@@ -38,13 +32,16 @@ const Modal: React.FC<ModalProps> = ({
       <div
         className={classNames(
           "fixed top-0 left-0 w-full h-full bg-main-a11y-medium opacity-70 z-20",
+          "hidden sm:block",
           backgroundClassName
         )}
+        onClick={() => onOpenChange(!open)}
         {...props}
       />
       <div
         className={classNames(
-          "fixed inset-0 container mx-auto m-4 z-50 flex items-center justify-center",
+          "fixed inset-0 container mx-auto m-4 z-30 flex items-center justify-center",
+          "h-[100vh-var(--header-height)] sm:h-auto my-0 sm:my-4 top-[--header-height] sm:top-0",
           className
         )}
         onKeyDown={(e) => {
@@ -55,9 +52,9 @@ const Modal: React.FC<ModalProps> = ({
         {...props}
       >
         <div
-          ref={container}
           className={classNames(
             "max-w-full max-h-full bg-main-200 p-4 rounded-2xl overflow-auto custom-scrollbar",
+            "!rounded-none sm:!rounded-2xl",
             contentClassName
           )}
         >

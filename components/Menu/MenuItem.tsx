@@ -3,13 +3,13 @@ import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
 
 import { IMenuItemCompositionItem, ISidesItem } from "/models/MenuItem";
-import Button from "/components/Button";
 import EditableSection from "../EditableSection";
 import DbImage from "../DbImage";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/User";
 import getHighlightedText from "/lib/getHighlightedText";
 import MoneyDisplay from "../MoneyDisplay";
+import { Button } from "@chakra-ui/react";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
@@ -89,7 +89,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         ) : null}
         <EditableSection
-          iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
+          iconsContainerClassName="bottom-1 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
           hideEdit={!editable}
           hideDelete={!editable}
           onEditClick={onEditClick}
@@ -158,8 +158,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       </div>
       <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
         <Button
-          className="w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-4 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
-          variant="contained"
+          className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
           onClick={onClick}
         >
           <FaShoppingCart className="text-xl" />

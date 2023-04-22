@@ -17,12 +17,12 @@ const EditableSection: React.FC<Props> = ({
       {(!hideEdit || !hideDelete) && (
         <div
           className={classNames(
-            "absolute left-2 top-2 hidden group-hover:flex cursor-pointer print:group-hover:hidden flex-row gap-2",
+            "absolute left-1 sm:left-2 top-1 sm:top-2 flex sm:hidden group-hover:flex cursor-pointer print:group-hover:hidden flex-row gap-2",
             iconsContainerClassName
           )}
         >
           <MdEdit
-            className={classNames({ hidden: hideEdit })}
+            className={classNames("z-20", { hidden: hideEdit })}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -30,7 +30,7 @@ const EditableSection: React.FC<Props> = ({
             }}
           />
           <MdDelete
-            className={classNames({ hidden: hideDelete })}
+            className={classNames("z-20", { hidden: hideDelete })}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

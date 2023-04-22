@@ -94,6 +94,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     IMenuItem | undefined
   >();
 
+  const hasModalOpen =
+    addStoreModalOpen ||
+    editMenuItemModalOpen ||
+    editNewSectionModalOpen ||
+    orderMenuItemDetailsOpen;
+
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
@@ -135,6 +141,13 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       };
     }
   }, [searchMobileVisible]);
+
+  const closeModals = () => {
+    setAddStoreModalOpen(false);
+    setEditMenuItemModalOpen(false);
+    setEditNewSectionModalOpen(false);
+    setOrderMenuItemDetailsOpen(false);
+  };
 
   const onFindMenuItem = useCallback(
     (sectionIndex: number[]) => (id: string) => {
@@ -358,14 +371,20 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             className="sm:!hidden !px-0"
             variant="text"
             onClick={() => {
-              if (searchMobileVisible) {
-                if (!isSearchMobileInScreen) {
-                  searchMobileRef.current?.focus();
-                } else {
-                  setSearchMobileVisible(false);
-                }
-              } else {
+              if (hasModalOpen) {
                 setSearchMobileVisible(true);
+                searchMobileRef.current?.focus();
+                closeModals();
+              } else {
+                if (searchMobileVisible) {
+                  if (!isSearchMobileInScreen) {
+                    searchMobileRef.current?.focus();
+                  } else {
+                    setSearchMobileVisible(false);
+                  }
+                } else {
+                  setSearchMobileVisible(true);
+                }
               }
             }}
           >

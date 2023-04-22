@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { Button } from "@chakra-ui/react";
+import { createPortal } from "react-dom";
 
 const UserIcon = () => {
   const { data: session, status } = useSession();
@@ -29,24 +30,26 @@ const UserIcon = () => {
             className="rounded-full cursor-pointer border-solid border-hero-a11y-high border-2"
             onClick={() => setMenuOpened(!menuOpened)}
           />
-          {menuOpened && (
-            <div
-              ref={container}
-              className="absolute top-14 right-0 bg-main-100 p-2 px-4 rounded-md shadow-lg z-50 m-4 text-main-a11y-high"
-            >
-              <small className="block">Autenticado como</small>
-              <strong>{session.user.email ?? session.user.name}</strong>
-              <div className="border-b-[1px] -mx-4 pb-2 border-main-400" />
-              <Button
-                className="mt-2 w-full"
-                onClick={() => {
-                  signOut();
-                }}
+          {menuOpened &&
+            createPortal(
+              <div
+                ref={container}
+                className="absolute top-14 right-0 bg-main-100 p-2 px-4 rounded-md shadow-lg z-50 m-4 text-main-a11y-high"
               >
-                Sign out
-              </Button>
-            </div>
-          )}
+                <small className="block">Autenticado como</small>
+                <strong>{session.user.email ?? session.user.name}</strong>
+                <div className="border-b-[1px] -mx-4 pb-2 border-main-400" />
+                <Button
+                  className="mt-2 w-full"
+                  onClick={() => {
+                    signOut();
+                  }}
+                >
+                  Sign out
+                </Button>
+              </div>,
+              document.body
+            )}
         </>
       )}
     </>

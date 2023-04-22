@@ -22,7 +22,7 @@ const NumberInput = ({
   const input = getInputProps();
 
   return (
-    <div className="flex flex-row gap-0 w-fit pb-2">
+    <div className="flex flex-row gap-0 w-fit py-1">
       <Button className="!rounded-r-none !w-fit !h-[30px]" {...dec}>
         <AiOutlineMinus />
       </Button>
