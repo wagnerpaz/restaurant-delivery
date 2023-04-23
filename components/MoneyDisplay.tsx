@@ -5,6 +5,7 @@ interface MoneyDisplayProps extends ComponentProps<"div"> {
   oldValueClassName?: string;
   oldValue?: number;
   value?: number;
+  plus?: boolean;
 }
 
 const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
@@ -12,6 +13,7 @@ const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
   oldValueClassName,
   oldValue,
   value = 0,
+  plus,
 }) => {
   return (
     <div
@@ -21,6 +23,7 @@ const MoneyDisplay: React.FC<MoneyDisplayProps> = ({
       )}
     >
       <span className="font-bold text-money">
+        {plus ? "+" : null}
         R$
         {(Math.round((value || 0) * 100) / 100).toFixed(2).replace(".", ",")}
       </span>

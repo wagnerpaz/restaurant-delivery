@@ -120,13 +120,15 @@ const EditMenuItemCompositionForm: React.FC<
                 compositionItem,
                 compositionItemIndex,
                 "essential",
-                (value) => value == true
+                (e) => {
+                  return e.target.value === "true";
+                }
               )}
             >
-              <option key={`true`} value={`true`}>
+              <option key="true" value="true">
                 Sim
               </option>
-              <option key={`false`} value={`false`}>
+              <option key="false" value="false">
                 Não
               </option>
             </SimpleSelect>

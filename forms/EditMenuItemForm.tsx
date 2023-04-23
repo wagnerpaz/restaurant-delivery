@@ -186,8 +186,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 </Select>
               </FormControl>
             </div>
-            <div className="flex flex-row gap-2">
-              <FormControl className="min-w-fit flex-1" label="Preço">
+            <Fieldset className="flex flex-row gap-2" title="Preço">
+              <FormControl className="min-w-fit flex-1" label="Real">
                 <Input
                   type="number"
                   value={`${edit.price}`}
@@ -199,10 +199,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl
-                className="min-w-fit flex-1"
-                label="Preço Promocional"
-              >
+              <FormControl className="min-w-fit flex-1" label="Promocional">
                 <Input
                   type="number"
                   value={`${edit.pricePromotional}`}
@@ -216,22 +213,41 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               </FormControl>
               <FormControl
                 className="min-w-fit flex-1"
-                label="Preço Sugerido (Combo)"
+                label="Sugerido (Ingredientes)"
               >
                 <Input
                   type="number"
                   value={edit.sides?.reduce(
                     (acc, curr) =>
+                      acc +
                       Math.round(
-                        acc + (curr.menuItem?.price || 0) * curr.quantity * 100,
-                        2
-                      ) / 100,
+                        (curr.menuItem?.price || 0) * curr.quantity * 100
+                      ) /
+                        100,
                     0
                   )}
                   disabled
                 />
               </FormControl>
-            </div>
+              <FormControl
+                className="min-w-fit flex-1"
+                label="Sugerido (Combo)"
+              >
+                <Input
+                  type="number"
+                  value={edit.sides?.reduce(
+                    (acc, curr) =>
+                      acc +
+                      Math.round(
+                        (curr.menuItem?.price || 0) * curr.quantity * 100
+                      ) /
+                        100,
+                    0
+                  )}
+                  disabled
+                />
+              </FormControl>
+            </Fieldset>
             <Fieldset className="flex flex-col gap-5 mt-2" title="Detalhes">
               <FormControl className="flex-1 min-w-fit" label="Descrição curta">
                 <Input
@@ -343,6 +359,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               edit.composition = edit.composition?.filter(
                 (f) => f.ingredient?.name
               );
+              console.log("edit", edit);
               onMenuItemChange(edit);
             }}
           >

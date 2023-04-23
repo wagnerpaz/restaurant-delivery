@@ -207,11 +207,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         <>
           {(foundItems.length > 0 || admin) && (
             <>
-              <a
-                id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
-                className="relative -top-[80px]"
-              />
               <MenuSection
+                id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
                 key={section.name}
                 name={sectionName}
                 length={foundItems.length}
@@ -497,6 +494,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       />
       {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
         <OrderMenuItemDetailsModal
+          store={store}
           portalTarget={() => document.body}
           menuItem={orderMenuItemDetailObject}
           open={orderMenuItemDetailsOpen}

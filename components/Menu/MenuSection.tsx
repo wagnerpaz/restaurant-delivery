@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentProps, useEffect, useRef } from "react";
 import classNames from "classnames";
 
 import MenuSectionHeader from "./MenuSectionHeader";
@@ -14,6 +14,7 @@ interface MenuSectionProps extends ComponentProps<"section"> {
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
+  id,
   className,
   children,
   name,
@@ -26,7 +27,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   ...props
 }) => {
   return (
-    <>
+    <div>
+      <a id={id} className="relative -top-[80px]" />
       <MenuSectionHeader
         name={name}
         length={length}
@@ -46,7 +48,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       >
         {children}
       </section>
-    </>
+    </div>
   );
 };
 

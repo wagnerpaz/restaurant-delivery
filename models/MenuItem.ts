@@ -30,6 +30,13 @@ export interface ISidesItem {
   menuItem: IMenuItem;
   quantity?: number;
   essential?: boolean;
+  exchanges?: IExchangesItem[];
+}
+
+export interface IExchangesItem {
+  scope: "menu-section" | "menu-item";
+  menuSectionIndex?: string;
+  menuItem?: mongoose.Types.ObjectId;
 }
 
 const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
@@ -71,6 +78,13 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
       menuItem: { type: mongoose.Types.ObjectId, ref: "MenuItem" },
       quantity: { type: Number, required: false },
       essential: { type: Boolean, required: false },
+      exchanges: [
+        {
+          scope: { type: String, required: true },
+          menuSectionIndex: String,
+          menuItem: mongoose.Types.ObjectId,
+        },
+      ],
     },
   ],
 });
