@@ -16,6 +16,7 @@ export interface IMenuItem {
   pricePromotional?: number;
   hidden?: boolean;
   composition?: IMenuItemCompositionItem[];
+  additionals?: IMenuItemAdditionalsCategory[];
   sides?: ISidesItem[];
 }
 
@@ -24,6 +25,22 @@ export interface IMenuItemCompositionItem {
   ingredient: IIngredient;
   essential?: boolean;
   quantity?: number;
+  unitPrice?: number;
+}
+
+export interface IMenuItemAdditionalsCategory {
+  id?: string;
+  categoryName?: string;
+  min?: number;
+  max?: number;
+  items?: IMenuItemAdditionalsItem[];
+}
+
+export interface IMenuItemAdditionalsItem {
+  id?: string;
+  ingredient: IIngredient;
+  min?: number;
+  max?: number;
 }
 
 export interface ISidesItem {
@@ -71,6 +88,25 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
       },
       essential: { type: Boolean, required: false },
       quantity: { type: Number, required: false },
+      unitPrice: Number,
+    },
+  ],
+  additionals: [
+    {
+      categoryName: String,
+      min: Number,
+      max: Number,
+      items: [
+        {
+          ingredient: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+            ref: "Ingredient",
+          },
+          min: Number,
+          max: Number,
+        },
+      ],
     },
   ],
   sides: [

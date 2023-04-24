@@ -53,8 +53,6 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
     return [...menuItems.filter((el) => el)];
   }, [store]);
 
-  console.log(storeMenuItems);
-
   const onFindSidesItem = useCallback(
     (id: string) => {
       const index = sides?.findIndex((f) => f.id === id);
@@ -87,7 +85,6 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
         ...sidesItem,
         [key]: getter(value),
       });
-      console.log("slicedSides", slicedSides);
       onSidesChange(slicedSides);
     };
 

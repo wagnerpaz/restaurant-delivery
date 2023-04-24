@@ -9,7 +9,7 @@ async function createStore(req: NextApiRequest, res: NextApiResponse) {
 
     const bodyStore = req.body as IStore;
 
-    if (req.method === "POST" || req.method === "PUT") {
+    if (req.method === "POST") {
       const foundStore = await Store.findOne({ slug: bodyStore.slug }).exec();
       if (foundStore) {
         foundStore.name = bodyStore.name;

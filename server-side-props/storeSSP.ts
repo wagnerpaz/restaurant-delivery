@@ -29,6 +29,7 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
     slug: storeSlug,
   })
     .populate("ingredients")
+    .populate("ingredients.ingredient")
     .populate(populate)
     .exec();
 

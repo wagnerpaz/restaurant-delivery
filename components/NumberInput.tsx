@@ -8,7 +8,6 @@ const NumberInput = ({
   value = 0,
   onChange = (newValue: number) => {},
 }) => {
-  console.log("disabled", +value - 1 < min, +value + 1 > min);
   return (
     <div className="flex flex-row gap-0 w-fit py-1">
       <Button
@@ -22,7 +21,7 @@ const NumberInput = ({
         value={+value}
         disabled
         style={{ opacity: 1 }}
-        className="!rounded-none !h-[30px] !w-[60px]"
+        className="!rounded-none !h-[30px] !w-[50px]"
       />
       <Button
         isDisabled={+value + 1 > max}

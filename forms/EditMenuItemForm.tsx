@@ -30,13 +30,16 @@ import EditMenuItemCompositionForm, {
 } from "/forms/EditMenuItemCompositionForm";
 import EditMenuItemSidesForm, { emptySidesItem } from "./EditMenuItemSidesForm";
 import FormControl from "/components/FormControl";
+import EditMenuItemAdditionalsForm, {
+  emptyAdditionalsCategory,
+} from "./EditMenuItemAdditionalsForm";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
   ingredients: IIngredient[];
   menuItem: IMenuItem;
   onMenuItemChange: (newValue?: IMenuItem, cancelled?: boolean) => void;
-  onStoreChange: (newValue: IStore) => void;
+  onStoreChange: (newValue: IStore, shouldSave?: boolean) => void;
   onIngredientsChange: (newValue: IIngredient[]) => void;
 }
 
@@ -58,7 +61,11 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
 
   const addIngredientsInitialSelection = useMemo(
-    () => edit.composition.map((ci) => ci.ingredient),
+    () =>
+      edit.composition?.map((ci) => ({
+        ingredient: ci.ingredient,
+        price: ci.unitPrice,
+      })) || [],
     [edit]
   );
 
@@ -72,6 +79,24 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       ...menuItem,
       composition: compositionIndexed,
     } as IMenuItem);
+  }, [menuItem]);
+
+  useEffect(() => {
+    const additionalsIndexed = menuItem.additionals?.map((c, index) => ({
+      ...c,
+      id: `${index}`,
+    }));
+
+    setEdit({
+      ...menuItem,
+      additionals: additionalsIndexed,
+    } as IMenuItem);
+  }, [menuItem]);
+
+  useEffect(() => {
+    if (menuItem.additionals?.length === 0) {
+      setEdit({ ...menuItem, additionals: [{ ...emptyAdditionalsCategory }] });
+    }
   }, [menuItem]);
 
   const handleCancel = () => {
@@ -187,19 +212,19 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               </FormControl>
             </div>
             <Fieldset className="flex flex-row gap-2" title="Preço">
-              <FormControl className="min-w-fit flex-1" label="Real">
+              <FormControl className="min-w-0 flex-1" label="Real">
                 <Input
                   type="number"
                   value={`${edit.price}`}
                   onChange={(e) =>
                     setEdit({
                       ...edit,
-                      price: +e.target.value,
+                      price: Math.floor(+e.target.value * 100) / 100,
                     } as IMenuItem)
                   }
                 />
               </FormControl>
-              <FormControl className="min-w-fit flex-1" label="Promocional">
+              <FormControl className="min-w-0 flex-1" label="Promocional">
                 <Input
                   type="number"
                   value={`${edit.pricePromotional}`}
@@ -211,10 +236,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl
-                className="min-w-fit flex-1"
-                label="Sugerido (Ingredientes)"
-              >
+              <FormControl className="min-w-0 flex-1" label="Sugerido (Ingr.)">
                 <Input
                   type="number"
                   value={edit.sides?.reduce(
@@ -229,10 +251,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   disabled
                 />
               </FormControl>
-              <FormControl
-                className="min-w-fit flex-1"
-                label="Sugerido (Combo)"
-              >
+              <FormControl className="min-w-0 flex-1" label="Sugerido (Cmb.)">
                 <Input
                   type="number"
                   value={edit.sides?.reduce(
@@ -276,10 +295,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           </div>
         </div>
 
-        <Tabs>
+        <Tabs isLazy>
           <TabList>
-            <Tab>Ingredientes</Tab>
-            <Tab>Customizar</Tab>
+            <Tab>Ingredientes Principais</Tab>
+            <Tab>Ingredientes Adicionais</Tab>
             <Tab>Combo</Tab>
           </TabList>
           <TabPanels>
@@ -320,7 +339,16 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               </Fieldset>
             </TabPanel>
             <TabPanel className="!px-0">
-              <Fieldset className="flex flex-col gap-2"></Fieldset>
+              <Fieldset className="flex flex-col gap-2 pt-6">
+                <EditMenuItemAdditionalsForm
+                  store={store}
+                  ingredients={ingredients}
+                  additionals={edit.additionals}
+                  onAdditionalsChange={(additionals) =>
+                    setEdit({ ...edit, additionals })
+                  }
+                />
+              </Fieldset>
             </TabPanel>
             <TabPanel className="!px-0">
               <Fieldset className="flex flex-col gap-2">
@@ -359,7 +387,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               edit.composition = edit.composition?.filter(
                 (f) => f.ingredient?.name
               );
-              console.log("edit", edit);
+              //remove empty sides
+              edit.sides = edit.sides?.filter((f) => f.menuItem?._id);
               onMenuItemChange(edit);
             }}
           >
@@ -397,6 +426,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           portalTarget={() =>
             document.querySelector("#edit-menu-item-form") as HTMLElement
           }
+          onStoreChange={onStoreChange}
           onIngredientsChange={onIngredientsChange}
           onSelectionChange={(ingredientsSelection: IIngredientSelection[]) => {
             const newComposition: IMenuItemCompositionItem[] = [];
@@ -405,9 +435,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             edit.composition.forEach((ci) => {
               const found = selected.find(
                 (f) => f.ingredient._id === ci.ingredient?._id
-              )?.ingredient;
+              );
               if (found) {
-                newComposition.push(ci);
+                newComposition.push({ ...ci, unitPrice: found.price });
               }
             });
 
@@ -422,6 +452,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 newComposition.push({
                   ...emptyCompositionItem,
                   ingredient: is.ingredient,
+                  unitPrice: is.price,
                 });
               });
 

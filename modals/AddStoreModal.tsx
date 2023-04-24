@@ -54,7 +54,6 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
 
   useEffect(() => {
     async function exec() {
-      console.log("will set cities");
       setBrasilCities(
         await getBrasilCities(brasilStates.find((f) => f.sigla === state)?.id)
       );
@@ -153,7 +152,6 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                 <Select
                   value={clientStore.locations[0].state}
                   onChange={(e) => {
-                    console.log(e);
                     setClientStore({
                       ...clientStore,
                       locations: [
@@ -179,7 +177,6 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                 <Select
                   value={clientStore.locations[0].city}
                   onChange={(e) => {
-                    console.log("will change city");
                     setClientStore({
                       ...clientStore,
                       locations: [

@@ -10,7 +10,7 @@ interface MenuSectionsAccordionProps extends ComponentProps<"nav"> {
   onCloseDrawer: () => void;
 }
 
-const MenuSectionsAccordion: React.FC<MenuSectionsAccordionProps> = ({
+const MenuSectionsTree: React.FC<MenuSectionsAccordionProps> = ({
   store,
   onCloseDrawer,
   ...props
@@ -23,14 +23,13 @@ const MenuSectionsAccordion: React.FC<MenuSectionsAccordionProps> = ({
     indexPath: number[] = []
   ): React.ReactNode => {
     return sections.map((section, sectionIndex) => (
-      <>
+      <div className="w-full" key={section.name}>
         {section.items.length > 0 && (
           <Button
-            key={section.name}
             className={classNames(
-              "!rounded-none !justify-start border-b-[1px]",
+              "!rounded-none !justify-start border-b-[1px] w-full",
               {
-                "!ml-8": path.length === 1,
+                "w-[calc(100%-2rem)] !ml-8": path.length === 1,
               }
             )}
             onClick={() => {
@@ -48,7 +47,7 @@ const MenuSectionsAccordion: React.FC<MenuSectionsAccordionProps> = ({
           [...path, section],
           [...indexPath, sectionIndex]
         )}
-      </>
+      </div>
     ));
   };
 
@@ -59,4 +58,4 @@ const MenuSectionsAccordion: React.FC<MenuSectionsAccordionProps> = ({
   );
 };
 
-export default MenuSectionsAccordion;
+export default MenuSectionsTree;

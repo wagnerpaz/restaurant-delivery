@@ -20,7 +20,7 @@ interface EditMenuItemCompositionFormProps
 export const emptyCompositionItem: IMenuItemCompositionItem = {
   ingredient: { name: "" },
   quantity: 1,
-  essential: false,
+  essential: true,
 };
 
 const EditMenuItemCompositionForm: React.FC<

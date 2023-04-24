@@ -6,18 +6,25 @@ import usePutIngredient from "/hooks/usePutIngredient";
 import removeDiacritics from "/lib/removeDiacritics";
 import toPascalCase from "/lib/toPascalCase";
 import { IIngredient } from "/models/Ingredients";
-import { IMenuSection, IStore } from "/models/Store";
+import { IMenuSection, IStore, IStoreIngredient } from "/models/Store";
 import useGetIngredients from "/hooks/useGetIngredients";
 import Fieldset from "/components/Fieldset";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
 import { Button, Checkbox, Input } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
+import MoneyDisplay from "/components/MoneyDisplay";
+import { RiStore3Fill } from "react-icons/ri";
+import { MdStoreMallDirectory } from "react-icons/md";
+import { AiFillEdit } from "react-icons/ai";
+import EditIngredientDetailModal from "./EditIngredientDetailModal";
+import { replaceAt } from "/lib/immutable";
 
 interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
   ingredients: IIngredient[];
-  initialSelection: IIngredient[];
+  initialSelection: IIngredientSelection[];
+  onStoreChange?: (store: IStore) => void;
   onIngredientsChange?: (ingredients: IIngredient[]) => void;
   onSelectionChange?: (ingredientsSel: IIngredientSelection[]) => void;
 }
@@ -25,6 +32,7 @@ interface AddIngredientModalProps extends ComponentProps<typeof Modal> {
 export interface IIngredientSelection {
   ingredient: IIngredient;
   selected: boolean;
+  price?: number;
 }
 
 const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
@@ -34,6 +42,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   contentClassName,
   onOpenChange,
   onIngredientsChange = () => {},
+  onStoreChange = (store: IStore, shouldSave?: boolean) => {},
   onSelectionChange = () => {},
   ...props
 }) => {
@@ -44,6 +53,13 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   );
   const [additions, setAdditions] = useState<IIngredientSelection[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const [editIngredientDetail, setEditIngredientDetail] =
+    useState<IStoreIngredient>();
+  const [editIngredientDetailOpen, setEditIngredientDetailOpen] =
+    useState(false);
+  const [editIngredientDetailTarget, setEditIngredientDetailTarget] =
+    useState("");
 
   const putIngredient = usePutIngredient();
 
@@ -65,41 +81,22 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     [sorted, filter]
   );
 
-  const storeIngredients = useMemo(() => {
-    const ingredients: IIngredient[] = [];
-    function traverseSections(sections: IMenuSection[]) {
-      for (const section of sections) {
-        for (const item of section.items) {
-          const compositionIngredients = item.composition.map(
-            (c) => c.ingredient
-          );
-          if (compositionIngredients.length > 0) {
-            ingredients.push(...compositionIngredients);
-          }
-        }
-        if (section.sections) {
-          traverseSections(section.sections);
-        }
-      }
-    }
-    traverseSections(store.menu.sections);
-
-    //@ts-ignore
-    return [...new Set(ingredients)].filter((el) => el);
-  }, [store]);
+  const storeIngredients = useMemo(() => store.ingredients, [store]);
 
   useEffect(() => {
     const newIngredientsSel = ingredients.map((ingredient) => ({
       ingredient,
       selected: initialSelection
-        .map((is) => is?._id)
+        .map((is) => is?.ingredient?._id)
         .filter((f) => f)
         .includes(ingredient._id),
+      price: initialSelection.find((f) => f.ingredient?._id === ingredient._id)
+        ?.price,
     }));
     setIngredientsSel([...newIngredientsSel]);
   }, [initialSelection, ingredients]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const confirmation =
       filtered.length === 0 ||
       confirm(
@@ -108,13 +105,11 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         )}" realmente?`
       );
     if (confirmation) {
-      setAdditions([
-        ...additions,
-        {
-          ingredient: { name: toPascalCase(filter) },
-          selected: true,
-        } as IIngredientSelection,
-      ]);
+      const serverIngredient = await putIngredient({
+        name: toPascalCase(filter),
+        store: store._id,
+      } as IIngredient);
+      onIngredientsChange([...ingredients, serverIngredient]);
       setFilter("");
     }
   };
@@ -123,7 +118,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     const additionIngredients = await putIngredient(
       additions.map((a) => a.ingredient)
     );
-    console.log("additionIngredients", additionIngredients);
     onIngredientsChange([...ingredients, ...additionIngredients]);
     onSelectionChange(
       [...ingredientsSel, ...additions].map((i) => ({
@@ -133,6 +127,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         ),
       }))
     );
+    onStoreChange(store, true);
 
     setAdditions([]);
     onOpenChange(false);
@@ -152,10 +147,6 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           ingredientsSel.filter((is) => is.selected).map((is) => is.ingredient)
         )
       ) {
-        console.log(
-          initialSelection,
-          ingredientsSel.filter((is) => is.selected).map((is) => is.ingredient)
-        );
         const confirmed = confirm(
           "Você tem alterações não salvas. Deseja sair?"
         );
@@ -173,13 +164,16 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
   const inStoreFiltered = filtered
     .filter((f) => !f.selected)
     .filter((f) =>
-      storeIngredients.map((m) => m._id).includes(f.ingredient._id)
+      storeIngredients.map((m) => m.ingredient._id).includes(f.ingredient._id)
     );
 
   const notInStoreFiltered = filtered
     .filter((f) => !f.selected)
     .filter(
-      (f) => !storeIngredients.map((m) => m._id).includes(f.ingredient._id)
+      (f) =>
+        !storeIngredients
+          .map((m) => m.ingredient._id)
+          .includes(f.ingredient._id)
     );
 
   return (
@@ -197,9 +191,10 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
       }}
     >
       <div className="flex flex-row gap-2 mb-2 w-full">
-        <FormControl className="flex-1 min-w-fit" label="Ingrediente">
+        <FormControl className="flex-1 min-w-fit">
           <Input
             ref={filterRef}
+            placeholder="Pesquisar.."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -210,23 +205,23 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           onClick={handleAdd}
         >
           <HiPlus size={18} />
-          Adicionar
         </Button>
       </div>
-      <div className="h-[calc(100%-95px)] flex flex-col sm:flex-row gap-2">
-        <div className="flex-1 contents sm:flex flex-col gap-2">
+      <div className="h-[calc(100%-95px)] flex flex-col sm:flex-row gap-2 text-sm">
+        <div className="h-2/3 sm:h-auto flex-1 flex flex-col-reverse gap-2">
           <Fieldset
-            title="Usados na sua loja"
+            title="Loja"
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
             {inStoreFiltered.length > 0 && (
               <ul className="flex flex-col gap-2">
                 {inStoreFiltered.map((sel) => (
                   <li
-                    className="flex flex-row items-center gap-4 text-main-a11y-high"
+                    className="flex flex-row items-center justify-between gap-4 text-main-a11y-high"
                     key={sel.ingredient.name}
                   >
                     <Checkbox
+                      className="border-main-300"
                       checked={sel.selected}
                       onChange={(e) => {
                         filterRef.current?.focus();
@@ -238,14 +233,40 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                             {
                               ingredient: sel.ingredient,
                               selected: e.target.checked,
+                              price: store.ingredients.find(
+                                (f) => f.ingredient.name === sel.ingredient.name
+                              )?.price,
                             },
                           ];
                         });
                       }}
                     />
-                    <span className="whitespace-nowrap">
+                    <span className="text-left flex-1">
                       {sel.ingredient.name}
                     </span>
+                    <MoneyDisplay
+                      debit
+                      value={
+                        storeIngredients.find(
+                          (f) => f.ingredient.name === sel.ingredient.name
+                        )?.price
+                      }
+                    />
+                    <a
+                      className="cursor-pointer text-link"
+                      title="Editar"
+                      onClick={() => {
+                        setEditIngredientDetail(
+                          storeIngredients.find(
+                            (f) => f.ingredient.name === sel.ingredient.name
+                          )
+                        );
+                        setEditIngredientDetailOpen(true);
+                        setEditIngredientDetailTarget("store");
+                      }}
+                    >
+                      <AiFillEdit size={20} />
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -262,7 +283,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
             )}
           </Fieldset>
           <Fieldset
-            title="Nunca usados"
+            title="Biblioteca"
             className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
           >
             {notInStoreFiltered.length > 0 && (
@@ -272,26 +293,22 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                     className="flex flex-row items-center gap-4 text-main-a11y-high"
                     key={sel.ingredient.name}
                   >
-                    <Checkbox
-                      checked={sel.selected}
-                      onChange={(e) => {
-                        filterRef.current?.focus();
-                        setIngredientsSel((ingredientsSel) => {
-                          return [
-                            ...ingredientsSel.filter(
-                              (f) => f.ingredient.name !== sel.ingredient.name
-                            ),
-                            {
-                              ingredient: sel.ingredient,
-                              selected: e.target.checked,
-                            },
-                          ];
+                    <span className="flex-1">{sel.ingredient.name}</span>
+                    <a
+                      className="cursor-pointer text-link flex flex-row items-center font-bold"
+                      title="Adicionar à loja"
+                      onClick={(e) => {
+                        onStoreChange({
+                          ...store,
+                          ingredients: [
+                            ...store.ingredients,
+                            { ingredient: sel.ingredient },
+                          ],
                         });
                       }}
-                    />
-                    <span className="whitespace-nowrap">
-                      {sel.ingredient.name}
-                    </span>
+                    >
+                      +<MdStoreMallDirectory size={20} />
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -310,13 +327,12 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         </div>
 
         <Fieldset
-          title="Selecionados"
+          title="Produto"
           className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar"
         >
-          {[...ingredientsSel, ...additions].filter((f) => f.selected).length >
-            0 && (
+          {sorted.filter((f) => f.selected).length > 0 && (
             <ul className="flex flex-col gap-2">
-              {[...ingredientsSel, ...additions]
+              {sorted
                 .filter((f) => f.selected)
                 .map((sel) => (
                   <li
@@ -324,6 +340,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                     key={sel.ingredient.name}
                   >
                     <Checkbox
+                      className="!border-main-300"
                       defaultChecked
                       onChange={(e) => {
                         filterRef.current?.focus();
@@ -340,9 +357,19 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
                         });
                       }}
                     />
-                    <span className="whitespace-nowrap">
-                      {sel.ingredient.name}
-                    </span>
+                    <span className="flex-1">{sel.ingredient.name}</span>
+                    <MoneyDisplay debit value={sel.price} />
+                    <a
+                      className="cursor-pointer text-link"
+                      title="Editar"
+                      onClick={() => {
+                        setEditIngredientDetail(sel);
+                        setEditIngredientDetailOpen(true);
+                        setEditIngredientDetailTarget("product");
+                      }}
+                    >
+                      <AiFillEdit size={20} />
+                    </a>
                   </li>
                 ))}
             </ul>
@@ -355,8 +382,10 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
           )}
         </Fieldset>
       </div>
-      <div className="flex flex-row gap-2 mt-2">
+      <div className="flex flex-row gap-2 mt-2 justify-end">
         <Button
+          className="w-full sm:w-32"
+          variant="outline"
           onClick={() => {
             handleOpenChange(false);
             reset();
@@ -364,10 +393,54 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
         >
           Cancel
         </Button>
-        <Button className="flex-1" onClick={handleSave}>
+        <Button className="w-full sm:w-32" onClick={handleSave}>
           Salvar
         </Button>
       </div>
+      {editIngredientDetailOpen && (
+        <EditIngredientDetailModal
+          store={store}
+          ingredientDetail={editIngredientDetail as IStoreIngredient}
+          open={editIngredientDetailOpen}
+          onOpenChange={() =>
+            setEditIngredientDetailOpen(!editIngredientDetailOpen)
+          }
+          onSave={(newValue) => {
+            if (editIngredientDetailTarget === "store") {
+              onStoreChange({
+                ...store,
+                ingredients: [
+                  ...store.ingredients.filter(
+                    (f) => f.ingredient.name !== newValue.ingredient.name
+                  ),
+                  newValue,
+                ],
+              } as IStore);
+            } else if (editIngredientDetailTarget === "product") {
+              setIngredientsSel([
+                ...ingredientsSel.filter(
+                  (f) => f.ingredient.name !== newValue.ingredient.name
+                ),
+                newValue as IIngredientSelection,
+              ]);
+            }
+            setEditIngredientDetailOpen(false);
+          }}
+          onCancel={() => setEditIngredientDetailOpen(false)}
+          onDelete={() => {
+            onStoreChange({
+              ...store,
+              ingredients: [
+                ...store.ingredients.filter(
+                  (f) =>
+                    f.ingredient.name !== editIngredientDetail?.ingredient.name
+                ),
+              ],
+            } as IStore);
+            setEditIngredientDetailOpen(false);
+          }}
+        />
+      )}
     </Modal>
   );
 };

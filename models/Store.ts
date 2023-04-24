@@ -11,7 +11,12 @@ export interface IStore extends Document {
   menu: {
     sections: IMenuSection[];
   };
-  ingredients: IIngredient[];
+  ingredients: IStoreIngredient[];
+}
+
+export interface IStoreIngredient {
+  ingredient: IIngredient;
+  price?: number;
 }
 
 export interface IMenuSection {
@@ -45,6 +50,16 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       state: String,
       city: String,
       postalCode: String,
+    },
+  ],
+  ingredients: [
+    {
+      ingredient: {
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: "Ingredient",
+      },
+      price: Number,
     },
   ],
   menu: {
@@ -93,7 +108,6 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       },
     ],
   },
-  ingredients: [{ type: mongoose.Types.ObjectId, ref: "Ingredient" }],
 });
 
 const Store = models.Store || mongoose.model<IStore>("Store", storeSchema);

@@ -73,7 +73,6 @@ function App({
   Component,
   pageProps: { session, theme, ...pageProps },
 }: AppProps) {
-  console.log("theme", theme);
   const {
     hero = "#BE3144",
     heroA11yHigh = "#FFFFFF",
@@ -92,6 +91,8 @@ function App({
     contrastA11yMedium = "#232b2b",
     contrastA11yLow = "#353839",
     money = "#036704",
+    moneyDebit = "#AD3737",
+    link = "#0e1111",
   } = theme?.colors || {};
   const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
     theme?.patterns || {};
@@ -133,6 +134,9 @@ function App({
   );
 
   const moneyColorVar = getRGBColor(money, "money");
+  const moneyDebitColorVar = getRGBColor(moneyDebit, "money-debit");
+
+  const linkColorVar = getRGBColor(link, "link");
 
   const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
 
@@ -164,6 +168,8 @@ function App({
              ${contrastA11yMediumColorVar}
              ${contrastA11yLowColorVar}
              ${moneyColorVar}
+             ${moneyDebitColorVar}
+             ${linkColorVar}
              ${heroPatternVar}}
           `}
         </style>

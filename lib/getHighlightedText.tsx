@@ -17,8 +17,6 @@ export default function getHighlightedText(text: string, highlight: string) {
     const end = (reconciliatedCurrIndex += part.length);
     parts[partIndex] = text.slice(begin, end);
   }
-  console.log(parts);
-
   return (
     <span>
       {" "}

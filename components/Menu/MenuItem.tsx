@@ -98,9 +98,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
           <DbImage
             className="w-32 h-32 sm:w-full sm:h-full bg-main-200 rounded-xl mr-2"
             id={mainImageId}
-            width={99999}
-            height={99999}
+            width={500}
+            height={500}
             alt={`${name} hero image`}
+            priority
           />
         </EditableSection>
       </div>

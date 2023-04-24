@@ -13,7 +13,7 @@ import {
 import { signIn, useSession } from "next-auth/react";
 
 import { IUser } from "/models/User";
-import MenuSectionsAccordion from "./MenuSectionsAccordion";
+import MenuSectionsTree from "./MenuSectionsAccordion";
 import { IStore } from "/models/Store";
 
 interface MainMenuDrawerProps extends ComponentProps<typeof Drawer> {
@@ -53,7 +53,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
               Entrar
             </Button>
           )}
-          <MenuSectionsAccordion store={store} onCloseDrawer={onClose} />
+          <MenuSectionsTree store={store} onCloseDrawer={onClose} />
         </DrawerBody>
 
         <DrawerFooter></DrawerFooter>

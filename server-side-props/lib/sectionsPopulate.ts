@@ -4,6 +4,7 @@ const sectionsPopulate = (append?: any) => {
       path: "items",
       populate: [
         { path: "composition", populate: { path: "ingredient" } },
+        { path: "additionals", populate: { path: "items.ingredient" } },
         { path: "sides", populate: { path: "menuItem" } },
       ],
     },

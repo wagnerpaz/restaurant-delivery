@@ -44,6 +44,8 @@ module.exports = {
       "contrast-a11y-medium": "var(--color-contrast-a11y-medium)",
       "contrast-a11y-low": "var(--color-contrast-a11y-low)",
       money: "var(--color-money)",
+      "money-debit": "var(--color-money-debit)",
+      link: "var(--color-link)",
     },
     container: {},
     extend: {

@@ -38,7 +38,7 @@ import OrderMenuItemDetailsModal from "/modals/OrderMenuItemDetails";
 
 interface StoreProps {
   store: IStore;
-  onStoreChange: (value: IStore) => void;
+  onStoreChange: (value: IStore, shouldSave: boolean) => void;
   ingredients: IIngredient[];
   selectedLocation: ILocation;
 }
@@ -204,112 +204,106 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       foundItemsCount.current += foundItems.length;
 
       return (
-        <>
+        <div key={section.name}>
           {(foundItems.length > 0 || admin) && (
-            <>
-              <MenuSection
-                id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
-                key={section.name}
-                name={sectionName}
-                length={foundItems.length}
-                totalLength={section.items?.length || 0}
-                onAddMenuItemClick={() => {
-                  setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
-                  setEditMenuItemIndex(-1);
-                  setEditMenuSectionIndex([...indexPath, sectionIndex]);
-                  setEditMenuItemModalOpen(true);
-                }}
-                onAddSectionClick={() => {
-                  setEditNewSectionIndex([...indexPath, sectionIndex]);
-                  setEditNewSectionModalOpen(true);
-                  setEditNewSectionParentName(sectionName);
-                  setEditNewSectionObject({ ...emptyMenuSection });
-                  setEditNewSectionMode("ADD");
-                }}
-                onEditSectionClick={() => {
-                  setEditNewSectionIndex([...indexPath, sectionIndex]);
-                  setEditNewSectionModalOpen(true);
-                  setEditNewSectionParentName(sectionName);
-                  setEditNewSectionObject(section);
-                  setEditNewSectionMode("EDIT");
-                }}
-              >
-                <AdminDraggableGroup className="contents" editable={admin}>
-                  {foundItems
-                    .filter((f) => admin || !f.hidden)
-                    .map((menuItem, menuItemIndex) => (
-                      <AdminDraggable
-                        containerClassName="h-full"
-                        key={menuItem._id}
+            <MenuSection
+              id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
+              name={sectionName}
+              length={foundItems.length}
+              totalLength={section.items?.length || 0}
+              onAddMenuItemClick={() => {
+                setEditMenuItemObject({ ...emptyMenuItem } as IMenuItem);
+                setEditMenuItemIndex(-1);
+                setEditMenuSectionIndex([...indexPath, sectionIndex]);
+                setEditMenuItemModalOpen(true);
+              }}
+              onAddSectionClick={() => {
+                setEditNewSectionIndex([...indexPath, sectionIndex]);
+                setEditNewSectionModalOpen(true);
+                setEditNewSectionParentName(sectionName);
+                setEditNewSectionObject({ ...emptyMenuSection });
+                setEditNewSectionMode("ADD");
+              }}
+              onEditSectionClick={() => {
+                setEditNewSectionIndex([...indexPath, sectionIndex]);
+                setEditNewSectionModalOpen(true);
+                setEditNewSectionParentName(sectionName);
+                setEditNewSectionObject(section);
+                setEditNewSectionMode("EDIT");
+              }}
+            >
+              <AdminDraggableGroup className="contents" editable={admin}>
+                {foundItems
+                  .filter((f) => admin || !f.hidden)
+                  .map((menuItem, menuItemIndex) => (
+                    <AdminDraggable
+                      containerClassName="h-full"
+                      key={menuItem._id}
+                      id={menuItem._id}
+                      originalIndex={menuItemIndex}
+                      onFind={onFindMenuItem([...indexPath, sectionIndex])}
+                      onDrop={onDropMenuItem([...indexPath, sectionIndex])}
+                    >
+                      <MenuItem
+                        name={menuItem.name}
+                        nameDetail={menuItem.nameDetail}
                         id={menuItem._id}
-                        originalIndex={menuItemIndex}
-                        onFind={onFindMenuItem([...indexPath, sectionIndex])}
-                        onDrop={onDropMenuItem([...indexPath, sectionIndex])}
-                      >
-                        <MenuItem
-                          name={menuItem.name}
-                          nameDetail={menuItem.nameDetail}
-                          id={menuItem._id}
-                          mainImageId={menuItem.images?.main?.toString()}
-                          price={menuItem.price}
-                          pricePromotional={menuItem.pricePromotional}
-                          hidden={menuItem.hidden}
-                          descriptionShort={menuItem.details?.short}
-                          composition={menuItem.composition}
-                          sides={menuItem.sides}
-                          index={menuItemIndex}
-                          editable={admin}
-                          useEffects
-                          search={search}
-                          onClick={() => {
-                            setOrderMenuItemDetailsOpen(true);
-                            setOrderMenuItemDetailObject(menuItem);
-                          }}
-                          onEditClick={() => {
-                            setEditMenuItemObject({ ...menuItem } as IMenuItem);
-                            setEditMenuItemIndex(menuItemIndex);
-                            setEditMenuSectionIndex([
-                              ...indexPath,
-                              sectionIndex,
-                            ]);
-                            setEditMenuItemModalOpen(true);
-                          }}
-                          onDeleteClick={async () => {
-                            const confirmed = confirm(
-                              `Deseja excluir o item "${menuItem.name}"?`
-                            );
-                            if (confirmed) {
-                              try {
-                                await deleteMenuItem(
-                                  clientStore,
-                                  [...indexPath, sectionIndex],
-                                  menuItem
-                                );
-                                const cloneStore = cloneDeep(clientStore);
-                                const section =
-                                  cloneStore.menu.sections[sectionIndex];
-                                section.items = section.items.filter(
-                                  (f) => f._id !== menuItem._id
-                                );
-                                setClientStore(cloneStore);
-                              } catch (err: any) {
-                                toast(defaultToastError(err));
-                              }
+                        mainImageId={menuItem.images?.main?.toString()}
+                        price={menuItem.price}
+                        pricePromotional={menuItem.pricePromotional}
+                        hidden={menuItem.hidden}
+                        descriptionShort={menuItem.details?.short}
+                        composition={menuItem.composition}
+                        sides={menuItem.sides}
+                        index={menuItemIndex}
+                        editable={admin}
+                        useEffects
+                        search={search}
+                        onClick={() => {
+                          setOrderMenuItemDetailsOpen(true);
+                          setOrderMenuItemDetailObject(menuItem);
+                        }}
+                        onEditClick={() => {
+                          setEditMenuItemObject({ ...menuItem } as IMenuItem);
+                          setEditMenuItemIndex(menuItemIndex);
+                          setEditMenuSectionIndex([...indexPath, sectionIndex]);
+                          setEditMenuItemModalOpen(true);
+                        }}
+                        onDeleteClick={async () => {
+                          const confirmed = confirm(
+                            `Deseja excluir o item "${menuItem.name}"?`
+                          );
+                          if (confirmed) {
+                            try {
+                              await deleteMenuItem(
+                                clientStore,
+                                [...indexPath, sectionIndex],
+                                menuItem
+                              );
+                              const cloneStore = cloneDeep(clientStore);
+                              const section =
+                                cloneStore.menu.sections[sectionIndex];
+                              section.items = section.items.filter(
+                                (f) => f._id !== menuItem._id
+                              );
+                              setClientStore(cloneStore);
+                            } catch (err: any) {
+                              toast(defaultToastError(err));
                             }
-                          }}
-                        />
-                      </AdminDraggable>
-                    ))}
-                </AdminDraggableGroup>
-              </MenuSection>
-            </>
+                          }
+                        }}
+                      />
+                    </AdminDraggable>
+                  ))}
+              </AdminDraggableGroup>
+            </MenuSection>
           )}
           {renderMenuSections(
             section.sections || [],
             [...path, section],
             [...indexPath, sectionIndex]
           )}
-        </>
+        </div>
       );
     });
   };
@@ -450,7 +444,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
         store={clientStore}
         ingredients={clientIngredients}
         menuItem={editMenuItemObject}
-        onStoreChange={(newStore) => setClientStore(newStore)}
+        onStoreChange={async (newStore, shouldSave) => {
+          setClientStore(newStore);
+          if (shouldSave) {
+            await putStore(newStore);
+          }
+        }}
         onIngredientsChange={(newIngredients) => {
           setClientIngredients(newIngredients);
         }}
@@ -571,7 +570,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                 } else {
                   section = section.sections[0];
                 }
-                console.log(section, value);
                 Object.assign(section, value);
               }
 

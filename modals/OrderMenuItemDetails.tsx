@@ -19,7 +19,7 @@ import NumberInput from "/components/NumberInput";
 import { IMenuItem, ISidesItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
 import { RiExchangeFill } from "react-icons/ri";
-import { IoRemoveCircleSharp } from "react-icons/io5";
+import { IoAddCircleSharp, IoRemoveCircleSharp } from "react-icons/io5";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -57,11 +57,8 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     for (const index of sectionIndex) {
       section = section.sections[index];
     }
-    console.log("section", section);
     return section;
   };
-
-  console.log("order", order);
 
   const ingredientsChange = order.ingredients?.filter(
     (orderIngredient: any) =>
@@ -108,8 +105,10 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       />
       <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-row gap-2 flex-wrap items-center justify-between">
         <div className="">
-          <h2 className="text-2xl font-bold">{menuItem.name}</h2>
-          <span>{menuItem.nameDetail}</span>
+          <div className="flex flex-row flex-wrap gap-2 items-baseline">
+            <h2 className="text-2xl font-bold">{menuItem.name}</h2>
+            <span>({menuItem.nameDetail})</span>
+          </div>
           <MoneyDisplay
             className="text-2xl"
             oldValueClassName="text-lg"
@@ -186,13 +185,13 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
             {menuItem.composition?.filter((c) => !c.essential).length ? (
               <AccordionItem>
                 <AccordionButton>
-                  <h3 className="text-xl mb-2 flex-1 flex flex-row gap-2 items-center text-start">
+                  <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
                     <IoRemoveCircleSharp size={24} />O que deseja retirar?
                   </h3>{" "}
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel>
-                  <ul className="text-md">
+                  <ul className="text-sm">
                     {menuItem.composition
                       ?.filter((c) => !c.essential)
                       .map((compositionItem) => (
@@ -236,12 +235,57 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 </AccordionPanel>
               </AccordionItem>
             ) : null}
+            {menuItem.additionals?.length ? (
+              <AccordionItem>
+                <AccordionButton>
+                  <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
+                    <IoAddCircleSharp size={24} />O que deseja adicionar?
+                  </h3>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <ul className="text-md">
+                    {menuItem.additionals.map((additionalsCategory) => (
+                      <li
+                        className="grid sm:grid-cols-[max-content_1fr] items-center sm:gap-4 border-b-[1px]"
+                        key={additionalsCategory.categoryName}
+                      >
+                        <h4 className="pb-2 font-bold">
+                          {additionalsCategory.categoryName}{" "}
+                          <span className="text-main-a11y-medium font-normal">
+                            (0 de {additionalsCategory.max})
+                          </span>
+                        </h4>
+                        <ul className="flex-1 sm:border-l-[1px] sm:p-4 text-sm">
+                          {additionalsCategory.items?.map((item) => (
+                            <li
+                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px]"
+                              key={item.ingredient.name}
+                            >
+                              <span className="flex-1">
+                                {item.ingredient.name}
+                              </span>
+                              <MoneyDisplay
+                                className="mr-2"
+                                plus
+                                value={item.price}
+                              />
+                              <NumberInput />
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                </AccordionPanel>
+              </AccordionItem>
+            ) : null}
             {menuItem.sides
               ?.filter((s) => (s.exchanges?.length || 0) > 0)
               .map((side) => (
                 <AccordionItem key={side.menuItem._id}>
                   <AccordionButton>
-                    <h3 className="text-xl mb-2 flex-1 flex flex-row gap-2 items-center text-start">
+                    <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
                       <RiExchangeFill size={24} />
                       Trocar {side.menuItem.name} por:
                     </h3>
