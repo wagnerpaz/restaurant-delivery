@@ -16,7 +16,7 @@ import { FaShoppingCart } from "react-icons/fa";
 import Modal from "/components/Modal";
 import MoneyDisplay from "/components/MoneyDisplay";
 import NumberInput from "/components/NumberInput";
-import { IMenuItem } from "/models/MenuItem";
+import { IMenuItem, ISidesItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
 import { RiExchangeFill } from "react-icons/ri";
 import { IoRemoveCircleSharp } from "react-icons/io5";
@@ -43,6 +43,10 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       ingredient: i.ingredient,
       newQuantity: i.quantity,
     })),
+    combo: menuItem.sides?.map((s) => ({
+      menuItem: s.menuItem,
+      replacement: s.menuItem,
+    })),
   });
 
   const findSectionByIndex = (
@@ -60,12 +64,30 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
   console.log("order", order);
 
   const ingredientsChange = order.ingredients?.filter(
-    (orderIngredient) =>
+    (orderIngredient: any) =>
       orderIngredient.newQuantity !==
       menuItem.composition?.find(
         (f2) => f2.ingredient.name === orderIngredient.ingredient.name
       )?.quantity
   );
+
+  const comboChange = order.combo?.filter(
+    (comboItem: any) =>
+      comboItem.replacement._id !==
+      menuItem.sides?.find((f) => f.menuItem._id === comboItem.menuItem._id)
+        ?.menuItem?._id
+  );
+
+  const exchangesItemsBySide = (side: ISidesItem) => {
+    return side.exchanges?.map((ex) =>
+      ex.scope === "menu-section"
+        ? findSectionByIndex(
+            store,
+            ex.menuSectionIndex?.split(",").map((m) => +m) || []
+          ).items
+        : null
+    )[0];
+  };
 
   return (
     <Modal
@@ -84,7 +106,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         height={700}
         alt={`${menuItem.name} hero image`}
       />
-      <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3">
+      <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-row gap-2 flex-wrap items-center justify-between">
         <div className="">
           <h2 className="text-2xl font-bold">{menuItem.name}</h2>
           <span>{menuItem.nameDetail}</span>
@@ -95,10 +117,10 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
             oldValue={priceOld}
           />
         </div>
-        {ingredientsChange.length > 0 && (
-          <ul className="list-disc flex-1 pl-4">
+        <ul className="text-xs list-disc pl-4">
+          {ingredientsChange.length > 0 && (
             <li className="list-item">
-              <ul className="text-xs flex-1">
+              <ul className="flex-1">
                 <span className="font-bold">Remover: </span>
                 {ingredientsChange
                   .sort((ig1, ig2) =>
@@ -113,8 +135,24 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                   .slice(0, -1)}
               </ul>
             </li>
-          </ul>
-        )}
+          )}
+          {comboChange.length > 0 && (
+            <li className="list-item">
+              <ul className="list-disc">
+                {comboChange
+                  .sort((ci1, ci2) =>
+                    ci1.menuItem.name > ci2.menuItem.name ? 1 : -1
+                  )
+                  .map((comboItem) => (
+                    <li className="list-item " key={comboItem.menuItem._id}>
+                      <span className="font-bold">Trocar: </span>
+                      {comboItem.menuItem.name} por {comboItem.replacement.name}
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          )}
+        </ul>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 px-4 flex-1">
         <div className="sm:flex-1">
@@ -174,11 +212,6 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                               )?.newQuantity
                             }
                             onChange={(newValue) => {
-                              console.log(
-                                "oii",
-                                newValue,
-                                compositionItem.quantity
-                              );
                               setOrder({
                                 ...order,
                                 ingredients: [
@@ -215,57 +248,72 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                     <AccordionIcon />
                   </AccordionButton>
                   <AccordionPanel className="flex flex-col gap-4">
-                    <RadioGroup>
+                    <RadioGroup
+                      value={
+                        order.combo?.find(
+                          (f) => side.menuItem._id === f.menuItem._id
+                        ).replacement._id
+                      }
+                      onChange={(e) =>
+                        setOrder({
+                          ...order,
+                          combo: [
+                            ...order.combo.filter(
+                              (ci) => ci.menuItem?._id !== side.menuItem._id
+                            ),
+                            {
+                              menuItem: side.menuItem,
+                              replacement: exchangesItemsBySide(side).find(
+                                (f) => f._id === e
+                              ),
+                            },
+                          ],
+                        })
+                      }
+                    >
                       <div className="flex flex-row gap-2 items-center justify-between border-b-[1px] border-main-a11y-medium pb-2">
                         <span>Não trocar</span>
-                        <Radio className="!border-main-a11y-medium" value="" />
+                        <Radio
+                          className="!border-main-a11y-medium"
+                          value={side.menuItem._id}
+                        />
                       </div>
-                      {side.exchanges?.map((ex) =>
-                        ex.scope === "menu-section" ? (
-                          findSectionByIndex(
-                            store,
-                            ex.menuSectionIndex?.split(",").map((m) => +m) || []
-                          )
-                            .items.filter(
-                              (f) =>
-                                !menuItem.sides
-                                  ?.map((s) => s.menuItem._id)
-                                  .includes(f._id)
-                            )
-                            .map((sectionMenuItem) => (
-                              <div
-                                className="flex flex-row gap-2 items-center justify-between [&:not(:last-child)]:border-b-[1px] border-main-a11y-medium py-2"
-                                key={sectionMenuItem._id}
-                              >
-                                <div className="flex flex-row items-center gap-2">
-                                  <DbImage
-                                    className="rounded-md"
-                                    id={sectionMenuItem.images?.main}
-                                    width={50}
-                                    height={50}
-                                  />
-                                  <div className="flex flex-col gap-0">
-                                    {sectionMenuItem.name}
-                                    <MoneyDisplay
-                                      plus
-                                      value={Math.max(
-                                        sectionMenuItem.price -
-                                          side.menuItem.price,
-                                        0
-                                      )}
-                                    />
-                                  </div>
-                                </div>
-                                <Radio
-                                  className="!border-main-a11y-medium"
-                                  value={sectionMenuItem._id}
+                      {exchangesItemsBySide(side)
+                        .filter(
+                          (f) =>
+                            !menuItem.sides
+                              ?.map((s) => s.menuItem._id)
+                              .includes(f._id)
+                        )
+                        .map((sectionMenuItem) => (
+                          <div
+                            className="flex flex-row gap-2 items-center justify-between [&:not(:last-child)]:border-b-[1px] border-main-a11y-medium py-2"
+                            key={sectionMenuItem._id}
+                          >
+                            <div className="flex flex-row items-center gap-2">
+                              <DbImage
+                                className="rounded-md"
+                                id={sectionMenuItem.images?.main}
+                                width={50}
+                                height={50}
+                              />
+                              <div className="flex flex-col gap-0">
+                                {sectionMenuItem.name}
+                                <MoneyDisplay
+                                  plus
+                                  value={Math.max(
+                                    sectionMenuItem.price - side.menuItem.price,
+                                    0
+                                  )}
                                 />
                               </div>
-                            ))
-                        ) : (
-                          <div>Opps</div>
-                        )
-                      )}
+                            </div>
+                            <Radio
+                              className="!border-main-a11y-medium"
+                              value={sectionMenuItem._id}
+                            />
+                          </div>
+                        ))}
                     </RadioGroup>
                   </AccordionPanel>
                 </AccordionItem>
