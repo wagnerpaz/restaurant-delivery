@@ -9,7 +9,7 @@ import {
   RadioGroup,
 } from "@chakra-ui/react";
 import classNames from "classnames";
-import { ComponentProps, useState } from "react";
+import { ComponentProps, useMemo, useState } from "react";
 import DbImage from "/components/DbImage";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -39,14 +39,15 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
   const priceOld = menuItem.pricePromotional ? menuItem.price : undefined;
 
   const [order, setOrder] = useState<any>({
-    ingredients: menuItem.composition?.map((i) => ({
+    removals: menuItem.composition?.map((i) => ({
       ingredient: i.ingredient,
-      newQuantity: i.quantity,
+      quantity: i.quantity,
     })),
     combo: menuItem.sides?.map((s) => ({
       menuItem: s.menuItem,
       replacement: s.menuItem,
     })),
+    additionals: [],
   });
 
   const findSectionByIndex = (
@@ -60,20 +61,35 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     return section;
   };
 
-  const ingredientsChange = order.ingredients?.filter(
-    (orderIngredient: any) =>
-      orderIngredient.newQuantity !==
-      menuItem.composition?.find(
-        (f2) => f2.ingredient.name === orderIngredient.ingredient.name
-      )?.quantity
+  const removalsChange = useMemo(
+    () =>
+      order.removals?.filter(
+        (orderIngredient: any) =>
+          orderIngredient.quantity !==
+          menuItem.composition?.find(
+            (f2) => f2.ingredient.name === orderIngredient.ingredient.name
+          )?.quantity
+      ),
+    [order, menuItem.composition]
   );
 
-  const comboChange = order.combo?.filter(
-    (comboItem: any) =>
-      comboItem.replacement._id !==
-      menuItem.sides?.find((f) => f.menuItem._id === comboItem.menuItem._id)
-        ?.menuItem?._id
+  const additionalsChange = useMemo(
+    () =>
+      order.additionals?.filter(
+        (orderIngredient: any) => orderIngredient.quantity > 0
+      ),
+    [order]
   );
+
+  const comboChange = useMemo(
+    () =>
+      order.combo?.filter(
+        (comboItem: any) => comboItem.replacement._id !== comboItem.menuItem._id
+      ),
+    [order]
+  );
+
+  console.log("comboChange", comboChange);
 
   const exchangesItemsBySide = (side: ISidesItem) => {
     return side.exchanges?.map((ex) =>
@@ -85,6 +101,26 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         : null
     )[0];
   };
+
+  const calculedPrice = useMemo(() => {
+    return (
+      priceNew +
+      additionalsChange.reduce(
+        (acc, curr) => acc + curr.quantity * curr.price,
+        0
+      ) +
+      comboChange.reduce(
+        (acc, curr) =>
+          acc +
+          Math.max(
+            curr.replacement.price * curr.quantity -
+              curr.menuItem.price * curr.quantity,
+            0
+          ),
+        0
+      )
+    );
+  }, [priceNew, additionalsChange, comboChange]);
 
   return (
     <Modal
@@ -107,27 +143,45 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         <div className="">
           <div className="flex flex-row flex-wrap gap-2 items-baseline">
             <h2 className="text-2xl font-bold">{menuItem.name}</h2>
-            <span>({menuItem.nameDetail})</span>
+            {menuItem.nameDetail && <span>({menuItem.nameDetail})</span>}
           </div>
           <MoneyDisplay
             className="text-2xl"
             oldValueClassName="text-lg"
-            value={priceNew}
+            value={calculedPrice}
             oldValue={priceOld}
           />
         </div>
         <ul className="text-xs list-disc pl-4">
-          {ingredientsChange.length > 0 && (
+          {removalsChange.length > 0 && (
             <li className="list-item">
               <ul className="flex-1">
                 <span className="font-bold">Remover: </span>
-                {ingredientsChange
+                {removalsChange
                   .sort((ig1, ig2) =>
                     ig1.ingredient.name > ig2.ingredient.name ? 1 : -1
                   )
                   .map((ingRemove) => (
                     <li className="inline" key={ingRemove.ingredient.name}>
                       {ingRemove.ingredient.name}
+                    </li>
+                  ))
+                  .flatMap((item) => [item, ", "])
+                  .slice(0, -1)}
+              </ul>
+            </li>
+          )}
+          {additionalsChange.length > 0 && (
+            <li className="list-item">
+              <ul className="flex-1">
+                <span className="font-bold">Adicionar: </span>
+                {additionalsChange
+                  .sort((ig1, ig2) =>
+                    ig1.ingredient.name > ig2.ingredient.name ? 1 : -1
+                  )
+                  .map((ingAdd) => (
+                    <li className="inline" key={ingAdd.ingredient.name}>
+                      {ingAdd.ingredient.name}
                     </li>
                   ))
                   .flatMap((item) => [item, ", "])
@@ -145,7 +199,10 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                   .map((comboItem) => (
                     <li className="list-item " key={comboItem.menuItem._id}>
                       <span className="font-bold">Trocar: </span>
-                      {comboItem.menuItem.name} por {comboItem.replacement.name}
+                      {comboItem.quantity && `${comboItem.quantity}x `}
+                      {comboItem.menuItem.name} por{" "}
+                      {comboItem.quantity && `${comboItem.quantity}x `}
+                      {comboItem.replacement.name}
                     </li>
                   ))}
               </ul>
@@ -204,24 +261,24 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                           </span>
                           <NumberInput
                             value={
-                              order?.ingredients?.find(
+                              order.removals?.find(
                                 (f) =>
                                   f.ingredient.name ===
                                   compositionItem.ingredient.name
-                              )?.newQuantity
+                              )?.quantity
                             }
                             onChange={(newValue) => {
                               setOrder({
                                 ...order,
-                                ingredients: [
-                                  ...(order.ingredients?.filter(
+                                removals: [
+                                  ...(order.removals?.filter(
                                     (f) =>
                                       f.ingredient.name !==
                                       compositionItem.ingredient.name
                                   ) || []),
                                   {
                                     ingredient: compositionItem.ingredient,
-                                    newQuantity: newValue,
+                                    quantity: newValue,
                                   },
                                 ],
                               });
@@ -244,22 +301,22 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel>
-                  <ul className="text-md">
+                  <ul className="text-md flex flex-col gap-4">
                     {menuItem.additionals.map((additionalsCategory) => (
                       <li
-                        className="grid sm:grid-cols-[max-content_1fr] items-center sm:gap-4 border-b-[1px]"
+                        className="grid items-center"
                         key={additionalsCategory.categoryName}
                       >
-                        <h4 className="pb-2 font-bold">
+                        <h4 className="font-bold">
                           {additionalsCategory.categoryName}{" "}
                           <span className="text-main-a11y-medium font-normal">
                             (0 de {additionalsCategory.max})
                           </span>
                         </h4>
-                        <ul className="flex-1 sm:border-l-[1px] sm:p-4 text-sm">
+                        <ul className="flex-1 text-sm">
                           {additionalsCategory.items?.map((item) => (
                             <li
-                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px]"
+                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px] py-2"
                               key={item.ingredient.name}
                             >
                               <span className="flex-1">
@@ -268,9 +325,44 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                               <MoneyDisplay
                                 className="mr-2"
                                 plus
-                                value={item.price}
+                                value={
+                                  store.ingredients.find(
+                                    (f) =>
+                                      f.ingredient._id === item.ingredient._id
+                                  )?.price
+                                }
                               />
-                              <NumberInput />
+                              <NumberInput
+                                value={
+                                  order.additionals.find(
+                                    (f) =>
+                                      f.ingredient.name === item.ingredient.name
+                                  )?.quantity
+                                }
+                                min={item.min}
+                                max={item.max}
+                                onChange={(e) =>
+                                  setOrder({
+                                    ...order,
+                                    additionals: [
+                                      ...order?.additionals?.filter(
+                                        (f) =>
+                                          f.ingredient.name !==
+                                          item.ingredient.name
+                                      ),
+                                      {
+                                        ...item,
+                                        quantity: e,
+                                        price: store.ingredients.find(
+                                          (f) =>
+                                            f.ingredient.name ===
+                                            item.ingredient.name
+                                        )?.price,
+                                      },
+                                    ],
+                                  })
+                                }
+                              />
                             </li>
                           ))}
                         </ul>
@@ -307,6 +399,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                             ),
                             {
                               menuItem: side.menuItem,
+                              quantity: side.quantity,
                               replacement: exchangesItemsBySide(side).find(
                                 (f) => f._id === e
                               ),
@@ -346,7 +439,9 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                                 <MoneyDisplay
                                   plus
                                   value={Math.max(
-                                    sectionMenuItem.price - side.menuItem.price,
+                                    (sectionMenuItem.price -
+                                      side.menuItem.price) *
+                                      side.quantity,
                                     0
                                   )}
                                 />
@@ -373,7 +468,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         >
           Cancelar
         </Button>
-        <Button className="!bg-hero flex-1">
+        <Button className="!bg-hero flex-1" isDisabled={calculedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
           Adicionar
         </Button>
