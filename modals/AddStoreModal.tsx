@@ -25,6 +25,7 @@ interface AddStoreModalProps extends ComponentProps<typeof Modal> {
 const AddStoreModal: React.FC<AddStoreModalProps> = ({
   contentClassName,
   store = {} as IStore,
+  onOpenChange,
   onStoreChange,
   ...props
 }) => {
@@ -33,7 +34,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
   const [clientStore, setClientStore] = useState({
     ...store,
     slug: router.query.storeSlug,
-    locations: [{}],
+    locations: store.locations?.length > 0 ? store.locations : [{}],
   } as IStore);
   const [brasilStates, setBrasilStates] = useState([]);
   const [brasilCities, setBrasilCities] = useState([]);
@@ -95,24 +96,28 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
   return (
     <Modal
       {...props}
-      contentClassName={classNames(
-        "!overflow-visible flex flex-col container",
-        contentClassName
-      )}
+      contentClassName={classNames("flex flex-col container", contentClassName)}
+      onOpenChange={onOpenChange}
     >
-      <form className="flex flex-col gap-4">
-        <div className="flex flex-row gap-4 items-center">
+      <form className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
           <EditableSection
             iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
             onEditClick={() => setEditImageModalOpen(true)}
             // onDeleteClick={onDeleteClick}
           >
-            <DbImage id={clientStore.logo} width={200} height={200} />
+            <DbImage
+              className="border border-solid border-main-a11y-low rounded-lg bg-main-100"
+              id={clientStore.logo}
+              width={200}
+              height={200}
+            />
           </EditableSection>
-          <div className="flex-1 flex flex-col gap-4">
-            <FormControl className="flex-1 min-w-fit" label="Nome">
+          <div className="w-full flex-1 flex flex-col gap-6">
+            <FormControl className="flex-1 w-full sm:min-w-fit" label="Nome">
               <Input
                 value={clientStore.name}
+                autoFocus
                 onChange={(e) =>
                   setClientStore({
                     ...clientStore,
@@ -127,7 +132,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
           </div>
         </div>
         {clientStore?.locations?.[0] && (
-          <Fieldset className="flex flex-col gap-4">
+          <Fieldset className="flex flex-col gap-6 pt-6">
             <legend>Localização</legend>
 
             <FormControl className="flex-1 min-w-fit" label="CEP">
@@ -148,7 +153,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               />
             </FormControl>
             <div className="flex flex-row gap-4">
-              <FormControl className="flex-1 min-w-fit" label="Estado">
+              <FormControl className="min-w-fit" label="Estado">
                 <Select
                   value={clientStore.locations[0].state}
                   onChange={(e) => {
@@ -173,7 +178,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                 </Select>
               </FormControl>
 
-              <FormControl className="flex-1 min-w-fit" label="Cidade">
+              <FormControl className="flex-1 w-full" label="Cidade">
                 <Select
                   value={clientStore.locations[0].city}
                   onChange={(e) => {
@@ -187,7 +192,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                 >
                   {brasilCities.map((city) => (
                     <option
-                      className="text-main-a11y-high"
+                      className="text-main-a11y-high overflow-hidden text-ellipsis"
                       key={city}
                       value={city}
                     >
@@ -195,6 +200,25 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                     </option>
                   ))}
                 </Select>
+              </FormControl>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-6">
+              <FormControl className="flex-1 min-w-fit" label="Endereço">
+                <Input
+                  value={clientStore.locations[0].address}
+                  onChange={(e) =>
+                    setClientStore({
+                      ...clientStore,
+                      locations: [
+                        {
+                          ...clientStore.locations[0],
+                          address: e.target.value,
+                        },
+                      ],
+                    } as IStore)
+                  }
+                />
               </FormControl>
 
               <FormControl className="flex-1 min-w-fit" label="Bairro">
@@ -213,27 +237,8 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                   }
                 />
               </FormControl>
-            </div>
 
-            <div className="flex flex-row gap-4">
-              <FormControl className="flex-1 min-w-fit" label="Endereço">
-                <Input
-                  value={clientStore.locations[0].address}
-                  onChange={(e) =>
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        {
-                          ...clientStore.locations[0],
-                          address: e.target.value,
-                        },
-                      ],
-                    } as IStore)
-                  }
-                />
-              </FormControl>
-
-              <FormControl className="flex-1 min-w-fit" label="Número">
+              <FormControl className="w-full sm:w-20" label="Número">
                 <Input
                   value={clientStore.locations[0].number}
                   onChange={(e) =>
@@ -246,10 +251,44 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                   }
                 />
               </FormControl>
+
+              <FormControl
+                className="flex-1 w-full sm:w-auto"
+                label="Complemento"
+              >
+                <Input
+                  value={clientStore.locations[0].address2}
+                  onChange={(e) =>
+                    setClientStore({
+                      ...clientStore,
+                      locations: [
+                        {
+                          ...clientStore.locations[0],
+                          address2: e.target.value,
+                        },
+                      ],
+                    } as IStore)
+                  }
+                />
+              </FormControl>
             </div>
           </Fieldset>
         )}
-        <Button onClick={() => onStoreChange(clientStore, true)}>Salvar</Button>
+        <div className="self-end flex flex-row gap-2">
+          <Button
+            className="w-32"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancelar
+          </Button>
+          <Button
+            className="w-32 self-end"
+            onClick={() => onStoreChange(clientStore, true)}
+          >
+            Salvar
+          </Button>
+        </div>
       </form>
       <ImageEditorModal
         open={editImageModalOpen}

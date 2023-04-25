@@ -20,6 +20,7 @@ import { IMenuItem, ISidesItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
 import { RiExchangeFill } from "react-icons/ri";
 import { IoAddCircleSharp, IoRemoveCircleSharp } from "react-icons/io5";
+import { IoMdClose } from "react-icons/io";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -133,28 +134,36 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       )}
     >
       <DbImage
-        className="bg-main-200 !rounded-none w-full h-[200px] object-cover"
+        className="bg-main-200 !rounded-none w-full sm:h-[300px] object-cover"
         id={menuItem.images?.main}
         width={500}
-        height={700}
+        height={500}
         alt={`${menuItem.name} hero image`}
       />
-      <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-row gap-2 flex-wrap items-center justify-between">
-        <div className="">
-          <div className="flex flex-row flex-wrap gap-2 items-baseline">
-            <h2 className="text-2xl font-bold">{menuItem.name}</h2>
-            {menuItem.nameDetail && <span>({menuItem.nameDetail})</span>}
+      <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-col sm:flex-row sm:items-center">
+        <div className="flex flex-row gap-2 items-center justify-between">
+          <div className="flex-1">
+            <div className="flex flex-row flex-wrap gap-2 items-baseline">
+              <h2 className="text-2xl font-bold">{menuItem.name}</h2>
+              {menuItem.nameDetail && <span>({menuItem.nameDetail})</span>}
+            </div>
+            <MoneyDisplay
+              className="text-2xl"
+              oldValueClassName="text-lg"
+              value={calculedPrice}
+              oldValue={priceOld}
+            />
           </div>
-          <MoneyDisplay
-            className="text-2xl"
-            oldValueClassName="text-lg"
-            value={calculedPrice}
-            oldValue={priceOld}
-          />
+          <div
+            className="cursor-pointer mt-1 sm:hidden"
+            onClick={() => onOpenChange(false)}
+          >
+            <IoMdClose size={30} />
+          </div>
         </div>
-        <ul className="text-xs list-disc pl-4">
+        <ul className="flex-1 sm:text-right text-xs sm:pl-4">
           {removalsChange.length > 0 && (
-            <li className="list-item">
+            <li>
               <ul className="flex-1">
                 <span className="font-bold">Remover: </span>
                 {removalsChange
@@ -209,7 +218,15 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
             </li>
           )}
         </ul>
+
+        <div
+          className="cursor-pointer mt-1 hidden sm:block"
+          onClick={() => onOpenChange(false)}
+        >
+          <IoMdClose size={30} />
+        </div>
       </div>
+
       <div className="flex flex-col sm:flex-row gap-4 px-4 flex-1">
         <div className="sm:flex-1">
           {menuItem.details?.short && <span>{menuItem.details?.short}</span>}
@@ -313,10 +330,10 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                             (0 de {additionalsCategory.max})
                           </span>
                         </h4>
-                        <ul className="flex-1 text-sm">
+                        <ul className="flex-1 text-sm pt-2">
                           {additionalsCategory.items?.map((item) => (
                             <li
-                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px] py-2"
+                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px]"
                               key={item.ingredient.name}
                             >
                               <span className="flex-1">
@@ -461,13 +478,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         </div>
       </div>
       <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 justify-between h-18">
-        <Button
-          className="text-hero flex-1"
-          variant="outline"
-          onClick={() => onOpenChange(false)}
-        >
-          Cancelar
-        </Button>
+        <NumberInput full />
         <Button className="!bg-hero flex-1" isDisabled={calculedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
           Adicionar

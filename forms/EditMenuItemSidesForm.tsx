@@ -1,9 +1,10 @@
 import { Button, Input, Select as SelectSimple } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
-import cloneDeep from "lodash.clonedeep";
 import React, { ComponentProps, useCallback, useMemo } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import { RiExchangeFill } from "react-icons/ri";
+
+import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 import DbImage from "/components/DbImage";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
@@ -36,21 +37,7 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
   onSidesChange,
 }) => {
   const storeMenuItems = useMemo(() => {
-    const menuItems: IMenuItem[] = [];
-    function traverseSections(sections: IMenuSection[]) {
-      for (const section of sections) {
-        if (section.items.length > 0) {
-          menuItems.push(...section.items);
-        }
-        if (section.sections) {
-          traverseSections(section.sections);
-        }
-      }
-    }
-    traverseSections(store.menu.sections);
-
-    //@ts-ignore
-    return [...menuItems.filter((el) => el)];
+    retriveAllMenuItems(store.menu.sections);
   }, [store]);
 
   const onFindSidesItem = useCallback(

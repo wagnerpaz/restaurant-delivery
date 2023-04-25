@@ -27,6 +27,7 @@ export interface IMenuSection {
 
 export interface ILocation {
   address: string;
+  address2: string;
   number: string;
   neighborhood: string;
   state: string;
@@ -50,6 +51,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       state: String,
       city: String,
       postalCode: String,
+      address2: String,
     },
   ],
   ingredients: [

@@ -10,7 +10,7 @@ import { IMenuItem } from "/models/MenuItem";
 interface AddMenuSectionModalProps extends ComponentProps<typeof Modal> {
   menuSection: IMenuItem;
   parentName?: string;
-  mode?: "ADD" | "EDIT";
+  mode?: "ADD" | "ADD-SUB" | "EDIT";
   onSave?: (section: IMenuSection) => void;
   onCancel?: () => void;
   onDelete?: () => void;
@@ -36,14 +36,24 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
         contentClassName
       )}
     >
-      <form className="flex flex-col gap-6 mt-4">
-        {mode === "ADD" && (
+      <form
+        className="flex flex-col gap-6 mt-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSave({ ...menuSection, name } as IMenuSection);
+        }}
+      >
+        {mode === "ADD-SUB" && (
           <FormControl label="Caminho Atual">
             <Input value={parentName} disabled />
           </FormControl>
         )}
         <FormControl label="Nome">
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+          />
         </FormControl>
         <div className="flex-1 flex flex-row gap-2">
           {mode === "EDIT" && (
@@ -55,10 +65,7 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
           <Button className="w-28" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button
-            className="w-28"
-            onClick={() => onSave({ ...menuSection, name } as IMenuSection)}
-          >
+          <Button type="submit" className="w-28">
             Salvar
           </Button>
         </div>

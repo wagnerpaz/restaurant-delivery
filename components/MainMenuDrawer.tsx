@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { RiStore3Fill } from "react-icons/ri";
 import {
   Button,
   Drawer,
@@ -18,6 +19,7 @@ import { IStore } from "/models/Store";
 
 interface MainMenuDrawerProps extends ComponentProps<typeof Drawer> {
   store: IStore;
+  onStoreDataClick: () => void;
 }
 
 const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
@@ -25,6 +27,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   children,
   isOpen,
   onClose,
+  onStoreDataClick,
   ...props
 }) => {
   const { data: session, status } = useSession();
@@ -51,6 +54,16 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
             >
               <FaUserCircle className="mr-4" size={36} />
               Entrar
+            </Button>
+          )}
+          {admin && (
+            <Button
+              className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
+              variant="text"
+              onClick={onStoreDataClick}
+            >
+              <RiStore3Fill className="mr-4" size={36} />
+              Dados da Loja
             </Button>
           )}
           <MenuSectionsTree store={store} onCloseDrawer={onClose} />

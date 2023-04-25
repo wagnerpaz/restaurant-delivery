@@ -376,7 +376,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             </TabPanel>
           </TabPanels>
         </Tabs>
-        <div className="flex flex-row justify-end gap-2">
+        <div className="sticky bottom-0 flex flex-row justify-end gap-2 bg-main-100 z-20 py-3 px-4 -mx-4 translate-y-4 border-t border-hero">
           <Button className="w-32" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
@@ -386,6 +386,11 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               //remove empty ingredients
               edit.composition = edit.composition?.filter(
                 (f) => f.ingredient?.name
+              );
+              //remove additionals
+              edit.additionals = edit.additionals?.filter(
+                (f) =>
+                  (f.items?.filter((f2) => f2.ingredient?.name).length || 0) > 0
               );
               //remove empty sides
               edit.sides = edit.sides?.filter((f) => f.menuItem?._id);
