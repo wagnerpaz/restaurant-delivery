@@ -66,7 +66,7 @@ const Modal: React.FC<ModalProps> = ({
         <div
           ref={contentRef}
           className={classNames(
-            "max-w-full max-h-full bg-main-200 p-4 rounded-2xl  overflow-auto custom-scrollbar pointer-events-auto",
+            "h-full sm:h-auto w-full sm:w-auto bg-main-200 p-4 rounded-2xl  overflow-auto custom-scrollbar pointer-events-auto",
             "!rounded-none sm:!rounded-l-2xl",
             contentClassName
           )}

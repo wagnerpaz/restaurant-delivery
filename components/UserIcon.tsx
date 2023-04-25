@@ -2,13 +2,16 @@ import React, { useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
-
-import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { Button } from "@chakra-ui/react";
 import { createPortal } from "react-dom";
+import { FaAddressBook, FaSignOutAlt } from "react-icons/fa";
 
-const UserIcon = () => {
-  const { data: session, status } = useSession();
+import useOnClickOutside from "/lib/hooks/useOnClickOutside";
+import { useRouter } from "next/router";
+
+const UserIcon = ({ store }) => {
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const container = useRef(null);
 
@@ -17,6 +20,8 @@ const UserIcon = () => {
   useOnClickOutside(container, () => {
     setMenuOpened(false);
   });
+
+  console.log(session?.user);
 
   return (
     <>
@@ -38,14 +43,33 @@ const UserIcon = () => {
               >
                 <small className="block">Autenticado como</small>
                 <strong>{session.user.email ?? session.user.name}</strong>
-                <div className="border-b-[1px] -mx-4 pb-2 border-main-400" />
+                <div className="border-b -mx-4 pb-3 border-main-a11y-low" />
+                <nav className="-mx-4 mt-1 flex ">
+                  <Button
+                    className="flex-row items-center gap-2"
+                    variant="text"
+                    onClick={() => {
+                      router.push(
+                        `/store/${store.slug}?addressesUserId=${session?.user?.id}`,
+                        undefined,
+                        { shallow: true }
+                      );
+                      setMenuOpened(false);
+                    }}
+                  >
+                    <FaAddressBook size={24} />
+                    Meu Endereço
+                  </Button>
+                </nav>
+                <div className="border-b -mx-4 pb-2 border-main-a11y-low" />
                 <Button
-                  className="mt-2 w-full"
+                  className="mt-4 mb-2 w-full flex flex-row gap-1 items-center"
                   onClick={() => {
                     signOut();
                   }}
                 >
-                  Sign out
+                  <FaSignOutAlt />
+                  Sair
                 </Button>
               </div>,
               document.body

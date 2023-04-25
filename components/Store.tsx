@@ -41,6 +41,7 @@ import {
   retriveAllMenuItems as retrieveAllMenuItems,
 } from "/lib/menuSectionUtils";
 import useGetStore from "/hooks/useGetStore";
+import EditAddressModal from "/modals/EditAddressModal";
 
 interface StoreProps {
   store: IStore;
@@ -66,6 +67,10 @@ const emptyMenuSection: IMenuSection = {
 const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const toast = useToast();
   const router = useRouter();
+
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const admin = (session?.user as IUser)?.role === "admin";
 
   const searchMobileRef = useRef<HTMLInputElement>();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -109,17 +114,19 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       ),
     [store.menu.sections, router.query.orderItem]
   );
-  const orderMenuItemDetailsOpen = router.query.orderItem;
+  const orderMenuItemDetailsOpen = !!router.query.orderItem;
+
+  const editUserAddressesObject = useMemo(
+    () => (session?.user as IUser)?.locations,
+    [session?.user]
+  );
+  const editUserAddressesOpen = !!router.query.addressesUserId;
 
   const hasModalOpen =
     addStoreModalOpen ||
     editMenuItemModalOpen ||
     editNewSectionModalOpen ||
     orderMenuItemDetailsOpen;
-
-  const { data: session, status } = useSession();
-  const loading = status === "loading";
-  const admin = (session?.user as IUser)?.role === "admin";
 
   const AdminDraggableGroup = admin
     ? DraggableGroup
@@ -340,13 +347,18 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     }
   };
 
+  if (!clientStore.listed && !admin) {
+    return null;
+  }
+
   return (
     <div
       className={classNames("font-lato custom-scrollbar min-h-screen pb-40", {
         "fixed top-0 left-0 w-full h-full overflow-hidden":
           addStoreModalOpen ||
           orderMenuItemDetailsOpen ||
-          editMenuItemModalOpen,
+          editMenuItemModalOpen ||
+          editUserAddressesOpen,
       })}
     >
       <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-lg z-20 flex flex-row items-center w-full">
@@ -414,13 +426,13 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             <FaSearch size={22} />
           </Button>
           <Button
-            className="flex flex-row gap-2 items-center !px-0  "
+            className="flex flex-row gap-2 items-center !px-0"
             variant="text"
             onClick={() => setDrawerOpen(true)}
           >
             <HiMenu size={36} />
           </Button>
-          <UserIcon />
+          <UserIcon store={store} />
         </div>
       </header>
       {searchMobileVisible && (
@@ -525,7 +537,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           store={store}
           portalTarget={() => document.body}
           menuItem={orderMenuItemDetailObject}
-          open={!!router.query.orderItem}
+          open={orderMenuItemDetailsOpen}
           onOpenChange={comeBackToStoreRoot}
         />
       )}
@@ -648,6 +660,13 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
               }
             }
           }}
+        />
+      )}
+      {editUserAddressesOpen && (
+        <EditAddressModal
+          open={editUserAddressesOpen}
+          locations={editUserAddressesObject}
+          onOpenChange={comeBackToStoreRoot}
         />
       )}
     </div>

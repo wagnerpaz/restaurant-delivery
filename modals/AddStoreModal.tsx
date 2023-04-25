@@ -5,17 +5,13 @@ import EditableSection from "/components/EditableSection";
 import Fieldset from "/components/Fieldset";
 
 import Modal from "/components/Modal";
-import useGetBrasilCep from "/hooks/useGetBrasilCep";
-import useGetBrasilCities from "/hooks/useGetBrasilCities";
-import useGetBrasilStates from "/hooks/useGetBrasilStates";
-import applyCepMask from "/lib/cepMask";
-import isValidBRPostalCode from "/lib/isValidBrPostalCode";
 import { IStore } from "/models/Store";
 import { useRouter } from "next/router";
 import ImageEditorModal from "./ImageEditorModal";
 import mongoose from "mongoose";
 import { Button, Input, Select } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
+import EditAddressForm from "/forms/EditAddressForm";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store?: IStore;
@@ -36,31 +32,8 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
     slug: router.query.storeSlug,
     locations: store.locations?.length > 0 ? store.locations : [{}],
   } as IStore);
-  const [brasilStates, setBrasilStates] = useState([]);
-  const [brasilCities, setBrasilCities] = useState([]);
+
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
-
-  const getBrasilCep = useGetBrasilCep();
-  const getBrasilStates = useGetBrasilStates();
-  const getBrasilCities = useGetBrasilCities();
-
-  useEffect(() => {
-    async function exec() {
-      setBrasilStates(await getBrasilStates());
-    }
-    exec();
-  }, [getBrasilStates]);
-
-  const state = clientStore.locations?.[0]?.state;
-
-  useEffect(() => {
-    async function exec() {
-      setBrasilCities(
-        await getBrasilCities(brasilStates.find((f) => f.sigla === state)?.id)
-      );
-    }
-    exec();
-  }, [brasilStates, state, getBrasilCities]);
 
   useEffect(() => {
     if (!clientStore.locations || clientStore.locations.length === 0) {
@@ -68,30 +41,6 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
     }
     onStoreChange(clientStore);
   }, [clientStore, onStoreChange]);
-
-  const postalCode = clientStore.locations?.[0]?.postalCode;
-
-  useEffect(() => {
-    async function exec() {
-      if (isValidBRPostalCode(postalCode)) {
-        const serviceLocation = await getBrasilCep(postalCode);
-        setClientStore(
-          (clientStore) =>
-            ({
-              ...clientStore,
-              locations: [
-                {
-                  ...clientStore.locations[0],
-                  ...serviceLocation,
-                  postalCode: postalCode,
-                },
-              ],
-            } as IStore)
-        );
-      }
-    }
-    exec();
-  }, [postalCode, getBrasilCep]);
 
   return (
     <Modal
@@ -129,161 +78,43 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             <FormControl className="flex-1 min-w-fit" label="URL">
               <Input value={`/store/${clientStore.slug}`} disabled />
             </FormControl>
+            <FormControl className="flex-1 min-w-fit" label="Listada">
+              <Select
+                value={`${clientStore.listed}`}
+                onChange={(e) =>
+                  setClientStore({
+                    ...clientStore,
+                    listed: e.target.value === "true",
+                  } as IStore)
+                }
+              >
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </Select>
+            </FormControl>
           </div>
         </div>
         {clientStore?.locations?.[0] && (
-          <Fieldset className="flex flex-col gap-6 pt-6">
+          <Fieldset className="pt-0">
             <legend>Localização</legend>
-
-            <FormControl className="flex-1 min-w-fit" label="CEP">
-              <Input
-                value={clientStore.locations[0].postalCode}
-                onChange={async (e) => {
-                  const newCep = applyCepMask(e);
-                  setClientStore({
-                    ...clientStore,
-                    locations: [
-                      {
-                        ...clientStore.locations[0],
-                        postalCode: newCep,
-                      },
-                    ],
-                  } as IStore);
-                }}
-              />
-            </FormControl>
-            <div className="flex flex-row gap-4">
-              <FormControl className="min-w-fit" label="Estado">
-                <Select
-                  value={clientStore.locations[0].state}
-                  onChange={(e) => {
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        { ...clientStore.locations[0], state: e.target.value },
-                      ],
-                    } as IStore);
-                  }}
-                >
-                  <option></option>
-                  {brasilStates.map((state) => (
-                    <option
-                      className="text-main-a11y-high"
-                      key={state.id}
-                      value={state.sigla}
-                    >
-                      {state.sigla}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl className="flex-1 w-full" label="Cidade">
-                <Select
-                  value={clientStore.locations[0].city}
-                  onChange={(e) => {
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        { ...clientStore.locations[0], city: e.target.value },
-                      ],
-                    } as IStore);
-                  }}
-                >
-                  {brasilCities.map((city) => (
-                    <option
-                      className="text-main-a11y-high overflow-hidden text-ellipsis"
-                      key={city}
-                      value={city}
-                    >
-                      {city}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-6">
-              <FormControl className="flex-1 min-w-fit" label="Endereço">
-                <Input
-                  value={clientStore.locations[0].address}
-                  onChange={(e) =>
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        {
-                          ...clientStore.locations[0],
-                          address: e.target.value,
-                        },
-                      ],
-                    } as IStore)
-                  }
-                />
-              </FormControl>
-
-              <FormControl className="flex-1 min-w-fit" label="Bairro">
-                <Input
-                  value={clientStore.locations[0].neighborhood}
-                  onChange={(e) =>
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        {
-                          ...clientStore.locations[0],
-                          neighborhood: e.target.value,
-                        },
-                      ],
-                    } as IStore)
-                  }
-                />
-              </FormControl>
-
-              <FormControl className="w-full sm:w-20" label="Número">
-                <Input
-                  value={clientStore.locations[0].number}
-                  onChange={(e) =>
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        { ...clientStore.locations[0], number: e.target.value },
-                      ],
-                    } as IStore)
-                  }
-                />
-              </FormControl>
-
-              <FormControl
-                className="flex-1 w-full sm:w-auto"
-                label="Complemento"
-              >
-                <Input
-                  value={clientStore.locations[0].address2}
-                  onChange={(e) =>
-                    setClientStore({
-                      ...clientStore,
-                      locations: [
-                        {
-                          ...clientStore.locations[0],
-                          address2: e.target.value,
-                        },
-                      ],
-                    } as IStore)
-                  }
-                />
-              </FormControl>
-            </div>
+            <EditAddressForm
+              location={clientStore.locations?.[0]}
+              onLocationChange={(newLocation) =>
+                setClientStore({ ...clientStore, locations: [newLocation] })
+              }
+            />
           </Fieldset>
         )}
-        <div className="self-end flex flex-row gap-2">
+        <div className="sticky bottom-0 sm:self-end flex flex-row gap-2 bg-main-100 p-4 -mx-4 translate-y-4 z-20 border-t border-hero">
           <Button
-            className="w-32"
+            className="w-full sm:w-32"
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
             Cancelar
           </Button>
           <Button
-            className="w-32 self-end"
+            className="w-full sm:w-32 self-end"
             onClick={() => onStoreChange(clientStore, true)}
           >
             Salvar

@@ -7,6 +7,7 @@ export interface IStore extends Document {
   name: string;
   logo?: mongoose.Types.ObjectId;
   slug: string;
+  listed: boolean;
   locations: ILocation[];
   menu: {
     sections: IMenuSection[];
@@ -43,6 +44,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
     required: false,
   },
   slug: { type: String, required: true, unique: true },
+  listed: { type: Boolean, required: true, default: false },
   locations: [
     {
       address: String,
