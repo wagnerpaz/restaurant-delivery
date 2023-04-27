@@ -93,6 +93,8 @@ function App({
     money = "#036704",
     moneyDebit = "#AD3737",
     link = "#0e1111",
+    add = "#11419b",
+    remove = "#ce1414",
   } = theme?.colors || {};
   const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
     theme?.patterns || {};
@@ -137,6 +139,8 @@ function App({
   const moneyDebitColorVar = getRGBColor(moneyDebit, "money-debit");
 
   const linkColorVar = getRGBColor(link, "link");
+  const addColorVar = getRGBColor(add, "add");
+  const removeColorVar = getRGBColor(remove, "remove");
 
   const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
 
@@ -170,6 +174,8 @@ function App({
              ${moneyColorVar}
              ${moneyDebitColorVar}
              ${linkColorVar}
+             ${addColorVar}
+             ${removeColorVar}
              ${heroPatternVar}}
           `}
         </style>

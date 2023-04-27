@@ -46,6 +46,8 @@ module.exports = {
       money: "var(--color-money)",
       "money-debit": "var(--color-money-debit)",
       link: "var(--color-link)",
+      add: "var(--color-add)",
+      remove: "var(--color-remove)",
     },
     container: {},
     extend: {

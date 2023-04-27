@@ -15,18 +15,12 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   location,
   onLocationChange = () => {},
 }) => {
-  const [clientLocation, setClientLocation] = useState(location);
-
   const [brasilStates, setBrasilStates] = useState([]);
   const [brasilCities, setBrasilCities] = useState([]);
 
   const getBrasilCep = useGetBrasilCep();
   const getBrasilStates = useGetBrasilStates();
   const getBrasilCities = useGetBrasilCities();
-
-  useEffect(() => {
-    onLocationChange(clientLocation);
-  }, [clientLocation, onLocationChange]);
 
   useEffect(() => {
     async function exec() {
@@ -52,7 +46,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
     async function exec() {
       if (isValidBRPostalCode(postalCode)) {
         const serviceLocation = await getBrasilCep(postalCode);
-        setClientLocation((location: ILocation) => ({
+        onLocationChange((location: ILocation) => ({
           ...location,
           ...serviceLocation,
           postalCode: postalCode,
@@ -60,16 +54,17 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
       }
     }
     exec();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postalCode, getBrasilCep]);
 
   return (
-    <div className="flex flex-col gap-6 pt-6">
-      <FormControl className="flex-1 min-w-fit" label="CEP">
+    <div className="flex flex-col gap-6 pt-6 flex-1">
+      <FormControl className="min-w-fit" label="CEP">
         <Input
           value={location.postalCode}
           onChange={async (e) => {
             const newCep = applyCepMask(e);
-            setClientLocation({
+            onLocationChange({
               ...location,
               postalCode: newCep,
             });
@@ -81,7 +76,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           <Select
             value={location.state}
             onChange={(e) => {
-              setClientLocation({
+              onLocationChange({
                 ...location,
                 state: e.target.value,
               });
@@ -100,11 +95,11 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           </Select>
         </FormControl>
 
-        <FormControl className="flex-1 w-full" label="Cidade">
+        <FormControl className="w-full" label="Cidade">
           <Select
             value={location.city}
             onChange={(e) => {
-              setClientLocation({
+              onLocationChange({
                 ...location,
                 city: e.target.value,
               });
@@ -124,11 +119,11 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-6">
-        <FormControl className="flex-1 min-w-fit" label="Endereço">
+        <FormControl className="min-w-fit" label="Endereço">
           <Input
             value={location.address}
             onChange={(e) =>
-              setClientLocation({
+              onLocationChange({
                 ...location,
                 address: e.target.value,
               })
@@ -136,11 +131,11 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           />
         </FormControl>
 
-        <FormControl className="flex-1 min-w-fit" label="Bairro">
+        <FormControl className="min-w-fit" label="Bairro">
           <Input
             value={location.neighborhood}
             onChange={(e) =>
-              setClientLocation({
+              onLocationChange({
                 ...location,
                 neighborhood: e.target.value,
               })
@@ -152,7 +147,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           <Input
             value={location.number}
             onChange={(e) =>
-              setClientLocation({
+              onLocationChange({
                 ...location,
                 number: e.target.value,
               })
@@ -160,11 +155,11 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           />
         </FormControl>
       </div>
-      <FormControl className="flex-1 w-full sm:w-auto" label="Complemento">
+      <FormControl className="w-full sm:w-auto" label="Complemento">
         <Input
           value={location.address2}
           onChange={(e) =>
-            setClientLocation({
+            onLocationChange({
               ...location,
               address2: e.target.value,
             })

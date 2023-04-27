@@ -34,6 +34,7 @@ export interface ILocation {
   state: string;
   city: string;
   postalCode: string;
+  main?: boolean;
 }
 
 const storeSchema: Schema = new mongoose.Schema<IStore>({
@@ -54,6 +55,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       city: String,
       postalCode: String,
       address2: String,
+      main: Boolean,
     },
   ],
   ingredients: [

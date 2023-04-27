@@ -38,6 +38,7 @@ const schema = new mongoose.Schema<IUser>({
       city: String,
       postalCode: String,
       address2: String,
+      main: Boolean,
     },
   ],
 });

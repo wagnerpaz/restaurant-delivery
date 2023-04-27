@@ -42,6 +42,7 @@ import {
 } from "/lib/menuSectionUtils";
 import useGetStore from "/hooks/useGetStore";
 import EditAddressModal from "/modals/EditAddressModal";
+import usePutUser from "/hooks/usePutUser";
 
 interface StoreProps {
   store: IStore;
@@ -76,6 +77,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
 
+  const [clientUser, setClientUser] = useState<IUser>();
   const [clientStore, setClientStore] = useState(store);
   const [clientIngredients, setClientIngredients] = useState(ingredients);
   const clientLocation = selectedLocation || clientStore?.locations?.[0];
@@ -117,8 +119,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const orderMenuItemDetailsOpen = !!router.query.orderItem;
 
   const editUserAddressesObject = useMemo(
-    () => (session?.user as IUser)?.locations,
-    [session?.user]
+    () => clientUser?.locations,
+    [clientUser]
   );
   const editUserAddressesOpen = !!router.query.addressesUserId;
 
@@ -142,6 +144,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const deleteMenuSection = useDeleteStoreMenuSection();
   const putMenuSection = usePutStoreMenuSection();
   const putMenuSectionSection = usePutStoreMenuSectionSection();
+  const putUser = usePutUser();
   const swapMenuItems = useSwapMenuItems();
 
   useEffect(() => {
@@ -149,6 +152,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       searchMobileRef.current?.focus();
     }
   }, [searchMobileVisible]);
+
+  useEffect(() => {
+    console.log("changed session?.user");
+    setClientUser(session?.user as IUser);
+  }, [session?.user]);
 
   useEffect(() => {
     const cachedRef = searchMobileRef.current,
@@ -350,6 +358,8 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   if (!clientStore.listed && !admin) {
     return null;
   }
+
+  console.log("clientUser", clientUser);
 
   return (
     <div
@@ -667,6 +677,15 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           open={editUserAddressesOpen}
           locations={editUserAddressesObject}
           onOpenChange={comeBackToStoreRoot}
+          onLocationsChange={async (locations) => {
+            const serverUser = await putUser({
+              ...clientUser,
+              locations,
+            } as IUser);
+            console.log("serverUser", serverUser);
+            setClientUser(serverUser);
+            comeBackToStoreRoot(false);
+          }}
         />
       )}
     </div>
