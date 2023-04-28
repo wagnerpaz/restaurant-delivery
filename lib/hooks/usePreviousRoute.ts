@@ -15,7 +15,6 @@ export default function usePreviousRoute() {
     router.events.on("routeChangeStart", handleRouteChange);
 
     return () => {
-      console.log("unmount");
       router.events.off("routeChangeStart", handleRouteChange);
     };
   }, []);

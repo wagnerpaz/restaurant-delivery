@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
-import { swap } from "/lib/immutable";
+import { moveTo } from "/lib/immutable";
 
 import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
 import Store from "/models/Store";
 
-async function swapMenuItems(req: NextApiRequest, res: NextApiResponse) {
+async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
     const storeId = req.query.storeId as string;
@@ -20,26 +20,25 @@ async function swapMenuItems(req: NextApiRequest, res: NextApiResponse) {
     const atIndex = idAndPositionSplit[1];
 
     if (req.method === "POST" || req.method === "PUT") {
-      const store = await Store.findOne();
+      const store = await Store.findById(storeId);
 
       let section = store.menu;
       for (const index of sectionIndexSplit) {
         section = section.sections[index];
       }
 
-      section.items = section.items.filter(
-        (f: mongoose.Types.ObjectId) => f.toString() !== id1
+      const foundIndex = section.items.findIndex(
+        (f) => f?._id?.toString() === id1
       );
-      section.items.splice(atIndex, 0, new mongoose.Types.ObjectId(id1));
+      if (foundIndex >= 0) {
+        section.items = moveTo(section.items, foundIndex, +atIndex);
 
-      store.save();
+        store.save();
+      } else {
+        res.status(404).end();
+      }
 
-      res.status(200).end();
-    } else if (req.method === "GET") {
-      const newStore = await Store.findById(storeId);
-      await newStore.populate("ingredients");
-      const serialized = serializeJson(newStore.ingredients);
-      res.status(200).json(serialized);
+      res.status(200).json(section);
     } else {
       res.status(405).json({ message: "Method not allowed" });
     }
@@ -49,4 +48,4 @@ async function swapMenuItems(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default swapMenuItems;
+export default reorderMenuItems;

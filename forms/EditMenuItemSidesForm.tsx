@@ -36,9 +36,10 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
   sides = [],
   onSidesChange,
 }) => {
-  const storeMenuItems = useMemo(() => {
-    retriveAllMenuItems(store.menu.sections);
-  }, [store]);
+  const storeMenuItems = useMemo(
+    () => retriveAllMenuItems(store.menu.sections),
+    [store]
+  );
 
   const onFindSidesItem = useCallback(
     (id: string) => {

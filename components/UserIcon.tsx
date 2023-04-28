@@ -21,8 +21,6 @@ const UserIcon = ({ store }) => {
     setMenuOpened(false);
   });
 
-  console.log(session?.user);
-
   return (
     <>
       {session?.user && (

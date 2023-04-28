@@ -1,7 +1,9 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 import { IIngredient } from "./Ingredients";
+import { IMenuSection } from "./Store";
 
 export interface IMenuItem {
+  store: mongoose.Types.ObjectId;
   name: string;
   nameDetail?: string;
   images?: {
@@ -14,7 +16,7 @@ export interface IMenuItem {
   };
   price?: number;
   pricePromotional?: number;
-  hidden?: boolean;
+  itemType: "product" | "ingredient" | "ingredient-group";
   composition?: IMenuItemCompositionItem[];
   additionals?: IMenuItemAdditionalsCategory[];
   sides?: ISidesItem[];
@@ -22,10 +24,10 @@ export interface IMenuItem {
 
 export interface IMenuItemCompositionItem {
   id?: string;
-  ingredient: IIngredient;
+  section?: string;
+  ingredient?: IMenuItem;
   essential?: boolean;
   quantity?: number;
-  unitPrice?: number;
 }
 
 export interface IMenuItemAdditionalsCategory {
@@ -38,7 +40,8 @@ export interface IMenuItemAdditionalsCategory {
 
 export interface IMenuItemAdditionalsItem {
   id?: string;
-  ingredient: IIngredient;
+  sectionIndex: string;
+  ingredient: IMenuItem;
   min?: number;
   max?: number;
 }
@@ -57,6 +60,7 @@ export interface IExchangesItem {
 }
 
 const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
+  store: { type: mongoose.Types.ObjectId, required: true, ref: "Store" },
   name: { type: String, required: true },
   nameDetail: String,
   images: {
@@ -79,16 +83,22 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
   },
   price: { type: Number, required: true },
   pricePromotional: { type: Number, required: false },
-  hidden: { type: Boolean, required: false },
+  itemType: {
+    type: String,
+    enum: ["product", "ingredient", "ingredient-group"],
+    required: true,
+  },
   composition: [
     {
+      section: {
+        type: String,
+      },
       ingredient: {
         type: mongoose.Types.ObjectId,
-        ref: "Ingredient",
+        ref: "MenuItem",
       },
       essential: { type: Boolean, required: false },
       quantity: { type: Number, required: false },
-      unitPrice: Number,
     },
   ],
   additionals: [
@@ -98,10 +108,11 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
       max: Number,
       items: [
         {
+          sectionIndex: String,
           ingredient: {
             type: mongoose.Types.ObjectId,
             required: true,
-            ref: "Ingredient",
+            ref: "MenuItem",
           },
           min: Number,
           max: Number,

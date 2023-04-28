@@ -20,8 +20,8 @@ const DbImage: React.FC<DbImageProps> = ({
       {...props}
       src={`/api/download?id=${id}`}
       onError={({ currentTarget }) => {
-        currentTarget.onerror = null; // prevents looping
-        currentTarget.src = "/no-image-icon-4.png";
+        // currentTarget.onerror = null; // prevents looping
+        // currentTarget.src = "/no-image-icon-4.png";
       }}
     >
       {children}

@@ -77,7 +77,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
           />
           <div className="border-l border-r border-hero flex-1 flex flex-row gap-2 items-center px-2">
             <FaHouseUser size={60} />
-            <address className="text-sm text-main-a11y-high py-2 flex flex-col w-full flex-1">
+            <address className="text-sm text-main-a11y-high flex flex-col w-full flex-1">
               <span className="font-bold mr-2 block">
                 {currentLocation?.city || "[Cidade]"} -{" "}
                 {currentLocation?.state || "[ES]"}
@@ -159,7 +159,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
           setClientLocations(replaceAt(clientLocations, index, newLocation));
         }}
       />
-      <div className="sticky bottom-0 flex flex-row gap-2 pt-2 border-t border-hero -mx-4 translate-y-4 bg-main-100 p-4">
+      <div className="sticky bottom-0 flex flex-row gap-2 pt-2 border-t border-hero -mx-4 translate-y-4 bg-main-100 p-4 z-20">
         <Button
           className="flex-1"
           variant="outline"

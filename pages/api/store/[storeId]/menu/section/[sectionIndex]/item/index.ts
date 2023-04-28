@@ -31,7 +31,7 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).json(menuItems);
     } else if (req.method === "POST") {
       if (session) {
-        const created = await MenuItem.create(req.body);
+        const created = await MenuItem.create({ ...req.body, store: storeId });
         const serverItem = await MenuItem.findById(created._id)
           .populate("composition.ingredient")
           .exec();

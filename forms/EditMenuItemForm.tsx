@@ -162,7 +162,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             mainImageId={edit.images?.main?.toString()}
             price={edit.price}
             pricePromotional={edit.pricePromotional}
-            hidden={edit.hidden}
             descriptionShort={edit.details?.short}
             composition={edit.composition}
             sides={edit.sides}
@@ -195,19 +194,19 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="flex-1 min-w-fit" label="Listado">
+              <FormControl className="flex-1 min-w-fit" label="Tipo">
                 <Select
                   className="flex-1"
-                  value={`${!edit.hidden}`}
-                  onChange={(value) => {
+                  value={edit.itemType}
+                  onChange={(e) => {
                     setEdit({
                       ...edit,
-                      hidden: !!value,
+                      itemType: e.target.value,
                     });
                   }}
                 >
-                  <option value={"true"}>Sim</option>
-                  <option value={"false"}>Não</option>
+                  <option value="product">Produto</option>
+                  <option value="ingredient">Ingrediente</option>
                 </Select>
               </FormControl>
             </div>
@@ -298,7 +297,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         <Tabs isLazy>
           <TabList>
             <Tab>Ingredientes Principais</Tab>
-            <Tab>Ingredientes Adicionais</Tab>
+            <Tab>Customizar</Tab>
             <Tab>Combo</Tab>
           </TabList>
           <TabPanels>
@@ -316,9 +315,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                       ingredientes do prato (ex. Não quero ervilha)
                     </span>
                   </div>
-                  <Button variant="outline" onClick={handleFillIngredients}>
-                    Gerenciar Ingredientes
-                  </Button>
                   <FormControl
                     className="min-w-[180px]"
                     label="Exibir Ingredientes"
@@ -330,7 +326,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   </FormControl>
                 </div>
                 <EditMenuItemCompositionForm
-                  ingredients={ingredients}
+                  store={store}
                   composition={edit.composition}
                   onCompositionChange={(composition) =>
                     setEdit({ ...edit, composition })
@@ -394,6 +390,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               );
               //remove empty sides
               edit.sides = edit.sides?.filter((f) => f.menuItem?._id);
+
               onMenuItemChange(edit);
             }}
           >

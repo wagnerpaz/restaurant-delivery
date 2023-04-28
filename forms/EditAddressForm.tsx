@@ -54,8 +54,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
       }
     }
     exec();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postalCode, getBrasilCep]);
+  }, [postalCode, getBrasilCep, onLocationChange]);
 
   return (
     <div className="flex flex-col gap-6 pt-6 flex-1">
@@ -119,7 +118,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-6">
-        <FormControl className="min-w-fit" label="Endereço">
+        <FormControl className="flex-1" label="Endereço">
           <Input
             value={location.address}
             onChange={(e) =>
@@ -131,7 +130,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           />
         </FormControl>
 
-        <FormControl className="min-w-fit" label="Bairro">
+        <FormControl className="w-full sm:w-56" label="Bairro">
           <Input
             value={location.neighborhood}
             onChange={(e) =>
@@ -143,7 +142,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
           />
         </FormControl>
 
-        <FormControl className="w-full sm:w-20" label="Número">
+        <FormControl className="w-38 sm:w-20" label="Número">
           <Input
             value={location.number}
             onChange={(e) =>

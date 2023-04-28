@@ -1,11 +1,11 @@
 import classNames from "classnames";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useEffect, useState } from "react";
 import DbImage from "/components/DbImage";
 import EditableSection from "/components/EditableSection";
 import Fieldset from "/components/Fieldset";
 
 import Modal from "/components/Modal";
-import { IStore } from "/models/Store";
+import { ILocation, IStore } from "/models/Store";
 import { useRouter } from "next/router";
 import ImageEditorModal from "./ImageEditorModal";
 import mongoose from "mongoose";
@@ -41,6 +41,19 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
     }
     onStoreChange(clientStore);
   }, [clientStore, onStoreChange]);
+
+  const handleLocationChange = useCallback(
+    (param: ILocation | ((newLocation: ILocation) => ILocation)) => {
+      const newLocation =
+        typeof param === "function" ? param(clientStore.locations[0]) : param;
+
+      setClientStore(
+        (clientStore) =>
+          ({ ...clientStore, locations: [newLocation] } as IStore)
+      );
+    },
+    []
+  );
 
   return (
     <Modal
@@ -99,13 +112,11 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             <legend>Localização</legend>
             <EditAddressForm
               location={clientStore.locations?.[0]}
-              onLocationChange={(newLocation) =>
-                setClientStore({ ...clientStore, locations: [newLocation] })
-              }
+              onLocationChange={handleLocationChange}
             />
           </Fieldset>
         )}
-        <div className="sticky bottom-0 sm:self-end flex flex-row gap-2 bg-main-100 p-4 -mx-4 translate-y-4 z-20 border-t border-hero">
+        <div className="sticky bottom-0 flex flex-row justify-end gap-2 bg-main-100 p-4 -mx-4 translate-y-4 z-20 border-t border-hero">
           <Button
             className="w-full sm:w-32"
             variant="outline"

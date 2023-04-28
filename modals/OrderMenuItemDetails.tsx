@@ -21,6 +21,8 @@ import { IMenuSection, IStore } from "/models/Store";
 import { RiExchangeFill } from "react-icons/ri";
 import { IoAddCircleSharp, IoRemoveCircleSharp } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
+import { MdPlaylistAddCircle } from "react-icons/md";
+import { navigateBySectionIndex } from "/lib/menuSectionUtils";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -51,17 +53,6 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     additionals: [],
   });
 
-  const findSectionByIndex = (
-    store: IStore,
-    sectionIndex: number[]
-  ): IMenuSection => {
-    let section = store.menu as IMenuSection;
-    for (const index of sectionIndex) {
-      section = section.sections[index];
-    }
-    return section;
-  };
-
   const removalsChange = useMemo(
     () =>
       order.removals?.filter(
@@ -90,17 +81,20 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     [order]
   );
 
-  console.log("comboChange", comboChange);
-
-  const exchangesItemsBySide = (side: ISidesItem) => {
-    return side.exchanges?.map((ex) =>
-      ex.scope === "menu-section"
-        ? findSectionByIndex(
-            store,
-            ex.menuSectionIndex?.split(",").map((m) => +m) || []
-          ).items
-        : null
-    )[0];
+  const exchangesItemsBySide = (side: ISidesItem, menuItem: IMenuItem) => {
+    const result = side.exchanges
+      ?.map((ex) =>
+        ex.scope === "menu-section"
+          ? navigateBySectionIndex(
+              store.menu.sections,
+              ex.menuSectionIndex?.split(",").map((m) => +m) || []
+            ).items
+          : null
+      )[0]
+      .filter(
+        (f) => !menuItem.sides?.map((s) => s.menuItem._id).includes(f._id)
+      );
+    return result;
   };
 
   const calculedPrice = useMemo(() => {
@@ -270,18 +264,16 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                       ?.filter((c) => !c.essential)
                       .map((compositionItem) => (
                         <li
-                          className="grid grid-cols-[1fr_max-content] items-center gap-4 border-b-[1px]"
-                          key={compositionItem.ingredient.name}
+                          className="grid grid-cols-[1fr_max-content] items-center gap-4 border-b-[1px] py-2"
+                          key={compositionItem.ingredient._id}
                         >
-                          <span className="pb-2">
-                            {compositionItem.ingredient.name}
-                          </span>
+                          <span>{compositionItem.ingredient.name}</span>
                           <NumberInput
                             value={
                               order.removals?.find(
                                 (f) =>
-                                  f.ingredient.name ===
-                                  compositionItem.ingredient.name
+                                  f.ingredient._id ===
+                                  compositionItem.ingredient._id
                               )?.quantity
                             }
                             onChange={(newValue) => {
@@ -290,8 +282,8 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                                 removals: [
                                   ...(order.removals?.filter(
                                     (f) =>
-                                      f.ingredient.name !==
-                                      compositionItem.ingredient.name
+                                      f.ingredient._id !==
+                                      compositionItem.ingredient._id
                                   ) || []),
                                   {
                                     ingredient: compositionItem.ingredient,
@@ -309,171 +301,164 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 </AccordionPanel>
               </AccordionItem>
             ) : null}
-            {menuItem.additionals?.length ? (
-              <AccordionItem>
+            {menuItem?.additionals?.map((additionalsCategory) => (
+              <AccordionItem key={additionalsCategory.categoryName}>
                 <AccordionButton>
-                  <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
-                    <IoAddCircleSharp size={24} />O que deseja adicionar?
+                  <h3 className="text-lg mb-2 w-full text-start flex flex-row items-center gap-2">
+                    <MdPlaylistAddCircle size={24} />
+                    {additionalsCategory.categoryName}{" "}
+                    <span className="text-main-a11y-medium font-normal">
+                      (0 de {additionalsCategory.max})
+                    </span>
                   </h3>
                   <AccordionIcon />
                 </AccordionButton>
-                <AccordionPanel>
-                  <ul className="text-md flex flex-col gap-4">
-                    {menuItem.additionals.map((additionalsCategory) => (
+                <AccordionPanel className="!pt-0">
+                  <ul className="flex-1 text-sm">
+                    {additionalsCategory.items?.map((item) => (
                       <li
-                        className="grid items-center"
-                        key={additionalsCategory.categoryName}
+                        className="flex flex-row items-center justify-between [&:not(:last-child)]:border-b border-main-a11y-low gap-2 py-2"
+                        key={item.ingredient.name}
                       >
-                        <h4 className="font-bold">
-                          {additionalsCategory.categoryName}{" "}
-                          <span className="text-main-a11y-medium font-normal">
-                            (0 de {additionalsCategory.max})
-                          </span>
-                        </h4>
-                        <ul className="flex-1 text-sm pt-2">
-                          {additionalsCategory.items?.map((item) => (
-                            <li
-                              className="flex flex-row items-center justify-between flex-wrap border-b-[1px]"
-                              key={item.ingredient.name}
-                            >
-                              <span className="flex-1">
-                                {item.ingredient.name}
-                              </span>
-                              <MoneyDisplay
-                                className="mr-2"
-                                plus
-                                value={
-                                  store.ingredients.find(
-                                    (f) =>
-                                      f.ingredient._id === item.ingredient._id
-                                  )?.price
-                                }
-                              />
-                              <NumberInput
-                                value={
-                                  order.additionals.find(
-                                    (f) =>
-                                      f.ingredient.name === item.ingredient.name
-                                  )?.quantity
-                                }
-                                min={item.min}
-                                max={item.max}
-                                onChange={(e) =>
-                                  setOrder({
-                                    ...order,
-                                    additionals: [
-                                      ...order?.additionals?.filter(
-                                        (f) =>
-                                          f.ingredient.name !==
-                                          item.ingredient.name
-                                      ),
-                                      {
-                                        ...item,
-                                        quantity: e,
-                                        price: store.ingredients.find(
-                                          (f) =>
-                                            f.ingredient.name ===
-                                            item.ingredient.name
-                                        )?.price,
-                                      },
-                                    ],
-                                  })
-                                }
-                              />
-                            </li>
-                          ))}
-                        </ul>
+                        <div className="flex flex-row items-center gap-2">
+                          {item.ingredient.images?.main && (
+                            <DbImage
+                              className="rounded-md"
+                              id={item.ingredient.images?.main}
+                              width={50}
+                              height={50}
+                            />
+                          )}
+                          <div>
+                            <span className="flex-1">
+                              {item.ingredient.name}
+                            </span>
+                            <MoneyDisplay
+                              className="mr-2"
+                              plus
+                              zeroInvisible
+                              value={item.ingredient.price}
+                              promotional={item.ingredient.pricePromotional}
+                            />
+                          </div>
+                        </div>
+                        <NumberInput
+                          value={
+                            order.additionals.find(
+                              (f) => f.ingredient.name === item.ingredient.name
+                            )?.quantity
+                          }
+                          min={item.min}
+                          max={item.max}
+                          onChange={(e) =>
+                            setOrder({
+                              ...order,
+                              additionals: [
+                                ...order?.additionals?.filter(
+                                  (f) =>
+                                    f.ingredient.name !== item.ingredient.name
+                                ),
+                                {
+                                  ...item,
+                                  quantity: e,
+                                  price: item.ingredient.price,
+                                },
+                              ],
+                            })
+                          }
+                        />
                       </li>
                     ))}
                   </ul>
                 </AccordionPanel>
               </AccordionItem>
-            ) : null}
+            ))}
             {menuItem.sides
               ?.filter((s) => (s.exchanges?.length || 0) > 0)
-              .map((side) => (
-                <AccordionItem key={side.menuItem._id}>
-                  <AccordionButton>
-                    <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
-                      <RiExchangeFill size={24} />
-                      Trocar {side.menuItem.name} por:
-                    </h3>
-                    <AccordionIcon />
-                  </AccordionButton>
-                  <AccordionPanel className="flex flex-col gap-4">
-                    <RadioGroup
-                      value={
-                        order.combo?.find(
-                          (f) => side.menuItem._id === f.menuItem._id
-                        ).replacement._id
-                      }
-                      onChange={(e) =>
-                        setOrder({
-                          ...order,
-                          combo: [
-                            ...order.combo.filter(
-                              (ci) => ci.menuItem?._id !== side.menuItem._id
-                            ),
-                            {
-                              menuItem: side.menuItem,
-                              quantity: side.quantity,
-                              replacement: exchangesItemsBySide(side).find(
-                                (f) => f._id === e
-                              ),
-                            },
-                          ],
-                        })
-                      }
-                    >
-                      <div className="flex flex-row gap-2 items-center justify-between border-b-[1px] border-main-a11y-medium pb-2">
-                        <span>Não trocar</span>
-                        <Radio
-                          className="!border-main-a11y-medium"
-                          value={side.menuItem._id}
-                        />
-                      </div>
-                      {exchangesItemsBySide(side)
-                        .filter(
-                          (f) =>
-                            !menuItem.sides
-                              ?.map((s) => s.menuItem._id)
-                              .includes(f._id)
-                        )
-                        .map((sectionMenuItem) => (
-                          <div
-                            className="flex flex-row gap-2 items-center justify-between [&:not(:last-child)]:border-b-[1px] border-main-a11y-medium py-2"
-                            key={sectionMenuItem._id}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              <DbImage
-                                className="rounded-md"
-                                id={sectionMenuItem.images?.main}
-                                width={50}
-                                height={50}
-                              />
-                              <div className="flex flex-col gap-0">
-                                {sectionMenuItem.name}
-                                <MoneyDisplay
-                                  plus
-                                  value={Math.max(
-                                    (sectionMenuItem.price -
-                                      side.menuItem.price) *
-                                      side.quantity,
-                                    0
-                                  )}
-                                />
-                              </div>
-                            </div>
+              .map(
+                (side) =>
+                  (exchangesItemsBySide(side, menuItem)?.filter(
+                    (f) => f._id !== side.menuItem._id
+                  ).length || 0) > 0 && (
+                    <AccordionItem key={side.menuItem._id}>
+                      <AccordionButton>
+                        <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
+                          <RiExchangeFill size={24} />
+                          Trocar {side.menuItem.name} por:
+                        </h3>
+                        <AccordionIcon />
+                      </AccordionButton>
+                      <AccordionPanel className="flex flex-col gap-4">
+                        <RadioGroup
+                          value={
+                            order.combo?.find(
+                              (f) => side.menuItem._id === f.menuItem._id
+                            ).replacement._id
+                          }
+                          onChange={(e) =>
+                            setOrder({
+                              ...order,
+                              combo: [
+                                ...order.combo.filter(
+                                  (ci) => ci.menuItem?._id !== side.menuItem._id
+                                ),
+                                {
+                                  menuItem: side.menuItem,
+                                  quantity: side.quantity,
+                                  replacement: exchangesItemsBySide(
+                                    side,
+                                    menuItem
+                                  ).find((f) => f._id === e),
+                                },
+                              ],
+                            })
+                          }
+                        >
+                          <div className="flex flex-row gap-2 items-center justify-between border-b-[1px] border-main-a11y-low pb-2">
+                            <span>Não trocar</span>
                             <Radio
                               className="!border-main-a11y-medium"
-                              value={sectionMenuItem._id}
+                              value={side.menuItem._id}
                             />
                           </div>
-                        ))}
-                    </RadioGroup>
-                  </AccordionPanel>
-                </AccordionItem>
-              ))}
+                          {exchangesItemsBySide(side, menuItem).map(
+                            (sectionMenuItem) => (
+                              <div
+                                className="flex flex-row gap-2 items-center justify-between [&:not(:last-child)]:border-b-[1px] border-main-a11y-low py-2"
+                                key={sectionMenuItem._id}
+                              >
+                                <div className="flex flex-row items-center gap-2">
+                                  <DbImage
+                                    className="rounded-md"
+                                    id={sectionMenuItem.images?.main}
+                                    width={50}
+                                    height={50}
+                                  />
+                                  <div className="flex flex-col gap-0">
+                                    {sectionMenuItem.name}
+                                    <MoneyDisplay
+                                      plus
+                                      value={Math.max(
+                                        (sectionMenuItem.price -
+                                          side.menuItem.price) *
+                                          side.quantity,
+                                        0
+                                      )}
+                                    />
+                                  </div>
+                                </div>
+                                <Radio
+                                  className="!border-main-a11y-medium"
+                                  value={sectionMenuItem._id}
+                                />
+                              </div>
+                            )
+                          )}
+                        </RadioGroup>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  )
+              )}
           </Accordion>
         </div>
       </div>

@@ -27,6 +27,7 @@ interface MenuItemProps extends ComponentProps<"div"> {
   editable?: boolean;
   useEffects?: boolean;
   search?: string;
+  displayOnly?: boolean;
   portalTargetEditModal?: () => HTMLElement;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
@@ -52,6 +53,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   editable = false,
   useEffects = false,
   search = "",
+  displayOnly,
   portalTargetEditModal,
   onEditClick,
   onDeleteClick,
@@ -64,28 +66,25 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const priceNew = pricePromotional ? pricePromotional : price;
-  const priceOld = pricePromotional ? price : undefined;
-
   return !admin && hidden ? null : (
     <div
       className={classNames(
-        "sm:flex sm:flex-col h-full relative rounded-2xl  overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
+        "sm:flex sm:flex-col h-full relative rounded-2xl overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
         {
           "sm:hover:scale-[105%] transition-all": useEffects,
           "opacity-50": hidden,
-          "sm:rounded-tr-none": priceNew,
+          "sm:rounded-tr-none": price,
         },
         className
       )}
       {...props}
     >
       <div className="relative float-left sm:float-none">
-        {priceNew ? (
+        {price ? (
           <MoneyDisplay
             className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-2 text-end"
-            oldValue={priceOld}
-            value={priceNew}
+            value={price}
+            promotional={pricePromotional}
           />
         ) : null}
         <EditableSection
@@ -105,7 +104,12 @@ const MenuItem: React.FC<MenuItemProps> = ({
           />
         </EditableSection>
       </div>
-      <div className="flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:mb-8 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0">
+      <div
+        className={classNames(
+          "flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0",
+          { "sm:mb-8": !displayOnly, "sm:-mb-8": displayOnly }
+        )}
+      >
         <div className="flex flex-col justify-center flex-wrap min-h-[36px]">
           <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
             {getHighlightedText(name, search)}
@@ -157,15 +161,17 @@ const MenuItem: React.FC<MenuItemProps> = ({
           )}
         </div>
       </div>
-      <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
-        <Button
-          className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
-          onClick={onClick}
-        >
-          <FaShoppingCart className="text-xl" />
-          <span className="hidden sm:inline-block">Adicionar</span>
-        </Button>
-      </div>
+      {!displayOnly && (
+        <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
+          <Button
+            className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
+            onClick={onClick}
+          >
+            <FaShoppingCart className="text-xl" />
+            <span className="hidden sm:inline-block">Adicionar</span>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

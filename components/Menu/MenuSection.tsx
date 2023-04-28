@@ -8,9 +8,12 @@ interface MenuSectionProps extends ComponentProps<"section"> {
   length?: number;
   totalLength?: number;
   isNew?: boolean;
+  editMode?: "realistic" | "fast";
   onAddMenuItemClick?: () => void;
   onAddSectionClick?: () => void;
   onEditSectionClick?: () => void;
+  onTrashClick?: () => void;
+  onFastEditClick?: () => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
@@ -21,9 +24,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   length,
   totalLength,
   isNew,
+  editMode,
   onAddMenuItemClick,
   onAddSectionClick,
   onEditSectionClick,
+  onTrashClick,
+  onFastEditClick,
   ...props
 }) => {
   return (
@@ -34,13 +40,21 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         length={length}
         totalLength={totalLength}
         isNew={isNew}
+        editMode={editMode}
         onAddMenuItemClick={onAddMenuItemClick}
         onAddSectionClick={onAddSectionClick}
         onEditSectionClick={onEditSectionClick}
+        onTrashClick={onTrashClick}
+        onFastEditClick={onFastEditClick}
       />
       <section
         className={classNames(
-          "sm:container sm:m-auto px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6",
+          "sm:container sm:m-auto px-4 sm:px-8",
+          {
+            "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
+              editMode === "realistic",
+            "flex flex-col gap-2": editMode === "fast",
+          },
           { "mb-4 sm:mb-6": length > 0 },
           className
         )}

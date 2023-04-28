@@ -21,6 +21,8 @@ async function section(req: NextApiRequest, res: NextApiResponse) {
           $set: {
             [`menu.sections.${sectionIndexSplit.join(".sections.")}.name`]:
               requestSection.name,
+            [`menu.sections.${sectionIndexSplit.join(".sections.")}.editMode`]:
+              requestSection.editMode,
           },
         }
       );

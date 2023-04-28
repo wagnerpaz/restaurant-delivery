@@ -1,21 +1,31 @@
 import { ComponentProps } from "react";
 import classNames from "classnames";
 import { IoFastFood } from "react-icons/io5";
-import { FaCodeBranch } from "react-icons/fa";
+import {
+  FaCodeBranch,
+  FaThList,
+  FaTrash,
+  FaTrashRestore,
+} from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
 
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/User";
+import { BsMicrosoft } from "react-icons/bs";
+import { MdMoveDown } from "react-icons/md";
 
 interface MenuSectionHeaderProps extends ComponentProps<"form"> {
   name?: string;
   length?: number;
   totalLength?: number;
   isNew?: boolean;
+  editMode?: "realistic" | "fast";
   onAddMenuItemClick?: () => void;
   onAddSectionClick?: () => void;
   onEditSectionClick?: () => void;
+  onTrashClick?: () => void;
+  onFastEditClick?: () => void;
 }
 
 const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
@@ -25,9 +35,12 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   length,
   totalLength,
   isNew,
+  editMode = "realistic",
   onAddMenuItemClick = () => {},
   onAddSectionClick = () => {},
   onEditSectionClick = () => {},
+  onTrashClick = () => {},
+  onFastEditClick = () => {},
   ...props
 }) => {
   const { data: session, status } = useSession();
@@ -45,7 +58,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
       {...props}
     >
       <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">
-        <div className="flex flex-row flex-wrap gap-x-2">
+        <div className="flex flex-row flex-wrap gap-x-2 items-center">
           {admin && !isNew && (
             <>
               <RiEditFill
@@ -55,9 +68,15 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                 onClick={onEditSectionClick}
               />
               <FaCodeBranch
-                className="mt-1 cursor-pointer"
+                className="cursor-pointer"
                 size={20}
                 title="Adicionar Sub-Seção do Menu"
+                onClick={onAddSectionClick}
+              />
+              <MdMoveDown
+                className="cursor-pointer"
+                size={24}
+                title="Move Seção"
                 onClick={onAddSectionClick}
               />
             </>
@@ -90,11 +109,32 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
 
         {admin && !isNew && (
           <div className="flex flex-row gap-3 items-center text-sm">
+            {editMode === "realistic" ? (
+              <BsMicrosoft
+                className="cursor-pointer mt-1"
+                size={20}
+                onClick={onFastEditClick}
+                title="Edição realista (cartões)"
+              />
+            ) : (
+              <FaThList
+                className="cursor-pointer mt-1"
+                size={20}
+                onClick={onFastEditClick}
+                title="Edição rápida (lista)"
+              />
+            )}
             <IoFastFood
               className="cursor-pointer"
               size={24}
               onClick={onAddMenuItemClick}
               title="Adicionar Item do Menu"
+            />
+            <FaTrashRestore
+              className="cursor-pointer"
+              size={20}
+              onClick={onTrashClick}
+              title="Lixeira"
             />
           </div>
         )}

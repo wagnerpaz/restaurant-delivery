@@ -22,6 +22,7 @@ export interface IStoreIngredient {
 
 export interface IMenuSection {
   name: string;
+  editMode: "realistic" | "fast";
   items: IMenuItem[];
   sections: IMenuSection[];
 }
@@ -73,28 +74,64 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
     sections: [
       {
         name: String,
+        editMode: {
+          type: String,
+          required: true,
+          enum: ["realistic", "fast"],
+          default: "realistic",
+        },
         items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
         sections: [
           {
             name: String,
+            editMode: {
+              type: String,
+              required: true,
+              enum: ["realistic", "fast"],
+              default: "realistic",
+            },
             items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
             sections: [
               {
                 name: String,
+                editMode: {
+                  type: String,
+                  required: true,
+                  enum: ["realistic", "fast"],
+                  default: "realistic",
+                },
                 items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
                 sections: [
                   {
                     name: String,
+                    editMode: {
+                      type: String,
+                      required: true,
+                      enum: ["realistic", "fast"],
+                      default: "realistic",
+                    },
                     items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
                     sections: [
                       {
                         name: String,
+                        editMode: {
+                          type: String,
+                          required: true,
+                          enum: ["realistic", "fast"],
+                          default: "realistic",
+                        },
                         items: [
                           { type: mongoose.Types.ObjectId, ref: "MenuItem" },
                         ],
                         sections: [
                           {
                             name: String,
+                            editMode: {
+                              type: String,
+                              required: true,
+                              enum: ["realistic", "fast"],
+                              default: "realistic",
+                            },
                             items: [
                               {
                                 type: mongoose.Types.ObjectId,

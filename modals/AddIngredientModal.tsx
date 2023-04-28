@@ -180,7 +180,7 @@ const AddIngredientModal: React.FC<AddIngredientModalProps> = ({
     <Modal
       {...props}
       contentClassName={classNames(
-        "!overflow-visible flex flex-col container",
+        "!overflow-visible !h-full flex flex-col container",
         contentClassName
       )}
       onOpenChange={handleOpenChange}

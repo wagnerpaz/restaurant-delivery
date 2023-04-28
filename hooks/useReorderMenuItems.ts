@@ -4,13 +4,17 @@ import { useCallback } from "react";
 import axiosInstance from "/lib/axiosInstance";
 import { IStore } from "/models/Store";
 
-const useSwapMenuItems = () => {
+const useReorderMenuItems = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const call = useCallback(
     debounce(
-      async (store: IStore, sectionIndex: number[], swapIds: string[]) => {
+      async (
+        store: IStore,
+        sectionIndex: number[],
+        idAndPosition: string[]
+      ) => {
         const response = await axiosInstance.put(
-          `/api/store/${store._id}/menu/section/${sectionIndex}/item/swap/${swapIds}`
+          `/api/store/${store._id}/menu/section/${sectionIndex}/item/reorder/${idAndPosition}`
         );
         return response;
       },
@@ -21,4 +25,4 @@ const useSwapMenuItems = () => {
   return call;
 };
 
-export default useSwapMenuItems;
+export default useReorderMenuItems;
