@@ -29,6 +29,7 @@ async function menuItemTrash(req: NextApiRequest, res: NextApiResponse) {
       );
       const trashedMenuItems = await MenuItem.find({
         _id: { $nin: allStoreRegisteredMenuItems },
+        store: storeId,
       })
         .populate("composition.ingredient")
         .populate("sides.menuItem")

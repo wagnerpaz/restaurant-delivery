@@ -55,7 +55,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               editMode === "realistic",
             "flex flex-col gap-2": editMode === "fast",
           },
-          { "mb-4 sm:mb-6": length > 0 },
+          { "mb-4 sm:mb-6": true },
           className
         )}
         {...props}

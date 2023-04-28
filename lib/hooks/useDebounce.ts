@@ -13,7 +13,7 @@ const useDebounce = (callback: () => void) => {
       ref.current?.(e);
     };
 
-    return debounce(func, 500);
+    return debounce(func, 1000);
   }, []);
 
   return debouncedCallback;

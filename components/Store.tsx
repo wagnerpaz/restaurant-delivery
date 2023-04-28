@@ -326,9 +326,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       );
       foundItemsCount.current += foundItems.length;
 
+      console.log(foundItems);
+
       return (
         <div key={section.name}>
-          {(foundItems.length > 0 || admin) && (
+          {(foundItems.filter((f) => f.itemType === "product").length > 0 ||
+            admin) && (
             <MenuSection
               id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
               name={sectionName}
@@ -374,7 +377,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             >
               <AdminDraggableGroup className="contents" editable={admin}>
                 {foundItems
-                  .filter((f) => admin || !f.hidden)
+                  .filter((f) => admin || f.itemType === "product")
                   .map((menuItem, menuItemIndex) => (
                     <AdminDraggable
                       dragIndicator={section.editMode === "fast"}
@@ -449,24 +452,32 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                       )}
                     </AdminDraggable>
                   ))}
-                <div className="flex items-center justify-center">
-                  <HiPlus
+                {admin && (
+                  <div
                     className={classNames(
-                      "bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
+                      "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
                       {
-                        "w-20 h-20 p-5 ": section.editMode === "realistic",
-                        "w-10 h-10 p-1 ": section.editMode === "fast",
+                        "min-h-[428px]": section.editMode === "realistic",
+                        "ml-6 w-[calc(100%-1.5rem)]":
+                          section.editMode === "fast",
                       }
                     )}
-                    onClick={() => {
-                      if (section.editMode === "realistic") {
-                        handleAddMenuItem([...indexPath, sectionIndex]);
-                      } else if (section.editMode === "fast") {
-                        handleAddMenuItemFast([...indexPath, sectionIndex]);
-                      }
-                    }}
-                  />
-                </div>
+                  >
+                    <HiPlus
+                      className={classNames("", {
+                        "w-20 h-20 p-5 ": section.editMode === "realistic",
+                        "w-10 h-10 p-1 ": section.editMode === "fast",
+                      })}
+                      onClick={() => {
+                        if (section.editMode === "realistic") {
+                          handleAddMenuItem([...indexPath, sectionIndex]);
+                        } else if (section.editMode === "fast") {
+                          handleAddMenuItemFast([...indexPath, sectionIndex]);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </AdminDraggableGroup>
             </MenuSection>
           )}
