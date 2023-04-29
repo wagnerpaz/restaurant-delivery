@@ -17,7 +17,6 @@ async function createIngredient(req: NextApiRequest, res: NextApiResponse) {
       res.status(200).end();
     } else if (req.method === "GET") {
       const newStore = await Store.findById(storeId);
-      await newStore.populate("ingredients");
       const serialized = serializeJson(newStore.ingredients);
       res.status(200).json(serialized);
     } else {

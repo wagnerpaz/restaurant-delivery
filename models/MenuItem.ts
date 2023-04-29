@@ -18,6 +18,9 @@ export interface IMenuItem {
   pricePromotional?: number;
   itemType: "product" | "ingredient" | "ingredient-group";
   composition?: IMenuItemCompositionItem[];
+  customizeType: "template" | "individual";
+  customizeTemplateSectionIndex: string;
+  customizeTemplateMenuItem: IMenuItem;
   additionals?: IMenuItemAdditionalsCategory[];
   sides?: ISidesItem[];
 }
@@ -101,6 +104,13 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
       quantity: { type: Number, required: false },
     },
   ],
+  customizeType: {
+    type: String,
+    enum: ["template", "individual"],
+    default: "individual",
+  },
+  customizeTemplateSectionIndex: { type: String },
+  customizeTemplateMenuItem: { type: mongoose.Types.ObjectId, ref: "MenuItem" },
   additionals: [
     {
       categoryName: String,

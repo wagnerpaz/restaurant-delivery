@@ -19,8 +19,6 @@ export default async function store(req: NextApiRequest, res: NextApiResponse) {
 
     if (req.method === "GET") {
       const serverStore = await Store.findById(storeId)
-        .populate("ingredients")
-        .populate("ingredients.ingredient")
         .populate(populate)
         .exec();
       res.status(200).json(serverStore.toObject());

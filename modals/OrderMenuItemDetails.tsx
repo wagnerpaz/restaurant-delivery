@@ -9,7 +9,7 @@ import {
   RadioGroup,
 } from "@chakra-ui/react";
 import classNames from "classnames";
-import { ComponentProps, useMemo, useState } from "react";
+import { ComponentProps, useCallback, useMemo, useState } from "react";
 import DbImage from "/components/DbImage";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -22,7 +22,10 @@ import { RiExchangeFill } from "react-icons/ri";
 import { IoAddCircleSharp, IoRemoveCircleSharp } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import { MdPlaylistAddCircle } from "react-icons/md";
-import { navigateBySectionIndex } from "/lib/menuSectionUtils";
+import {
+  navigateBySectionIndex,
+  retriveAllMenuItems,
+} from "/lib/menuSectionUtils";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -116,6 +119,21 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       )
     );
   }, [priceNew, additionalsChange, comboChange]);
+
+  const storeIngredients = useMemo(
+    () => retriveAllMenuItems(store.menu.sections),
+    [store.menu.sections]
+  );
+
+  const findCustomization = useCallback(
+    (toFoundBy: IMenuItem) =>
+      toFoundBy.customizeType === "template"
+        ? storeIngredients.find(
+            (f) => f._id === toFoundBy.customizeTemplateMenuItem?._id
+          )?.additionals
+        : toFoundBy.additionals,
+    [storeIngredients]
+  );
 
   return (
     <Modal
@@ -301,7 +319,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 </AccordionPanel>
               </AccordionItem>
             ) : null}
-            {menuItem?.additionals?.map((additionalsCategory) => (
+            {findCustomization(menuItem)?.map((additionalsCategory) => (
               <AccordionItem key={additionalsCategory.categoryName}>
                 <AccordionButton>
                   <h3 className="text-lg mb-2 w-full text-start flex flex-row items-center gap-2">

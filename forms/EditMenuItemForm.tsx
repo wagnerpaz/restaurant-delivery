@@ -338,8 +338,11 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               <Fieldset className="flex flex-col gap-2 pt-6">
                 <EditMenuItemAdditionalsForm
                   store={store}
-                  ingredients={ingredients}
+                  menuItem={edit}
                   additionals={edit.additionals}
+                  onMenuItemChange={(newMenuItem) =>
+                    setEdit({ ...newMenuItem })
+                  }
                   onAdditionalsChange={(additionals) =>
                     setEdit({ ...edit, additionals })
                   }

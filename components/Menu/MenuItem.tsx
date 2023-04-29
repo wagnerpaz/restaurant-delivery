@@ -79,10 +79,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
       )}
       {...props}
     >
-      <div className="relative float-left sm:float-none">
+      <div className="relative float-left sm:float-none pr-0">
         {price ? (
           <MoneyDisplay
-            className="absolute top-0 right-0 bg-contrast-high p-1 rounded-bl-2xl z-10 text-end"
+            className="absolute top-0 right-2 sm:right-0 bg-contrast-high p-1 sm:p-2 rounded-bl-2xl z-10 text-end"
             value={price}
             promotional={pricePromotional}
           />
@@ -106,11 +106,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
       </div>
       <div
         className={classNames(
-          "flex-1 sm:relative bottom-0 w-full p-1 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0",
+          "flex-1 sm:relative bottom-0 w-full p-0 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0",
           { "sm:mb-8": !displayOnly, "sm:-mb-8": displayOnly }
         )}
       >
-        <div className="flex flex-col justify-center flex-wrap min-h-[36px]">
+        <div className="flex flex-col justify-center mt-1 flex-wrap min-h-[36px]">
           <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
             {getHighlightedText(name, search)}
           </h3>
@@ -121,14 +121,14 @@ const MenuItem: React.FC<MenuItemProps> = ({
           )}
         </div>
 
-        <div className="relative flex-1 pb-2">
+        <div className="relative flex-1 pb-2 mt-1">
           {descriptionShort && (
             <span className="block text-xs leading-tight">
               {getHighlightedText(descriptionShort, search)}
             </span>
           )}
           {sides?.length ? (
-            <ul className="flex flex-col text-xs mt-2 pt-2 border-t-[1px] border-contrast-a11y-low">
+            <ul className="flex flex-col text-xs pt-2 border-t-[1px] border-contrast-a11y-low">
               {sides?.map((side) => (
                 <li className="block" key={side.menuItem.name}>
                   <span className="font-bold">{`${side.quantity}x `}</span>

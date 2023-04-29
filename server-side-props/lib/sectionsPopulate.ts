@@ -7,6 +7,7 @@ const sectionsPopulate = (append?: any) => {
           path: "composition",
           populate: [{ path: "ingredient" }],
         },
+        { path: "customizeTemplateMenuItem" },
         { path: "additionals", populate: { path: "items.ingredient" } },
         { path: "sides", populate: { path: "menuItem" } },
       ],

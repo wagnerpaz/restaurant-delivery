@@ -62,6 +62,7 @@ const emptyMenuItem: IMenuItem = {
   details: {},
   images: {},
   composition: [],
+  customizeType: "template",
 };
 
 const emptyMenuSection: IMenuSection = {
