@@ -51,7 +51,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
     <form
       className={classNames(
         "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[var(--header-height)] bg-main-100 text-main-a11y-high z-10 shadow-md border-hero border-t-2",
-        { "mb-4 sm:mb-6": true },
+        { "mb-2 sm:mb-6": true },
         className
       )}
       onClick={(e) => e.preventDefault()}

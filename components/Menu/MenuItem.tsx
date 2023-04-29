@@ -82,7 +82,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       <div className="relative float-left sm:float-none">
         {price ? (
           <MoneyDisplay
-            className="absolute top-0 right-0 bg-contrast-high p-2 rounded-bl-2xl z-10 pt-2 text-end"
+            className="absolute top-0 right-0 bg-contrast-high p-1 rounded-bl-2xl z-10 text-end"
             value={price}
             promotional={pricePromotional}
           />
