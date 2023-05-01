@@ -95,7 +95,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <DbImage
-            className="w-32 h-32 sm:w-full sm:h-full bg-main-200 rounded-xl mr-2"
+            className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 rounded-xl mr-2 object-cover"
             id={mainImageId}
             width={500}
             height={500}
@@ -137,11 +137,12 @@ const MenuItem: React.FC<MenuItemProps> = ({
               ))}
             </ul>
           ) : null}
-          {(composition?.length || 0) > 0 && (
+          {(composition?.filter((f) => f.ingredient).length || 0) > 0 && (
             <ul className="text-xs pt-1 opacity-60">
               <span>Ingredientes: </span>
               {composition
-                ?.map((compositionItem) =>
+                ?.filter((f) => f.ingredient)
+                .map((compositionItem) =>
                   compositionItem.ingredient ? (
                     <li
                       className="inline"
@@ -164,7 +165,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
       {!displayOnly && (
         <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
           <Button
-            className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero text-hero-a11y-high"
+            className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero !text-hero-a11y-high"
             onClick={onClick}
           >
             <FaShoppingCart className="text-xl" />

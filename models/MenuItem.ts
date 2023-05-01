@@ -1,6 +1,6 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 import { IIngredient } from "./Ingredients";
-import { IMenuSection } from "./Store";
+import Store, { IMenuSection } from "./Store";
 
 export interface IMenuItem {
   store: mongoose.Types.ObjectId;

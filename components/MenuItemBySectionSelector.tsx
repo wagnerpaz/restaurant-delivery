@@ -120,27 +120,29 @@ const MenuItemBySectionSelector: React.FC<MenuItemBySectionSelectorProps> = ({
             ),
           }}
           options={allowAllIfPossible(
-            [...selectedSectionItems].map((menuItem) => ({
-              value: menuItem._id,
-              label: (
-                <div className="flex flex-row items-center justify-between gap-2 w-full">
-                  <div className="flex flex-row items-center">
-                    <DbImage
-                      className="rounded-md"
-                      id={menuItem.images?.main?.toString()}
-                      width={30}
-                      height={30}
-                      alt="menu item foto"
-                    />
-                    <span>
-                      {menuItem.name}
-                      {menuItem.nameDetail && ` (${menuItem.nameDetail})`}
-                    </span>
+            [...selectedSectionItems]
+              .sort((a, b) => (a.name > b.name ? 1 : -1))
+              .map((menuItem) => ({
+                value: menuItem._id,
+                label: (
+                  <div className="flex flex-row items-center justify-between gap-2 w-full">
+                    <div className="flex flex-row items-center">
+                      <DbImage
+                        className="rounded-md"
+                        id={menuItem.images?.main?.toString()}
+                        width={30}
+                        height={30}
+                        alt="menu item foto"
+                      />
+                      <span>
+                        {menuItem.name}
+                        {menuItem.nameDetail && ` (${menuItem.nameDetail})`}
+                      </span>
+                    </div>
+                    <MoneyDisplay zeroInvisible plus value={menuItem.price} />
                   </div>
-                  <MoneyDisplay zeroInvisible plus value={menuItem.price} />
-                </div>
-              ),
-            }))
+                ),
+              }))
           )}
           onChange={(e) =>
             onMenuItemChange(
