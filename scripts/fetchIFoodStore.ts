@@ -1,26 +1,24 @@
 import dotenv from "dotenv";
 import axios from "axios";
-import * as fs from "fs";
-import path from "path";
-import blobStream from "blob-stream";
 import FormData from "form-data";
 import request from "request";
 
 import connectToDatabase from "../lib/mongoose";
 import Store, { IMenuSection } from "../models/Store";
-import MenuItem from "../models/MenuItem";
+import MenuItem, { IMenuItemAdditionalsCategory } from "../models/MenuItem";
 import toPascalCase from "../lib/toPascalCase";
 
-const CV_STORE_SLUG = "lorelay";
-const STORE_URL =
-  "https://wsloja.ifood.com.br/ifood-ws-v3/v1/merchants/13ef6042-6b9b-4dc9-bce7-a906b18c6742/catalog";
+const CV_STORE_SLUG = "reizinho-do-acai";
+const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
+
+const STORE_URL = `https://wsloja.ifood.com.br/ifood-ws-v3/v1/merchants/${STORE_ID}/catalog`;
 const IMAGES_BASE_URL = `https://static.ifood-static.com.br/image/upload/t_medium/pratos`;
 
 dotenv.config();
 
-const removeDuplicates = (arr, propName) => {
-  let seenNames = {};
-  return arr.filter((item) => {
+const removeDuplicates = (arr: Record<string, any>, propName: string) => {
+  let seenNames: Record<string, any> = {};
+  return arr.filter((item: any) => {
     if (seenNames.hasOwnProperty(item[propName])) {
       return false;
     } else {
@@ -30,32 +28,7 @@ const removeDuplicates = (arr, propName) => {
   });
 };
 
-const downloadImage = async (url: string, filename: string) => {
-  const response = await axios({
-    method: "GET",
-    url: url,
-    responseType: "stream",
-  });
-
-  const dir = path.dirname(filename);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  response.data.pipe(fs.createWriteStream(filename));
-
-  return new Promise((resolve, reject) => {
-    response.data.on("end", () => {
-      resolve();
-    });
-
-    response.data.on("error", (err) => {
-      reject(err);
-    });
-  });
-};
-
-async function uploadFile(url, id) {
+async function uploadFile(url: string, id: string) {
   const fileStream = request(url);
   const formData = new FormData();
   formData.append("file", fileStream);
@@ -89,7 +62,7 @@ async function run() {
 
   if (previousStore) {
     console.log("will delete previous store data");
-    await MenuItem.deleteMany({ slug: previousStore._id });
+    await MenuItem.deleteMany({ slug: previousStore.slug });
     await Store.deleteOne({ _id: previousStore._id });
   }
 
@@ -101,67 +74,119 @@ async function run() {
 
   const allIngredients = [];
 
-  async function mapIFoodItemsBySection(ifoodSectionItems: any[]) {
-    const result = [];
-    for (const i of ifoodSectionItems) {
-      console.log("creating item", i);
+  async function extractIngredients(ifoodItem) {
+    const detailsSplit = ifoodItem.details?.split(".") || [];
 
-      const detailsSplit = i.details?.split(".") || [];
-
-      const cvSectionIngredients = [];
-      for (const detailItem of detailsSplit) {
-        const ingredientsSplit = detailItem.split(/,| e /);
-        for (const ingredientName of ingredientsSplit) {
-          if (ingredientName.trim()) {
-            const cvIngredient = {
-              store: createdStore._id,
-              itemType: "ingredient",
-              name: toPascalCase(ingredientName.trim()),
-              price: 0,
-            };
-            const found = await MenuItem.findOne(cvIngredient, null, {
-              new: true,
-            });
-            if (!found) {
-              cvSectionIngredients.push(await MenuItem.create(cvIngredient));
-            } else {
-              cvSectionIngredients.push(found);
-            }
+    const cvSectionIngredients = [];
+    for (const detailItem of detailsSplit) {
+      const ingredientsSplit = detailItem.split(/,| e /);
+      for (const ingredientName of ingredientsSplit) {
+        if (ingredientName.trim()) {
+          const cvIngredient = {
+            store: createdStore._id,
+            itemType: "ingredient",
+            name: toPascalCase(ingredientName.trim()),
+            price: 0,
+          };
+          const found = await MenuItem.findOne(cvIngredient, null, {
+            new: true,
+          });
+          if (!found) {
+            cvSectionIngredients.push(await MenuItem.create(cvIngredient));
+          } else {
+            cvSectionIngredients.push(found);
           }
         }
       }
-      allIngredients.push(...cvSectionIngredients);
+    }
+    allIngredients.push(...cvSectionIngredients);
+
+    return cvSectionIngredients;
+  }
+
+  async function extractCustomization(ifoodItem: Record<string, any>) {
+    console.log("extracting customization...");
+    const cvCustomCategories: IMenuItemAdditionalsCategory[] = [];
+    for (const choice of ifoodItem.choices || []) {
+      const cvCustomItems = [];
+      for (const gi of choice.garnishItens || []) {
+        const toBeAdd = {
+          store: createdStore._id,
+          name: gi.description,
+          itemType: "ingredient",
+          price: gi.unitPrice,
+        };
+        const found = await MenuItem.findOne(toBeAdd, null, {
+          new: true,
+        });
+        if (!found) {
+          const cvCustomItem = await MenuItem.create(toBeAdd);
+          await extractAndUpdateHeroImage(gi, cvCustomItem._id);
+          cvCustomItems.push(cvCustomItem);
+          allIngredients.push(cvCustomItem);
+        } else {
+          cvCustomItems.push(found);
+        }
+      }
+
+      const cvCustomCategory = {
+        categoryName: choice.name,
+        min: choice.min,
+        max: choice.max,
+        items: cvCustomItems.map((m) => ({ ingredient: m, min: 0, max: 1 })),
+      };
+
+      cvCustomCategories.push(cvCustomCategory);
+    }
+    return cvCustomCategories;
+  }
+
+  async function extractAndUpdateHeroImage(
+    ifoodItem: Record<string, any>,
+    id: string
+  ) {
+    if (ifoodItem.logoUrl) {
+      const uploadResponse = await uploadFile(
+        IMAGES_BASE_URL + "/" + ifoodItem.logoUrl,
+        id
+      );
+      await MenuItem.updateOne(
+        {
+          _id: id,
+        },
+        {
+          images: { main: uploadResponse._id },
+        }
+      );
+    }
+  }
+
+  async function mapIFoodItemsBySection(ifoodSectionItems: any[]) {
+    const result = [];
+    for (const ifoodItem of ifoodSectionItems) {
+      console.log("creating item", ifoodItem);
+
+      // const cvSectionIngredients = await extractIngredients(ifoodItem);
+      const cvCustomCategories = await extractCustomization(ifoodItem);
 
       const createdMenuItem = await MenuItem.create({
         store: createdStore._id,
         itemType: "product",
-        name: i.description,
-        nameDetail: i.details,
-        price: i.unitPrice,
-        composition: cvSectionIngredients.map((m) => ({
-          section: "0",
-          ingredient: m,
-          quantity: 1,
-          essential: true,
-        })),
+        name: ifoodItem.description,
+        nameDetail: ifoodItem.details,
+        price: ifoodItem.unitPrice,
+        // composition: cvSectionIngredients.map((m) => ({
+        //   section: "0",
+        //   ingredient: m,
+        //   quantity: 1,
+        //   essential: true,
+        // })),
+        details: { short: ifoodItem.details },
+        additionals: cvCustomCategories,
       });
       result.push(createdMenuItem);
 
-      if (i.logoUrl) {
-        const uploadResponse = await uploadFile(
-          IMAGES_BASE_URL + "/" + i.logoUrl,
-          createdMenuItem._id
-        );
-        console.log(uploadResponse);
-        await MenuItem.updateOne(
-          {
-            _id: createdMenuItem._id,
-          },
-          {
-            images: { main: uploadResponse._id },
-          }
-        );
-      }
+      await extractAndUpdateHeroImage(ifoodItem, createdMenuItem._id);
     }
 
     return result;

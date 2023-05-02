@@ -115,7 +115,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
             {getHighlightedText(name, search)}
           </h3>
           {nameDetail && (
-            <span className="text-md font-bold mr-12 sm:mr-0 opacity-60 mb-1">
+            <span className="text-sm font-bold mr-12 sm:mr-0 opacity-60 mb-1">
               {getHighlightedText(nameDetail, search)}
             </span>
           )}

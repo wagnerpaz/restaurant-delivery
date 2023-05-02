@@ -606,16 +606,18 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           </span>
         )}
         {admin && (
-          <MenuSection
-            isNew
-            onAddSectionClick={() => {
-              setEditNewSectionObject({ ...emptyMenuSection });
-              setEditNewSectionModalOpen(true);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
-              setEditNewSectionMode("ADD");
-            }}
-          />
+          <Menu>
+            <MenuSection
+              isNew
+              onAddSectionClick={() => {
+                setEditNewSectionObject({ ...emptyMenuSection });
+                setEditNewSectionModalOpen(true);
+                setEditNewSectionIndex([-1]);
+                setEditNewSectionParentName("");
+                setEditNewSectionMode("ADD");
+              }}
+            />
+          </Menu>
         )}
       </main>
       <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
