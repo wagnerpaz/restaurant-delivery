@@ -82,12 +82,13 @@ const MenuItem: React.FC<MenuItemProps> = ({
       <div className="relative float-left sm:float-none pr-0">
         {price ? (
           <MoneyDisplay
-            className="absolute top-0 right-2 sm:right-0 bg-contrast-high p-1 sm:p-2 rounded-bl-2xl z-10 text-end"
+            className="absolute top-0 right-2 sm:right-0 bg-contrast-high p-1 sm:p-2 rounded-bl-2xl z-10 text-end border-l border-b border-main-a11y-low"
             value={price}
             promotional={pricePromotional}
           />
         ) : null}
         <EditableSection
+          className="!border !border-main-a11y-low rounded-xl overflow-hidden mr-2 sm:mr-0"
           iconsContainerClassName="bottom-1 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
           hideEdit={!editable}
           hideDelete={!editable}
@@ -95,7 +96,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <DbImage
-            className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 rounded-xl mr-2 object-cover"
+            className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
             id={mainImageId}
             width={500}
             height={500}
@@ -106,16 +107,22 @@ const MenuItem: React.FC<MenuItemProps> = ({
       </div>
       <div
         className={classNames(
-          "flex-1 sm:relative bottom-0 w-full p-0 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0",
+          "flex-1 sm:relative bottom-0 w-full p-0 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0 sm:border-t border-main-a11y-low",
           { "sm:mb-8": !displayOnly, "sm:-mb-8": displayOnly }
         )}
       >
-        <div className="flex flex-col justify-center mt-1 flex-wrap min-h-[36px]">
-          <h3 className="block text-md font-bold mr-12 sm:mr-0 leading-tight">
+        <div className="mt-1 min-h-[36px] sm:min-h-0">
+          <Button
+            className="sm:!hidden inline float-right !rounded-xl w-fit mx-0 !px-4 !py-2 !bg-hero !text-hero-a11y-high ml-1 mb-1"
+            onClick={onClick}
+          >
+            <FaShoppingCart className="text-xl" />
+          </Button>
+          <h3 className="block text-md font-bold !leading-tight mb-1">
             {getHighlightedText(name, search)}
           </h3>
           {nameDetail && (
-            <span className="text-sm font-bold mr-12 sm:mr-0 opacity-60 mb-1">
+            <span className="block text-sm font-bold opacity-60 mb-1 leading-tight">
               {getHighlightedText(nameDetail, search)}
             </span>
           )}
@@ -128,11 +135,14 @@ const MenuItem: React.FC<MenuItemProps> = ({
             </span>
           )}
           {sides?.length ? (
-            <ul className="flex flex-col text-xs pt-2 border-t-[1px] border-contrast-a11y-low">
+            <ul className="flex flex-col text-xs pt-2 border-t-[1px] mt-1 border-contrast-a11y-low">
               {sides?.map((side) => (
                 <li className="block" key={side.menuItem.name}>
-                  <span className="font-bold">{`${side.quantity}x `}</span>
+                  <span className="font-bold">
+                    {side.quantity > 0 ? `${side.quantity}x ` : "• "}
+                  </span>
                   {side.menuItem.name}
+                  {side.menuItem.nameDetail && ` - ${side.menuItem.nameDetail}`}
                 </li>
               ))}
             </ul>
@@ -163,13 +173,13 @@ const MenuItem: React.FC<MenuItemProps> = ({
         </div>
       </div>
       {!displayOnly && (
-        <div className="absolute top-0 sm:top-auto sm:bottom-0 right-0 sm:left-0 sm:right-0 p-1 sm:p-4">
+        <div className="hidden sm:block absolute bottom-0 right-0 left-0 p-4">
           <Button
-            className="uppercase !rounded-xl w-full sm:w-[calc(100%+1rem)] mx-0 sm:-mx-2 sm:mt-2 !px-4 !py-2 sm:!px-6 sm:!py-6 flex flex-row gap-2 items-center justify-center !bg-hero !text-hero-a11y-high"
+            className="uppercase !rounded-xl w-[calc(100%+1rem)] -mx-2 mt-2 !px-6 !py-6 flex flex-row gap-2 items-center justify-center !bg-hero !text-hero-a11y-high"
             onClick={onClick}
           >
             <FaShoppingCart className="text-xl" />
-            <span className="hidden sm:inline-block">Adicionar</span>
+            <span className="inline-block">Adicionar</span>
           </Button>
         </div>
       )}

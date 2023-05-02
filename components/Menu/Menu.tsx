@@ -8,7 +8,7 @@ const Menu: React.FC<MenuProps> = ({ className, children, ...props }) => {
   return (
     <Accordion
       allowMultiple
-      defaultIndex={Children.toArray(children).map((_, index) => index)}
+      defaultIndex={new Array(50).fill("").map((_, index) => index)}
     >
       <section className={classNames("", className)} {...props}>
         {children}

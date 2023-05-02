@@ -24,7 +24,8 @@ const MenuSectionsTree: React.FC<MenuSectionsAccordionProps> = ({
   ): React.ReactNode => {
     return sections.map((section, sectionIndex) => (
       <div className="w-full" key={section.name}>
-        {section.items.length > 0 && (
+        {(section.items.filter((f) => f.itemType === "product").length > 0 ||
+          section.sections.length > 0) && (
           <Button
             className={classNames(
               "!rounded-none !justify-start border-b-[1px] w-full",

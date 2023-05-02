@@ -282,6 +282,32 @@ const EditMenuItemAdditionalsForm: React.FC<
                           )}
                         />
                       </FormControl>
+                      <FormControl className="w-20" label="Cobrar">
+                        <SimpleSelect
+                          value={`${item.charge}`}
+                          onChange={handleModifyAdditionalsProp(
+                            additionalsCategory,
+                            additionalsCategoryIndex,
+                            "items",
+                            (e) =>
+                              replaceAt(
+                                additionalsCategory.items || [],
+                                itemIndex,
+                                {
+                                  ...item,
+                                  charge: e.target.value === "true",
+                                }
+                              )
+                          )}
+                        >
+                          <option key="true" value="true">
+                            Sim
+                          </option>
+                          <option key="false" value="false">
+                            Não
+                          </option>
+                        </SimpleSelect>
+                      </FormControl>
                       <div className="flex flex-row">
                         <Button
                           className="mr-2 text-main-a11y-high h-full"

@@ -30,6 +30,15 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
         )
           .populate("composition.ingredient")
           .exec();
+        await Store.updateOne(
+          { _id: storeId },
+          {
+            $addToSet: {
+              [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
+                menuItemId,
+            },
+          }
+        );
         res.status(200).json(serverMenuItem.toObject());
       } else if (req.method === "DELETE") {
         await Store.updateOne(

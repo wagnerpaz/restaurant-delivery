@@ -47,6 +47,7 @@ export interface IMenuItemAdditionalsItem {
   ingredient: IMenuItem;
   min?: number;
   max?: number;
+  charge?: boolean;
 }
 
 export interface ISidesItem {
@@ -126,6 +127,7 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
           },
           min: Number,
           max: Number,
+          charge: { type: Boolean, default: true },
         },
       ],
     },

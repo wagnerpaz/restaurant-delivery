@@ -39,6 +39,20 @@ const Modal: React.FC<ModalProps> = ({
     }
   }, [open, portalTarget]);
 
+  useEffect(() => {
+    const list = ["overflow-hidden"];
+
+    if (open) {
+      document.body.classList.add(...list);
+    } else {
+      document.body.classList.remove(...list);
+    }
+
+    return () => {
+      document.body.classList.remove(...list);
+    };
+  }, [open]);
+
   const render = (
     <>
       <div

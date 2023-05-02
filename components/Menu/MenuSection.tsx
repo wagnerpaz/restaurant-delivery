@@ -60,13 +60,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       />
       <AccordionPanel
         className={classNames(
-          "sm:container sm:m-auto px-2 sm:px-8",
+          "sm:container sm:m-auto !px-2 sm:!px-8",
           {
             "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
               editMode === "realistic" || !admin,
             "flex flex-col gap-2": editMode === "fast" && admin,
           },
-          { "my-4 sm:my-6": true },
+          { "my-2 sm:my-6": true },
           className
         )}
         {...props}

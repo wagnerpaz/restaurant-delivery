@@ -1,20 +1,14 @@
 import { ComponentProps } from "react";
 import classNames from "classnames";
-import { IoFastFood } from "react-icons/io5";
-import {
-  FaCodeBranch,
-  FaThList,
-  FaTrash,
-  FaTrashRestore,
-} from "react-icons/fa";
+import { FaCodeBranch, FaThList } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
-
 import { useSession } from "next-auth/react";
-import { IUser } from "/models/User";
-import { BsMicrosoft } from "react-icons/bs";
+import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
 import { AccordionButton, AccordionIcon } from "@chakra-ui/react";
+
+import { IUser } from "/models/User";
 
 interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
@@ -48,11 +42,19 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
+  const stopPropagation = (
+    e: MouseEvent,
+    callback: (e: MouseEvent) => void
+  ) => {
+    e.stopPropagation();
+    callback(e);
+  };
+
   return (
-    <div className="bg-main-100">
+    <div className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2">
       <AccordionButton
         className={classNames(
-          "flex flex-row items-center px-4 py-2 min-h-12 sticky top-[var(--header-height)] bg-main-100 text-main-a11y-high z-10 shadow-md border-hero border-t-2",
+          "flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high  ",
           className
         )}
         {...props}
@@ -65,19 +67,19 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                   className="cursor-pointer"
                   size={24}
                   title="Editar Seção"
-                  onClick={onEditSectionClick}
+                  onClick={(e) => stopPropagation(e, onEditSectionClick)}
                 />
                 <FaCodeBranch
                   className="cursor-pointer"
                   size={20}
                   title="Adicionar Sub-Seção do Menu"
-                  onClick={onAddSectionClick}
+                  onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
                 <MdMoveDown
                   className="cursor-pointer"
                   size={24}
                   title="Move Seção"
-                  onClick={onAddSectionClick}
+                  onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
               </>
             )}
@@ -87,7 +89,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                   className="mt-1 cursor-pointer"
                   size={24}
                   title="Adicionar Seção do Menu"
-                  onClick={onAddSectionClick}
+                  onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
               </div>
             )}
@@ -113,28 +115,22 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                 <BsMicrosoft
                   className="cursor-pointer mt-1"
                   size={20}
-                  onClick={onFastEditClick}
+                  onClick={(e) => stopPropagation(e, onFastEditClick)}
                   title="Edição realista (cartões)"
                 />
               ) : (
                 <FaThList
                   className="cursor-pointer mt-1"
                   size={20}
-                  onClick={onFastEditClick}
+                  onClick={(e) => stopPropagation(e, onFastEditClick)}
                   title="Edição rápida (lista)"
                 />
               )}
-              <IoFastFood
-                className="cursor-pointer"
-                size={24}
-                onClick={onAddMenuItemClick}
-                title="Adicionar Item do Menu"
-              />
-              <FaTrashRestore
-                className="cursor-pointer"
-                size={20}
-                onClick={onTrashClick}
-                title="Lixeira"
+              <BsFillCloudArrowUpFill
+                className="cursor-pointer mt-1"
+                size={26}
+                onClick={(e) => stopPropagation(e, onTrashClick)}
+                title="Núvem"
               />
               <AccordionIcon />
             </div>

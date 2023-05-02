@@ -504,13 +504,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   return (
     <div
-      className={classNames("font-lato custom-scrollbar min-h-screen pb-40", {
-        "fixed top-0 left-0 w-full h-full overflow-hidden":
-          addStoreModalOpen ||
-          orderMenuItemDetailsOpen ||
-          editMenuItemModalOpen ||
-          editUserAddressesOpen,
-      })}
+      className={classNames("font-lato custom-scrollbar min-h-screen pb-40")}
     >
       <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-md z-20 flex flex-row items-center w-full">
         <div className="flex flex-row items-center gap-2 px-3 sm:px-6 w-full">

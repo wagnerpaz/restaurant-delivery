@@ -100,11 +100,11 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     return result;
   };
 
-  const calculedPrice = useMemo(() => {
+  const calculatedPrice = useMemo(() => {
     return (
       priceNew +
       additionalsChange.reduce(
-        (acc, curr) => acc + curr.quantity * curr.price,
+        (acc, curr) => acc + curr.quantity * curr.price * curr.charge,
         0
       ) +
       comboChange.reduce(
@@ -156,13 +156,15 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         <div className="flex flex-row gap-2 items-center justify-between">
           <div className="flex-1">
             <div className="flex flex-row flex-wrap gap-2 items-baseline">
-              <h2 className="text-2xl font-bold">{menuItem.name}</h2>
-              {menuItem.nameDetail && <span>({menuItem.nameDetail})</span>}
+              <h2 className="text-2xl font-bold leading-tight -mb-1">
+                {menuItem.name}
+              </h2>
+              {menuItem.nameDetail && <span>{menuItem.nameDetail}</span>}
             </div>
             <MoneyDisplay
               className="text-2xl"
               oldValueClassName="text-lg"
-              value={calculedPrice}
+              value={calculatedPrice}
               oldValue={priceOld}
             />
           </div>
@@ -339,25 +341,25 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                         key={item.ingredient.name}
                       >
                         <div className="flex flex-row items-center gap-2">
-                          {item.ingredient.images?.main && (
-                            <DbImage
-                              className="rounded-md"
-                              id={item.ingredient.images?.main}
-                              width={50}
-                              height={50}
-                            />
-                          )}
+                          <DbImage
+                            className="rounded-md border border-solid border-main-a11y-low bg-main-100 object-cover w-[50px] h-[50px]"
+                            id={item.ingredient.images?.main}
+                            width={50}
+                            height={50}
+                          />
                           <div>
                             <span className="flex-1">
                               {item.ingredient.name}
                             </span>
-                            <MoneyDisplay
-                              className="mr-2"
-                              plus
-                              zeroInvisible
-                              value={item.ingredient.price}
-                              promotional={item.ingredient.pricePromotional}
-                            />
+                            {item.charge && (
+                              <MoneyDisplay
+                                className="mr-2"
+                                plus
+                                zeroInvisible
+                                value={item.ingredient.price}
+                                promotional={item.ingredient.pricePromotional}
+                              />
+                            )}
                           </div>
                         </div>
                         <NumberInput
@@ -482,7 +484,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       </div>
       <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 justify-between h-18">
         <NumberInput full />
-        <Button className="!bg-hero flex-1" isDisabled={calculedPrice <= 0}>
+        <Button className="!bg-hero flex-1" isDisabled={calculatedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
           Adicionar
         </Button>

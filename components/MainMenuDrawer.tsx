@@ -14,7 +14,7 @@ import {
 import { signIn, useSession } from "next-auth/react";
 
 import { IUser } from "/models/User";
-import MenuSectionsTree from "./MenuSectionsAccordion";
+import MenuSectionsTree from "./MenuSectionsTree";
 import { IStore } from "/models/Store";
 
 interface MainMenuDrawerProps extends ComponentProps<typeof Drawer> {

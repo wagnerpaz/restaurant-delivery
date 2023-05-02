@@ -1,13 +1,15 @@
 import { Button } from "@chakra-ui/react";
 import classNames from "classnames";
-import { ComponentProps, useEffect, useState } from "react";
-import Menu from "/components/Menu/Menu";
+import cloneDeep from "lodash.clonedeep";
+import { useRouter } from "next/router";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import MenuItem from "/components/Menu/MenuItem";
-import MenuSection from "/components/Menu/MenuSection";
 
 import Modal from "/components/Modal";
 import useDeleteMenuItemFromTrash from "/hooks/useDeleteMenuItemFromTrash";
 import useGetMenuItemsTrash from "/hooks/useGetMenuItemTrash";
+import usePutMenuItem from "/hooks/usePutMenuItem";
+import { navigateBySectionIndex } from "/lib/menuSectionUtils";
 import { IMenuItem } from "/models/MenuItem";
 import { IStore } from "/models/Store";
 
@@ -20,6 +22,9 @@ const EditMenuItemTrashModal: React.FC<EditMenuItemTrashModalProps> = ({
   contentClassName,
   ...props
 }) => {
+  const router = useRouter();
+  const putMenuItem = usePutMenuItem();
+
   const [menuItemTrash, setMenuItemTrash] = useState<IMenuItem[]>([]);
 
   const getMenuItemTrash = useGetMenuItemsTrash(store);
@@ -39,7 +44,7 @@ const EditMenuItemTrashModal: React.FC<EditMenuItemTrashModalProps> = ({
       contentClassName={classNames("flex flex-col container", contentClassName)}
     >
       <h2 className="sticky top-0 text-xl text-bol bg-main-200 z-20 -translate-y-4 p-4 border-b border-hero -mx-4 shadow-sm flex flex-row items-center justify-between">
-        Conteúdo na Lixeira
+        Conteúdo na Núvem
         <Button
           variant="outline"
           onClick={async () => {
@@ -74,6 +79,16 @@ const EditMenuItemTrashModal: React.FC<EditMenuItemTrashModalProps> = ({
             sides={menuItem.sides}
             index={menuItemIndex}
             editable
+            onEditClick={async () => {
+              await putMenuItem(
+                store,
+                menuItem,
+                (router.query.restoreTrashForSectionIndex as string)
+                  .split(",")
+                  .map((m) => +m)
+              );
+              updateList();
+            }}
             onDeleteClick={async () => {
               const confirmed = confirm(
                 `Deseja excluir definitivamente o item "${menuItem.name}"?`
