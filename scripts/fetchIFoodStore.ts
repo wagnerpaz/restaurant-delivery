@@ -8,8 +8,11 @@ import Store, { IMenuSection } from "../models/Store";
 import MenuItem, { IMenuItemAdditionalsCategory } from "../models/MenuItem";
 import toPascalCase from "../lib/toPascalCase";
 
-const CV_STORE_SLUG = "reizinho-do-acai";
-const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
+// const CV_STORE_SLUG = "reizinho-do-acai";
+// const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
+
+const CV_STORE_SLUG = "farm2go";
+const STORE_ID = "11000cf9-fd12-4953-8a53-20a780a7e201";
 
 const STORE_URL = `https://wsloja.ifood.com.br/ifood-ws-v3/v1/merchants/${STORE_ID}/catalog`;
 const IMAGES_BASE_URL = `https://static.ifood-static.com.br/image/upload/t_medium/pratos`;

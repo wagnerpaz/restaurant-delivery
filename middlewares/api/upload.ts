@@ -2,6 +2,7 @@ import formidable, { File, Files } from "formidable";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
+import sharp from "sharp";
 
 import connectToDatabase from "/lib/mongoose";
 
@@ -76,7 +77,14 @@ const streamFile = (
       metadata: file,
     });
     const readStream = fs.createReadStream(file.filepath);
-    readStream.pipe(stream);
+
+    const sharpObject = sharp();
+    readStream.pipe(sharpObject);
+
+    const webpOptions = { quality: 80 };
+    sharpObject.webp(webpOptions);
+
+    sharpObject.pipe(stream);
 
     stream.on("error", (err) => {
       console.error(err);

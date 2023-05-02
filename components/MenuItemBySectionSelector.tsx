@@ -1,5 +1,6 @@
 import { Select } from "chakra-react-select";
-import { ComponentProps, useMemo } from "react";
+import { ComponentProps, ReactElement, useMemo } from "react";
+import { onlyText } from "react-children-utilities";
 import MoneyDisplay from "./MoneyDisplay";
 
 import DbImage from "/components/DbImage";
@@ -12,6 +13,7 @@ import {
   navigateBySectionIndex,
   retriveAllMenuItems,
 } from "/lib/menuSectionUtils";
+import removeDiacritics from "/lib/removeDiacritics";
 import { IMenuItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
 
@@ -99,6 +101,11 @@ const MenuItemBySectionSelector: React.FC<MenuItemBySectionSelectorProps> = ({
           menuPlacement="auto"
           menuPortalTarget={menuPortalTarget}
           classNames={{ menuPortal: () => "!z-50" }}
+          filterOption={({ label }, inputValue) =>
+            removeDiacritics(onlyText(label.props.children))
+              .toLowerCase()
+              .includes(removeDiacritics(inputValue).toLowerCase())
+          }
           value={{
             value: menuItem?._id,
             label: (
