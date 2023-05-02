@@ -327,8 +327,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       );
       foundItemsCount.current += foundItems.length;
 
-      console.log(foundItems);
-
       return (
         <div key={section.name}>
           {(foundItems.filter((f) => f.itemType === "product").length > 0 ||
@@ -378,10 +376,10 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             >
               <AdminDraggableGroup className="contents" editable={admin}>
                 {foundItems
-                  .filter((f) => admin || f.itemType === "product")
+                  .filter((f) => f.itemType === "product" || admin)
                   .map((menuItem, menuItemIndex) => (
                     <AdminDraggable
-                      dragIndicator={section.editMode === "fast"}
+                      dragIndicator={section.editMode === "fast" && admin}
                       containerClassName="h-full"
                       key={menuItem._id}
                       id={menuItem._id}
@@ -389,7 +387,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                       onFind={onFindMenuItem([...indexPath, sectionIndex])}
                       onDrop={onDropMenuItem([...indexPath, sectionIndex])}
                     >
-                      {section.editMode === "realistic" ? (
+                      {section.editMode === "realistic" || !admin ? (
                         <MenuItem
                           name={menuItem.name}
                           nameDetail={menuItem.nameDetail}
@@ -514,7 +512,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
           editUserAddressesOpen,
       })}
     >
-      <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-lg z-20 flex flex-row items-center w-full">
+      <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-md z-20 flex flex-row items-center w-full">
         <div className="flex flex-row items-center gap-2 px-3 sm:px-6 w-full">
           <DbImage
             className="rounded-md w-[50px] h-[50px]"
