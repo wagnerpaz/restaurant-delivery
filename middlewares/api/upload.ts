@@ -78,13 +78,14 @@ const streamFile = (
     });
     const readStream = fs.createReadStream(file.filepath);
 
-    const sharpObject = sharp();
-    readStream.pipe(sharpObject);
+    // const sharpObject = sharp();
+    // readStream.pipe(sharpObject);
 
-    const webpOptions = { quality: 80 };
-    sharpObject.webp(webpOptions);
+    // const webpOptions = { quality: 80 };
+    // sharpObject.webp(webpOptions);
 
-    sharpObject.pipe(stream);
+    // sharpObject.pipe(stream);
+    readStream.pipe(stream);
 
     stream.on("error", (err) => {
       console.error(err);
