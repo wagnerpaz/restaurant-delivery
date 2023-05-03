@@ -22,7 +22,6 @@ import Draggable from "/components/Draggable";
 import UserIcon from "/components/UserIcon";
 import { IUser } from "/models/User";
 import useReorderMenuItems from "../hooks/useReorderMenuItems";
-import DbImage from "./DbImage";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import { Button, Input, useToast } from "@chakra-ui/react";
@@ -30,7 +29,7 @@ import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
-import Image from "next/image";
+import ImageWithFallback from "/components/ImageWithFallback";
 import Link from "next/link";
 import searchIncludes from "../lib/searchIncludes";
 import MainMenuDrawer from "./MainMenuDrawer";
@@ -392,7 +391,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                           name={menuItem.name}
                           nameDetail={menuItem.nameDetail}
                           id={menuItem._id}
-                          mainImageId={menuItem.images?.main?.toString()}
+                          mainImageId={menuItem.images?.main}
                           price={menuItem.price}
                           pricePromotional={menuItem.pricePromotional}
                           hidden={menuItem.hidden}
@@ -508,9 +507,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
     >
       <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-md z-20 flex flex-row items-center w-full">
         <div className="flex flex-row items-center gap-2 px-3 sm:px-6 w-full">
-          <DbImage
+          <ImageWithFallback
             className="rounded-md w-[50px] h-[50px]"
-            id={clientStore?.logo}
+            src={clientStore?.logo}
             alt={`${clientStore?.name} logo`}
             width={50}
             height={50}
@@ -616,7 +615,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       </main>
       <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
         <Link href="/">
-          <Image
+          <ImageWithFallback
             className="w-[200px]"
             src="/logo.png"
             width={99999}

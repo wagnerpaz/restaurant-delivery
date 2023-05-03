@@ -12,11 +12,11 @@ import toPascalCase from "../lib/toPascalCase";
 // const CV_STORE_SLUG = "reizinho-do-acai";
 // const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
 
-// const CV_STORE_SLUG = "black-cave";
-// const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
+const CV_STORE_SLUG = "black-cave";
+const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
 
-const CV_STORE_SLUG = "setor-1";
-const MERCHANT_ID = "243ef5ae-7f07-4539-bd3c-fa291d744ddb";
+// const CV_STORE_SLUG = "setor-1";
+// const MERCHANT_ID = "243ef5ae-7f07-4539-bd3c-fa291d744ddb";
 
 const IFOOD_API_ACCESS_KEY = "69f181d5-0046-4221-b7b2-deef62bd60d5";
 const IFOOD_API_SECRET_KEY = "9ef4fb4f-7a1d-4e0d-a9b1-9b82873297d8";
@@ -50,7 +50,7 @@ async function uploadFile(url: string, id: string) {
   formData.append("file", fileStream);
 
   const response = await axios.post(
-    `http://localhost:3000/api/upload?id=${id}`,
+    `http://localhost:3000/api/upload`,
     formData,
     {
       headers: {
@@ -172,7 +172,7 @@ async function run() {
           _id: id,
         },
         {
-          images: { main: uploadResponse._id },
+          images: { main: uploadResponse.url },
         }
       );
     }
@@ -192,7 +192,7 @@ async function run() {
           _id: id,
         },
         {
-          logo: uploadResponse._id,
+          logo: uploadResponse.url,
         }
       );
     }

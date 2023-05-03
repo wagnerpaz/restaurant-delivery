@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import classNames from "classnames";
 import { ComponentProps, useCallback, useMemo, useState } from "react";
-import DbImage from "/components/DbImage";
 import { FaShoppingCart } from "react-icons/fa";
 
 import Modal from "/components/Modal";
@@ -26,6 +25,8 @@ import {
   navigateBySectionIndex,
   retriveAllMenuItems,
 } from "/lib/menuSectionUtils";
+
+import ImageWithFallback from "/components/ImageWithFallback";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -145,9 +146,9 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         contentClassName
       )}
     >
-      <DbImage
+      <ImageWithFallback
         className="bg-main-200 !rounded-none w-full sm:h-[300px] object-cover"
-        id={menuItem.images?.main}
+        src={menuItem.images?.main}
         width={500}
         height={500}
         alt={`${menuItem.name} hero image`}
@@ -341,9 +342,9 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                         key={item.ingredient.name}
                       >
                         <div className="flex flex-row items-center gap-2">
-                          <DbImage
+                          <ImageWithFallback
                             className="rounded-md border border-solid border-main-a11y-low bg-main-100 object-cover w-[50px] h-[50px]"
-                            id={item.ingredient.images?.main}
+                            src={item.ingredient.images?.main}
                             width={50}
                             height={50}
                           />
@@ -448,9 +449,9 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                                 key={sectionMenuItem._id}
                               >
                                 <div className="flex flex-row items-center gap-2">
-                                  <DbImage
+                                  <ImageWithFallback
                                     className="rounded-md"
-                                    id={sectionMenuItem.images?.main}
+                                    src={sectionMenuItem.images?.main}
                                     width={50}
                                     height={50}
                                   />

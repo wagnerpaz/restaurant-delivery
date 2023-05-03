@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+import ImageWithFallback from "/components/ImageWithFallback";
 import { useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { createPortal } from "react-dom";
@@ -25,7 +25,7 @@ const UserIcon = ({ store }) => {
     <>
       {session?.user && (
         <>
-          <Image
+          <ImageWithFallback
             alt="user image"
             src={session.user.image}
             width={40}

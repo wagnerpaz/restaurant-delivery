@@ -9,12 +9,12 @@ import ReactCrop, {
   convertToPixelCrop,
 } from "react-image-crop";
 
-import DbImage from "/components/DbImage";
 import Modal from "/components/Modal";
 import { imgPreview } from "/lib/image-crop/imgPreview";
 import usePutUpload from "/hooks/usePutUpload";
 import { Button, Input } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
+import ImageWithFallback from "/components/ImageWithFallback";
 
 interface DbImageEditorProps extends ComponentProps<typeof Modal> {
   upload: {
@@ -104,10 +104,10 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
               />
             </ReactCrop>
           ) : (
-            <DbImage
+            <ImageWithFallback
               className="rounded-sm"
               alt="Profile photo stored"
-              id={upload.id}
+              src={upload.id}
               width={999}
               height={999}
             />
@@ -125,7 +125,7 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
                   const uploadedImage = reader.result;
                   const canvas = document.createElement("canvas");
                   const context2d = canvas.getContext("2d");
-                  const image = new Image();
+                  const image = new ImageWithFallback();
                   image.src = uploadedImage as string;
                   image.onload = () => {
                     //RESIZE TO MAX WIDTH 500

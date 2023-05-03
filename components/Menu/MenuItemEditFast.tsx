@@ -1,11 +1,11 @@
 import { Button, Select } from "@chakra-ui/react";
 import cloneDeep from "lodash.clonedeep";
 import isEqual from "lodash.isequal";
+import ImageWithFallback from "/components/ImageWithFallback";
 import { ComponentProps, memo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
 
-import DbImage from "/components/DbImage";
 import DebouncedInput from "/components/DebouncedInput";
 import EditableSection from "/components/EditableSection";
 
@@ -48,9 +48,9 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         hideDelete
         onEditClick={onEditClick}
       >
-        <DbImage
+        <ImageWithFallback
           className="border border-solid border-main-a11y-low rounded-md"
-          id={menuItem.images?.main}
+          src={menuItem.images?.main}
           width={38}
           height={38}
           alt={`${menuItem.name} hero image`}

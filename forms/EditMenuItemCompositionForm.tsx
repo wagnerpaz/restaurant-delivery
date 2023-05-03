@@ -16,7 +16,6 @@ import { Select } from "chakra-react-select";
 import { Select as SimpleSelect } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
 import { Button, Input } from "@chakra-ui/react";
-import DbImage from "/components/DbImage";
 import { IStore } from "/models/Store";
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 import MenuItemBySectionSelector from "/components/MenuItemBySectionSelector";

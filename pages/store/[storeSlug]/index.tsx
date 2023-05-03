@@ -21,11 +21,7 @@ const StorePage: NextPage<StorePageProps> = ({
   return (
     <>
       <Head>
-        <link
-          rel="icon"
-          type="image/x-icon"
-          href={`/api/download?id=${store?.logo}`}
-        />
+        <link rel="icon" type="image/x-icon" href={store?.logo} />
         <title>{store?.name}</title>
       </Head>
       <Store

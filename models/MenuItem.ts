@@ -7,8 +7,8 @@ export interface IMenuItem {
   name: string;
   nameDetail?: string;
   images?: {
-    main?: mongoose.Types.ObjectId;
-    others?: mongoose.Types.ObjectId[];
+    main?: string;
+    others?: string[];
   };
   details?: {
     short?: string;
@@ -69,14 +69,12 @@ const menuItemSchema: Schema = new mongoose.Schema<IMenuItem>({
   nameDetail: String,
   images: {
     main: {
-      type: mongoose.Types.ObjectId,
-      ref: "images.files",
+      type: String,
       required: false,
     },
     others: [
       {
-        type: mongoose.Types.ObjectId,
-        ref: "images.files",
+        type: String,
         required: false,
       },
     ],

@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { ComponentProps, useCallback, useEffect, useState } from "react";
-import DbImage from "/components/DbImage";
 import EditableSection from "/components/EditableSection";
 import Fieldset from "/components/Fieldset";
 
@@ -68,9 +67,9 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             onEditClick={() => setEditImageModalOpen(true)}
             // onDeleteClick={onDeleteClick}
           >
-            <DbImage
+            <ImageWithFallback
               className="border border-solid border-main-a11y-low rounded-lg bg-main-100"
-              id={clientStore.logo}
+              src={clientStore.logo}
               width={200}
               height={200}
             />

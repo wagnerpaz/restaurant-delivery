@@ -4,12 +4,12 @@ import { FaShoppingCart } from "react-icons/fa";
 
 import { IMenuItemCompositionItem, ISidesItem } from "/models/MenuItem";
 import EditableSection from "../EditableSection";
-import DbImage from "../DbImage";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/User";
 import getHighlightedText from "/lib/getHighlightedText";
 import MoneyDisplay from "../MoneyDisplay";
 import { Button } from "@chakra-ui/react";
+import ImageWithFallback from "/components/ImageWithFallback";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   id: string;
@@ -95,9 +95,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onEditClick={onEditClick}
           onDeleteClick={onDeleteClick}
         >
-          <DbImage
+          <ImageWithFallback
             className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
-            id={mainImageId}
+            src={mainImageId}
             width={500}
             height={500}
             alt={`${name} hero image`}

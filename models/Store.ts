@@ -5,7 +5,7 @@ import { IMenuItem } from "./MenuItem";
 
 export interface IStore extends Document {
   name: string;
-  logo?: mongoose.Types.ObjectId;
+  logo?: string;
   slug: string;
   listed: boolean;
   locations: ILocation[];
@@ -42,8 +42,7 @@ export interface ILocation {
 const storeSchema: Schema = new mongoose.Schema<IStore>({
   name: { type: String, required: true },
   logo: {
-    type: mongoose.Types.ObjectId,
-    ref: "images.files",
+    type: String,
     required: false,
   },
   slug: { type: String, required: true, unique: true },

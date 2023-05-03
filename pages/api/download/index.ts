@@ -26,10 +26,7 @@ async function downloadImage(req: NextApiRequest, res: NextApiResponse) {
 
     res.setHeader("Content-Type", metadata.mimetype);
     res.setHeader("Content-Length", metadata.size);
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${metadata.newFilename}"`
-    );
+    res.setHeader("Cache-Control", "public, max-age=604800, immutable");
 
     downloadStream.pipe(res);
   } catch (err) {

@@ -5,7 +5,6 @@ import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import { RiExchangeFill } from "react-icons/ri";
 
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
-import DbImage from "/components/DbImage";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import Fieldset from "/components/Fieldset";
@@ -13,6 +12,7 @@ import FormControl from "/components/FormControl";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
 import { IExchangesItem, IMenuItem, ISidesItem } from "/models/MenuItem";
 import { IMenuSection, IStore } from "/models/Store";
+import ImageWithFallback from "/components/ImageWithFallback";
 
 interface EditMenuItemSidesFormProps
   extends ComponentProps<typeof DraggableGroup> {
@@ -133,9 +133,9 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                         value: sidesItem.menuItem?._id,
                         label: (
                           <div className="flex flex-row items-center gap-2">
-                            <DbImage
+                            <ImageWithFallback
                               className="rounded-md"
-                              id={sidesItem.menuItem.images?.main?.toString()}
+                              src={sidesItem.menuItem.images?.main?.toString()}
                               width={30}
                               height={30}
                               alt="menu item foto"
@@ -151,9 +151,9 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                           value: menuItem._id,
                           label: (
                             <div className="flex flex-row items-center gap-2">
-                              <DbImage
+                              <ImageWithFallback
                                 className="rounded-md"
-                                id={menuItem.images?.main?.toString()}
+                                src={menuItem.images?.main?.toString()}
                                 width={30}
                                 height={30}
                                 alt="menu item foto"

@@ -1,17 +1,14 @@
 import { Select } from "chakra-react-select";
-import { ComponentProps, ReactElement, useMemo } from "react";
+import ImageWithFallback from "/components/ImageWithFallback";
+import { ComponentProps, useMemo } from "react";
 import { onlyText } from "react-children-utilities";
 import MoneyDisplay from "./MoneyDisplay";
 
-import DbImage from "/components/DbImage";
 import FormControl from "/components/FormControl";
 import {
   composeFullSectionNameByIndex,
-  findMenuItemSectionIndex,
-  listAllSections,
   listAllSectionsIndexes,
   navigateBySectionIndex,
-  retriveAllMenuItems,
 } from "/lib/menuSectionUtils";
 import removeDiacritics from "/lib/removeDiacritics";
 import { IMenuItem } from "/models/MenuItem";
@@ -112,9 +109,9 @@ const MenuItemBySectionSelector: React.FC<MenuItemBySectionSelectorProps> = ({
               <div className="flex flex-row items-center gap-2 justify-between w-full">
                 <div className="flex flex-row items-center">
                   {menuItem?.images?.main && (
-                    <DbImage
+                    <ImageWithFallback
                       className="rounded-md"
-                      id={menuItem?.images?.main?.toString()}
+                      src={menuItem?.images?.main?.toString()}
                       width={30}
                       height={30}
                       alt="Ingrediente foto"
@@ -134,9 +131,9 @@ const MenuItemBySectionSelector: React.FC<MenuItemBySectionSelectorProps> = ({
                 label: (
                   <div className="flex flex-row items-center justify-between gap-2 w-full">
                     <div className="flex flex-row items-center">
-                      <DbImage
+                      <ImageWithFallback
                         className="rounded-md"
-                        id={menuItem.images?.main?.toString()}
+                        src={menuItem.images?.main?.toString()}
                         width={30}
                         height={30}
                         alt="menu item foto"

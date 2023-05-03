@@ -1,11 +1,15 @@
 import formidable, { File, Files } from "formidable";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
-import fs from "fs";
 import tinify from "tinify";
-import streamToArray from "stream-to-array";
+import AWS from "aws-sdk";
 
-import connectToDatabase from "/lib/mongoose";
+const s3 = new AWS.S3({
+  accessKeyId: process.env.S3_ACCESS_KEY as string,
+  secretAccessKey: process.env.S3_SECRET_KEY as string,
+});
+
+const bucketName = process.env.S3_BUCKET_NAME as string;
 
 export interface IUploadFileResult {
   id: mongoose.Types.ObjectId;
@@ -38,21 +42,30 @@ const upload = (
         }
 
         try {
-          const conn = await connectToDatabase();
-
-          const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
-            bucketName: "images",
-          });
-
           const promises: any[] = [];
-          Object.keys(files).forEach((fileKey) => {
-            promises.push(streamFile(bucket, files, fileKey));
-          });
+          for (const fileKey of Object.keys(files)) {
+            const file = files[fileKey] as File;
+            const compressedImage = tinify.fromFile(file.filepath);
+            compressedImage.resize({ method: "scale", width: 500 });
+            const resultImage = await compressedImage.toBuffer();
+
+            // upload the file to S3
+            promises.push(
+              s3
+                .upload({
+                  Bucket: bucketName,
+                  Key: `${file.newFilename}`,
+                  Body: resultImage,
+                  ContentType: file.mimetype as string,
+                })
+                .promise()
+            );
+          }
           const promisesResults = await Promise.all(promises);
           const result = promisesResults.reduce(
             (res, cur, index) => ({
               ...res,
-              [Object.keys(files)[index]]: cur,
+              [Object.keys(files)[index]]: cur.Location,
             }),
             {}
           );
@@ -67,32 +80,6 @@ const upload = (
     }
   }
   return handler;
-};
-
-const streamFile = async (
-  bucket: mongoose.mongo.GridFSBucket,
-  files: Files,
-  fileKey: string
-) => {
-  const file = files[fileKey] as File;
-  const stream = bucket.openUploadStream(file.newFilename, {
-    metadata: file,
-  });
-  const compressedImage = tinify.fromFile(file.filepath);
-  compressedImage.resize({ method: "scale", width: 500 });
-  const resultImage = await compressedImage.toBuffer();
-
-  return new Promise((resolve, reject) => {
-    stream.on("error", (error) => {
-      reject(error);
-    });
-
-    stream.on("finish", () => {
-      resolve(stream.id);
-    });
-
-    stream.end(resultImage);
-  });
 };
 
 const equalSetsArray = (arr1: any[], arr2: any[]) => {

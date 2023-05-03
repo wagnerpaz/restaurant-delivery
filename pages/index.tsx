@@ -3,9 +3,8 @@ import { GetServerSideProps, NextPage } from "next";
 import { signIn, useSession } from "next-auth/react";
 import { FaUserCircle } from "react-icons/fa";
 import Head from "next/head";
-import Image from "next/image";
+import ImageWithFallback from "/components/ImageWithFallback";
 import Link from "next/link";
-import DbImage from "/components/DbImage";
 
 import { ssrHelpers } from "/lib/ssrHelpers";
 import { IStore } from "/models/Store";
@@ -32,7 +31,7 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
       <main>
         <header className="bg-hero shadow-lg">
           <div className="container mx-auto flex items-center justify-center">
-            <Image
+            <ImageWithFallback
               className="m-6 w-[200px] object-cover"
               src="/logo.png"
               width={200}
@@ -62,7 +61,7 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
                   key={store._id}
                   href={`/store/${store.slug}`}
                 >
-                  <DbImage
+                  <ImageWithFallback
                     className="rounded-2xl w-[200px] h-[200px] bg-white border-hero shadow-md"
                     id={store.logo?.toString()}
                     width={200}
