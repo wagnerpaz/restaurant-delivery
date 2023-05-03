@@ -2,13 +2,16 @@ import formidable, { File, Files } from "formidable";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs";
-import sharp from "sharp";
+import tinify from "tinify";
+import streamToArray from "stream-to-array";
 
 import connectToDatabase from "/lib/mongoose";
 
 export interface IUploadFileResult {
   id: mongoose.Types.ObjectId;
 }
+
+tinify.key = "cyC8hn71gxKl4g3p8tnLtJmQGL3wKLdv";
 
 const upload = (
   fileKeys: string[],
@@ -66,35 +69,29 @@ const upload = (
   return handler;
 };
 
-const streamFile = (
+const streamFile = async (
   bucket: mongoose.mongo.GridFSBucket,
   files: Files,
   fileKey: string
 ) => {
+  const file = files[fileKey] as File;
+  const stream = bucket.openUploadStream(file.newFilename, {
+    metadata: file,
+  });
+  const compressedImage = tinify.fromFile(file.filepath);
+  compressedImage.resize({ method: "scale", width: 500 });
+  const resultImage = await compressedImage.toBuffer();
+
   return new Promise((resolve, reject) => {
-    const file = files[fileKey] as File;
-    const stream = bucket.openUploadStream(file.newFilename, {
-      metadata: file,
-    });
-    const readStream = fs.createReadStream(file.filepath);
-
-    // const sharpObject = sharp();
-    // readStream.pipe(sharpObject);
-
-    // const webpOptions = { quality: 80 };
-    // sharpObject.webp(webpOptions);
-
-    // sharpObject.pipe(stream);
-    readStream.pipe(stream);
-
-    stream.on("error", (err) => {
-      console.error(err);
-      reject(err);
+    stream.on("error", (error) => {
+      reject(error);
     });
 
     stream.on("finish", () => {
       resolve(stream.id);
     });
+
+    stream.end(resultImage);
   });
 };
 

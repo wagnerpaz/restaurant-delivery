@@ -23,10 +23,7 @@ async function run() {
     ),
   };
 
-  const stores = await Store.find()
-    .populate("ingredients")
-    .populate(populate)
-    .exec();
+  const stores = await Store.find().populate(populate).exec();
 
   function processSection(section: IMenuSection) {
     for (const item of section.items) {
@@ -41,7 +38,7 @@ async function run() {
   }
 
   for (const store of stores) {
-    if (store.images?.logo) imageObjectIds.push(store.images.logo);
+    if (store.logo) imageObjectIds.push(store.logo);
 
     for (const section of store.menu.sections) {
       processSection(section);

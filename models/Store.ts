@@ -13,6 +13,7 @@ export interface IStore extends Document {
     sections: IMenuSection[];
   };
   ingredients: IStoreIngredient[];
+  theme: { colors: { hero: string } };
 }
 
 export interface IStoreIngredient {
@@ -69,6 +70,11 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       price: Number,
     },
   ],
+  theme: {
+    colors: {
+      hero: String,
+    },
+  },
   menu: {
     //five levels of nested sections
     sections: [
