@@ -12,11 +12,17 @@ import toPascalCase from "../lib/toPascalCase";
 // const CV_STORE_SLUG = "reizinho-do-acai";
 // const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
 
-const CV_STORE_SLUG = "black-cave";
-const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
+// const CV_STORE_SLUG = "black-cave";
+// const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
 
 // const CV_STORE_SLUG = "setor-1";
 // const MERCHANT_ID = "243ef5ae-7f07-4539-bd3c-fa291d744ddb";
+
+// const CV_STORE_SLUG = "ho-good-burger";
+// const MERCHANT_ID = "8cef2d65-e265-4124-aa9a-9ae4a95cfa11";
+
+const CV_STORE_SLUG = "forno-a-lenha-ristorante-e-pizzaria";
+const MERCHANT_ID = "2a8fc2e2-e8f4-4fa1-86e9-8c1f117a559b";
 
 const IFOOD_API_ACCESS_KEY = "69f181d5-0046-4221-b7b2-deef62bd60d5";
 const IFOOD_API_SECRET_KEY = "9ef4fb4f-7a1d-4e0d-a9b1-9b82873297d8";
@@ -31,18 +37,6 @@ const MERCHANT_GRAPHQL_QUERY = {
 };
 
 dotenv.config();
-
-const removeDuplicates = (arr: Record<string, any>, propName: string) => {
-  let seenNames: Record<string, any> = {};
-  return arr.filter((item: any) => {
-    if (seenNames.hasOwnProperty(item[propName])) {
-      return false;
-    } else {
-      seenNames[item[propName]] = true;
-      return true;
-    }
-  });
-};
 
 async function uploadFile(url: string, id: string) {
   const fileStream = request(url);
@@ -85,7 +79,7 @@ async function run() {
     slug: CV_STORE_SLUG,
   });
 
-  if (previousStore._id) {
+  if (previousStore?._id) {
     console.log("will delete previous store data");
     await MenuItem.deleteMany({ store: previousStore._id });
     await Store.deleteOne({ _id: previousStore._id });
@@ -240,7 +234,7 @@ async function run() {
         sections: [
           {
             name: "Ingredientes",
-            items: removeDuplicates(allIngredients, "name"),
+            items: allIngredients,
           },
           ...sections,
         ],

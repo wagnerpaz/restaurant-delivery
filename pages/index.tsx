@@ -20,8 +20,6 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  console.log("admin", admin);
-
   return (
     <>
       <Head>
@@ -63,9 +61,10 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
                 >
                   <ImageWithFallback
                     className="rounded-2xl w-[200px] h-[200px] bg-white border-hero shadow-md"
-                    id={store.logo?.toString()}
+                    src={store.logo}
                     width={200}
                     height={200}
+                    alt={`${store.name} logo`}
                   />
                 </Link>
               ))}

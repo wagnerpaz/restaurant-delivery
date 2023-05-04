@@ -125,7 +125,7 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
                   const uploadedImage = reader.result;
                   const canvas = document.createElement("canvas");
                   const context2d = canvas.getContext("2d");
-                  const image = new ImageWithFallback();
+                  const image = new Image();
                   image.src = uploadedImage as string;
                   image.onload = () => {
                     //RESIZE TO MAX WIDTH 500
@@ -169,12 +169,11 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
                 const response = await putUpload(
                   upload.path,
                   upload.fileKey,
-                  dataUrl,
-                  new mongoose.Types.ObjectId(upload.id)
+                  dataUrl
                 );
                 setLoadingSave(false);
                 onOpenChange(false);
-                onUploadIdChange(response.data._id);
+                onUploadIdChange(response.data.url);
               });
             }}
           >

@@ -416,7 +416,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               ...edit,
               images: {
                 ...edit.images,
-                main: new mongoose.Types.ObjectId(newMainImageId),
+                main: newMainImageId,
               },
             } as IMenuItem);
           }}

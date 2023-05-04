@@ -1,8 +1,10 @@
 import Image from "next/image";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState, SyntheticEvent } from "react";
 
-interface ImageWithFallbackProps extends ComponentProps<typeof Image> {
+interface ImageWithFallbackProps
+  extends Omit<ComponentProps<typeof Image>, "src"> {
   fallback?: string;
+  src?: string;
 }
 
 const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
@@ -11,10 +13,10 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   src,
   ...props
 }) => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<SyntheticEvent<HTMLImageElement, Event>>();
 
   useEffect(() => {
-    setError(null);
+    setError(undefined);
   }, [src]);
 
   return (

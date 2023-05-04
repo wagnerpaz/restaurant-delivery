@@ -22,6 +22,7 @@ import Draggable from "/components/Draggable";
 import UserIcon from "/components/UserIcon";
 import { IUser } from "/models/User";
 import useReorderMenuItems from "../hooks/useReorderMenuItems";
+import DbImage from "./DbImage";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import { Button, Input, useToast } from "@chakra-ui/react";
@@ -29,7 +30,7 @@ import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
-import ImageWithFallback from "/components/ImageWithFallback";
+import Image from "next/image";
 import Link from "next/link";
 import searchIncludes from "../lib/searchIncludes";
 import MainMenuDrawer from "./MainMenuDrawer";
@@ -46,6 +47,7 @@ import EditAddressModal from "/modals/EditAddressModal";
 import usePutUser from "/hooks/usePutUser";
 import EditMenuItemTrashModal from "/modals/EditMenuItemTrashModal";
 import MenuItemEditFast from "./Menu/MenuItemEditFast";
+import ImageWithFallback from "./ImageWithFallback";
 
 interface StoreProps {
   store: IStore;
@@ -319,17 +321,17 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
       const foundItems = section.items.filter(
         (f) =>
-          search.length < 3 ||
-          searchIncludes(f.name, search) ||
-          searchIncludes(f.nameDetail, search) ||
-          searchIncludes(f.details?.short, search)
+          (search.length < 3 ||
+            searchIncludes(f.name, search) ||
+            searchIncludes(f.nameDetail, search) ||
+            searchIncludes(f.details?.short, search)) &&
+          (f.itemType === "product" || admin)
       );
       foundItemsCount.current += foundItems.length;
 
       return (
         <div key={section.name}>
-          {(foundItems.filter((f) => f.itemType === "product").length > 0 ||
-            admin) && (
+          {foundItems.length > 0 && (
             <MenuSection
               id={"menu-section-" + [...indexPath, sectionIndex].join("-")}
               name={sectionName}
@@ -391,7 +393,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
                           name={menuItem.name}
                           nameDetail={menuItem.nameDetail}
                           id={menuItem._id}
-                          mainImageId={menuItem.images?.main}
+                          mainImageId={menuItem.images?.main?.toString()}
                           price={menuItem.price}
                           pricePromotional={menuItem.pricePromotional}
                           hidden={menuItem.hidden}
@@ -615,7 +617,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
       </main>
       <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
         <Link href="/">
-          <ImageWithFallback
+          <Image
             className="w-[200px]"
             src="/logo.png"
             width={99999}

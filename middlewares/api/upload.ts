@@ -1,30 +1,26 @@
-import formidable, { File, Files } from "formidable";
-import mongoose from "mongoose";
+import formidable, { File } from "formidable";
 import { NextApiRequest, NextApiResponse } from "next";
 import tinify from "tinify";
 import AWS from "aws-sdk";
+
+import { areSetsEquals } from "/lib/arraySets";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.S3_ACCESS_KEY as string,
   secretAccessKey: process.env.S3_SECRET_KEY as string,
 });
-
 const bucketName = process.env.S3_BUCKET_NAME as string;
 
-export interface IUploadFileResult {
-  id: mongoose.Types.ObjectId;
-}
-
-tinify.key = "cyC8hn71gxKl4g3p8tnLtJmQGL3wKLdv";
+tinify.key = process.env.TINIFY_API_KEY as string;
 
 const upload = (
   fileKeys: string[],
   onSuccess: (
     req: NextApiRequest,
     res: NextApiResponse,
-    filesResult: { [key: string]: mongoose.Types.ObjectId }
+    filesResult: { [key: string]: string }
   ) => void
-) => {
+) =>
   async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (["PUT", "POST"].includes(req.method as string)) {
       const form = new formidable.IncomingForm();
@@ -35,7 +31,7 @@ const upload = (
           return;
         }
 
-        if (!equalSetsArray(fileKeys, Object.keys(files))) {
+        if (!areSetsEquals(fileKeys, Object.keys(files))) {
           res.status(400).json({
             message: `FormData should contain the following files: [${fileKeys}]`,
           });
@@ -45,6 +41,8 @@ const upload = (
           const promises: any[] = [];
           for (const fileKey of Object.keys(files)) {
             const file = files[fileKey] as File;
+
+            //Compress and resize to width 500
             const compressedImage = tinify.fromFile(file.filepath);
             compressedImage.resize({ method: "scale", width: 500 });
             const resultImage = await compressedImage.toBuffer();
@@ -54,7 +52,7 @@ const upload = (
               s3
                 .upload({
                   Bucket: bucketName,
-                  Key: `${file.newFilename}`,
+                  Key: `${file.newFilename}-${file.originalFilename}`,
                   Body: resultImage,
                   ContentType: file.mimetype as string,
                 })
@@ -78,20 +76,6 @@ const upload = (
     } else {
       res.status(405).json({ message: "Method not allowed" });
     }
-  }
-  return handler;
-};
-
-const equalSetsArray = (arr1: any[], arr2: any[]) => {
-  // Sort the arrays before comparing
-  const sortedArr1 = arr1.sort();
-  const sortedArr2 = arr2.sort();
-
-  const areEqual =
-    sortedArr1.length === sortedArr2.length &&
-    sortedArr1.every((value, index) => value === sortedArr2[index]);
-
-  return areEqual;
-};
+  };
 
 export default upload;
