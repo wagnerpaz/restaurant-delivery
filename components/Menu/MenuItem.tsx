@@ -100,7 +100,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <ImageWithFallback
-            className="sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
+            className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
             src={mainImageId}
             width={500}
             height={500}
