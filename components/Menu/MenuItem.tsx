@@ -10,8 +10,12 @@ import getHighlightedText from "/lib/getHighlightedText";
 import MoneyDisplay from "../MoneyDisplay";
 import { Button } from "@chakra-ui/react";
 import ImageWithFallback from "/components/ImageWithFallback";
+import getTailwindScreenSize from "/lib/tailwind/getTailwindScreenSize";
+import { GRID_CONFIG } from "./MenuSection";
+import remToPix from "/lib/remToPix";
 
 interface MenuItemProps extends ComponentProps<"div"> {
+  idPrefix?: string;
   id: string;
   name: string;
   nameDetail?: string;
@@ -37,8 +41,10 @@ interface MenuItemProps extends ComponentProps<"div"> {
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({
+  style,
   className,
   children,
+  idPrefix = "",
   id,
   name,
   nameDetail,
@@ -62,14 +68,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onMainImageChange = () => {},
   ...props
 }) => {
-  const { data: session, status } = useSession();
-  const loading = status === "loading";
-  const admin = (session?.user as IUser)?.role === "admin";
-
-  return !admin && hidden ? null : (
+  return hidden ? null : (
     <div
+      id={idPrefix + id}
       className={classNames(
-        "sm:flex sm:flex-col h-full relative rounded-2xl overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
+        "sm:flex sm:flex-col relative rounded-2xl overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1",
         {
           "sm:hover:scale-[105%] transition-all": useEffects,
           "opacity-50": hidden,
@@ -77,6 +80,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
         },
         className
       )}
+      style={style}
       {...props}
     >
       <div className="relative float-left sm:float-none pr-0">
@@ -96,7 +100,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
           onDeleteClick={onDeleteClick}
         >
           <ImageWithFallback
-            className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
+            className="sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
             src={mainImageId}
             width={500}
             height={500}
@@ -186,5 +190,21 @@ const MenuItem: React.FC<MenuItemProps> = ({
     </div>
   );
 };
+
+export function calculateComponentWidth() {
+  const [screenSizeType, screenSize] = getTailwindScreenSize(
+    window.innerHeight
+  );
+  const cols = GRID_CONFIG[screenSizeType].cols;
+  const gap = GRID_CONFIG[screenSizeType].gap;
+
+  const width =
+    (screenSize -
+      remToPix(GRID_CONFIG.marginX * 2) -
+      remToPix(gap) * (cols - 1)) /
+    cols;
+
+  return width;
+}
 
 export default MenuItem;

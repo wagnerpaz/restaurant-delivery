@@ -9,14 +9,6 @@ module.exports = {
     "./config/**/*.{html,ts,tsx}",
     "./node_modules/react-tailwindcss-select/dist/index.esm.js",
   ],
-  purge: [
-    "./pages/**/*.{html,ts,tsx}",
-    "./components/**/*.{html,ts,tsx,jsx}",
-    "./forms/**/*.{html,ts,tsx}",
-    "./modals/**/*.{html,ts,tsx}",
-    "./config/**/*.{html,ts,tsx}",
-    "./node_modules/react-tailwindcss-select/dist/index.esm.js",
-  ],
   theme: {
     fontFamily: {
       lato: ["Lato"],

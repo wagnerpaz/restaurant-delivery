@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { MdDragIndicator } from "react-icons/md";
 
@@ -12,6 +12,7 @@ interface DraggableProps {
   children: ReactNode;
   className?: string;
   containerClassName?: string;
+  style?: CSSProperties;
 }
 
 interface Item {
@@ -32,6 +33,7 @@ const Draggable: React.FC<DraggableProps> = ({
   children,
   className,
   containerClassName,
+  style,
   ...props
 }) => {
   const [{ isDragging }, drag, preview] = useDrag(
@@ -68,6 +70,7 @@ const Draggable: React.FC<DraggableProps> = ({
   return (
     <div
       ref={(node) => preview(drop(node))}
+      style={style}
       className={classNames(
         {
           "flex flex-row items-center gap-2": dragIndicator,

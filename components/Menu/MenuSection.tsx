@@ -1,14 +1,20 @@
-import { ComponentProps } from "react";
+import { ComponentProps, memo } from "react";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/User";
-import {
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-} from "@chakra-ui/react";
+import { AccordionItem, AccordionPanel } from "@chakra-ui/react";
+
+export const GRID_CONFIG = {
+  xs: { cols: 1, gap: 1 },
+  sm: { cols: 2, gap: 1.5 },
+  md: { cols: 2, gap: 1.5 },
+  lg: { cols: 3, gap: 1.5 },
+  xl: { cols: 3, gap: 1.5 },
+  "2xl": { cols: 4, gap: 1.5 },
+  marginX: 2,
+};
 
 interface MenuSectionProps extends ComponentProps<typeof AccordionPanel> {
   name?: string;
