@@ -178,7 +178,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     >
       {foundItems.length > 0 && (
         <AccordionItem className="!border-t-0" uuid={menuSection._id}>
-          <a
+          <div
             id={"menu-section-" + menuSection._id}
             className="relative -top-[80px]"
           />

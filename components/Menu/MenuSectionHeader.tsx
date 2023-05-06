@@ -6,16 +6,8 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
-import {
-  AccordionButton,
-  AccordionIcon,
-  useAccordionItemState,
-} from "@chakra-ui/react";
 
 import { IUser } from "/models/types/User";
-import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
-import { StoreContext } from "../Store";
-import { MenuSectionContext } from "./MenuSection";
 import {
   AccordionItemButton,
   AccordionItemHeading,
@@ -53,13 +45,6 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const { store } = useContext(StoreContext);
-  const { menuSection } = useContext(MenuSectionContext);
-
-  // const { isOpen } = useAccordionItemState();
-
-  const putMenuSection = usePutStoreMenuSection();
-
   const stopPropagation = (
     e: MouseEvent,
     callback: (e: MouseEvent) => void
@@ -69,16 +54,15 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   };
 
   return (
-    <AccordionItemHeading className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2">
+    <AccordionItemHeading
+      aria-level={2}
+      className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2"
+    >
       <AccordionItemButton
         className={classNames(
           "flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high  ",
           className
         )}
-        // onClick={() => {
-        //   const newObj = { ...menuSection, retracted: isOpen };
-        //   putMenuSection(store, newObj, menuSection.index);
-        // }}
         {...props}
       >
         <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">

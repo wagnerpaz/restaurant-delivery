@@ -71,6 +71,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
         <Button
           className="sm:!hidden !px-0"
           variant="text"
+          aria-label="Menu"
           onClick={() => {
             if (searchMobileVisible) {
               if (!isSearchMobileInScreen) {
@@ -88,6 +89,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
         <Button
           className="flex flex-row gap-2 items-center !px-0"
           variant="text"
+          aria-label="Pesquisar"
           onClick={() => setDrawerOpen(true)}
         >
           <HiMenu size={36} />
