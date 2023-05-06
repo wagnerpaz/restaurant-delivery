@@ -29,7 +29,6 @@ import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
-import isEqual from "lodash.isequal";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -212,7 +211,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             )}
             {...props}
           >
-            {/* {!localMenuSection.retracted && ( */}
             <AdminDraggableGroup className="contents">
               {foundItems.map((menuItem, menuItemIndex) => (
                 <AdminDraggable
@@ -258,7 +256,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 </div>
               )}
             </AdminDraggableGroup>
-            {/* )} */}
           </AccordionPanel>
         </AccordionItem>
       )}

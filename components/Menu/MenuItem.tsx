@@ -1,5 +1,6 @@
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useInViewport } from "react-in-viewport";
 
 import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
 import MenuItemRealistic from "/components/Menu/MenuItemRealistic";
@@ -34,6 +35,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
   menuItem,
   useEffects,
 }) => {
+  const container = useRef<HTMLDivElement>(null);
+  const { inViewport, enterCount, leaveCount } = useInViewport(container, {
+    threshold: 0.01,
+  });
+
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";

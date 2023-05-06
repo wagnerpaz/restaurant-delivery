@@ -87,7 +87,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   );
 
   const imageSize = useMemo(
-    () => (screenSizeType === "xs" ? remToPix(32) : width) - 4 * 2,
+    () => (screenSizeType === "xs" ? remToPix(8) : width - 4 * 2),
     [screenSizeType, width]
   );
 
@@ -95,7 +95,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
     <div
       id={idPrefix + id}
       className={classNames(
-        "sm:flex sm:flex-col relative rounded-2xl overflow-hidden shadow-md text-contrast-a11y-high bg-contrast-high border-contrast-high border-4 group cursor-pointer z-0 outline outline-contrast-low outline-1 h-full",
+        "menu-item-realist-container group",
         {
           "sm:hover:scale-[105%] transition-all": useEffects,
           "opacity-50": hidden,
@@ -109,7 +109,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
       <div className="relative float-left sm:float-none pr-0">
         {price ? (
           <MoneyDisplay
-            className="absolute top-0 right-2 sm:right-0 bg-contrast-high p-1 sm:p-2 rounded-bl-2xl z-10 text-end border-l border-b border-main-a11y-low"
+            className="menu-item-realistic-money-display"
             value={price}
             promotional={pricePromotional}
           />
@@ -128,15 +128,10 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             width={imageSize}
             height={imageSize}
             alt={`${name} hero image`}
-            priority
           />
         </EditableSection>
       </div>
-      <div
-        className={
-          "flex-1 sm:relative bottom-0 w-full p-0 px-2 sm:p-4 sm:flex sm:flex-col bg-contrast-high sm:-translate-y-6 rounded-tl-2xl rounded-tr-2xl sm:mr-0 sm:border-t border-main-a11y-low sm:mb-8"
-        }
-      >
+      <div className={"menu-item-realistic-content-container"}>
         <div className="mt-1 min-h-[36px] sm:min-h-0">
           <Button
             className="sm:!hidden inline float-right !rounded-xl w-fit mx-0 !px-4 !py-2 !bg-hero !text-hero-a11y-high ml-1 mb-1"
@@ -200,7 +195,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
       </div>
       <div className="hidden sm:block absolute bottom-0 right-0 left-0 p-4">
         <Button
-          className="uppercase !rounded-xl w-[calc(100%+1rem)] -mx-2 mt-2 !px-6 !py-6 flex flex-row gap-2 items-center justify-center !bg-hero !text-hero-a11y-high"
+          className="button-hero-1 !rounded-xl w-[calc(100%+1rem)] -mx-2"
           onClick={onClick}
         >
           <FaShoppingCart className="text-xl" />
