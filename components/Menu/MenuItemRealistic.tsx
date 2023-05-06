@@ -1,4 +1,4 @@
-import { ComponentProps, useContext } from "react";
+import { ComponentProps, useContext, useMemo } from "react";
 import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -17,9 +17,8 @@ import ImageWithFallback from "/components/ImageWithFallback";
 import getTailwindScreenSize from "/lib/tailwind/getTailwindScreenSize";
 import { GRID_CONFIG } from "./MenuSection";
 import remToPix from "/lib/remToPix";
-import { useFormContext } from "react-hook-form";
 import { StoreContext } from "../Store";
-import removeDiacritics from "/lib/removeDiacritics";
+import ScreenSizeContext from "/contexts/BrowserScreenSizeContext";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   idPrefix?: string;
@@ -64,6 +63,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   const admin = (session?.user as IUser)?.role === "admin";
 
   const { search } = useContext(StoreContext);
+  const { screenSizeWidth } = useContext(ScreenSizeContext);
 
   const id = menuItem._id;
   const name = menuItem.name;
@@ -76,6 +76,15 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   const sides = menuItem.sides;
 
   const editable = admin;
+
+  const [screenSizeType] = useMemo(
+    () => getTailwindScreenSize(screenSizeWidth),
+    [screenSizeWidth]
+  );
+  const width = useMemo(
+    () => calculateComponentWidth(screenSizeWidth),
+    [screenSizeWidth]
+  );
 
   return (
     <div
@@ -111,8 +120,8 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
           <ImageWithFallback
             className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
             src={mainImageId}
-            width={500}
-            height={500}
+            width={(screenSizeType === "xs" ? remToPix(32) : width) - 4 * 2}
+            height={remToPix(width)}
             alt={`${name} hero image`}
             priority
           />
@@ -197,10 +206,8 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   );
 };
 
-export function calculateComponentWidth() {
-  const [screenSizeType, screenSize] = getTailwindScreenSize(
-    window.innerHeight
-  );
+export function calculateComponentWidth(screenWidth: number) {
+  const [screenSizeType, screenSize] = getTailwindScreenSize(screenWidth);
   const cols = GRID_CONFIG[screenSizeType].cols;
   const gap = GRID_CONFIG[screenSizeType].gap;
 

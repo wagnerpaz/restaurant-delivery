@@ -8,7 +8,7 @@ import { IUser } from "/models/types/User";
 import { useRouter } from "next/router";
 import { StoreContext } from "../Store";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
-import { useEditable, useToast } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import defaultToastError from "/config/defaultToastError";
 import { MenuSectionContext } from "./MenuSection";
 
@@ -33,7 +33,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
   editMode,
   menuItem,
   useEffects,
-  onMenuItemChange,
 }) => {
   const { data: session, status } = useSession();
   const loading = status === "loading";

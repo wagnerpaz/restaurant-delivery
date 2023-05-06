@@ -5,10 +5,12 @@ import { ssrHelpers } from "/lib/ssrHelpers";
 import { ILocation, IStore } from "/models/types/Store";
 import storeSSP from "/server-side-props/storeSSP";
 import Store from "/components/Store";
+import { ScreenSizeProvider } from "/contexts/BrowserScreenSizeContext";
 
 interface StorePageProps {
   store: IStore;
   selectedLocation: ILocation;
+  browserScreenSize: { width: number; height: number };
 }
 
 const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
@@ -18,7 +20,9 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
         <link rel="icon" type="image/x-icon" href={store?.logo} />
         <title>{store?.name}</title>
       </Head>
-      <Store store={store} selectedLocation={selectedLocation} />
+      <ScreenSizeProvider>
+        <Store store={store} selectedLocation={selectedLocation} />
+      </ScreenSizeProvider>
     </>
   );
 };
