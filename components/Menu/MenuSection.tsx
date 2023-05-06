@@ -10,12 +10,8 @@ import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
-import {
-  AccordionItem,
-  AccordionPanel,
-  AccordionPanelProps,
-  useToast,
-} from "@chakra-ui/react";
+import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
+import { useToast } from "@chakra-ui/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -181,7 +177,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       }}
     >
       {foundItems.length > 0 && (
-        <AccordionItem className="!border-t-0">
+        <AccordionItem className="!border-t-0" uuid={menuSection._id}>
           <a
             id={"menu-section-" + menuSection._id}
             className="relative -top-[80px]"
@@ -198,7 +194,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             onTrashClick={onTrashClick}
             onFastEditClick={onFastEditClick}
           />
-          <AccordionPanel
+          <AccordionItemPanel
             className={classNames(
               "sm:container sm:m-auto !px-2 sm:!px-8",
               {
@@ -256,7 +252,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 </div>
               )}
             </AdminDraggableGroup>
-          </AccordionPanel>
+          </AccordionItemPanel>
         </AccordionItem>
       )}
     </MenuSectionContext.Provider>

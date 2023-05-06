@@ -1,5 +1,5 @@
 import { ComponentProps, useMemo, memo } from "react";
-import { Accordion } from "@chakra-ui/react";
+import { Accordion } from "react-accessible-accordion";
 import isEqual from "lodash.isequal";
 
 import { listAllSections } from "/lib/menuSectionUtils";
@@ -24,15 +24,12 @@ const Menu: React.FC<MenuProps> = ({
   );
 
   const defaultIndex = useMemo(
-    () =>
-      allSections
-        .map((section, index) => (section.retracted ? null : index))
-        .filter((f) => f !== null),
+    () => allSections.map((section) => section._id),
     [allSections]
   );
 
   return (
-    <Accordion allowMultiple defaultIndex={defaultIndex}>
+    <Accordion allowMultipleExpanded preExpanded={defaultIndex}>
       {allSections.map((section) => (
         <MenuSection key={`${section._id}`} menuSection={section} />
       ))}

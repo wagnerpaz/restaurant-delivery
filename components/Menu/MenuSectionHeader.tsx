@@ -16,6 +16,10 @@ import { IUser } from "/models/types/User";
 import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
 import { StoreContext } from "../Store";
 import { MenuSectionContext } from "./MenuSection";
+import {
+  AccordionItemButton,
+  AccordionItemHeading,
+} from "react-accessible-accordion";
 
 interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
@@ -52,7 +56,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const { store } = useContext(StoreContext);
   const { menuSection } = useContext(MenuSectionContext);
 
-  const { isOpen } = useAccordionItemState();
+  // const { isOpen } = useAccordionItemState();
 
   const putMenuSection = usePutStoreMenuSection();
 
@@ -65,16 +69,16 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   };
 
   return (
-    <div className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2">
-      <AccordionButton
+    <AccordionItemHeading className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2">
+      <AccordionItemButton
         className={classNames(
           "flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high  ",
           className
         )}
-        onClick={() => {
-          const newObj = { ...menuSection, retracted: isOpen };
-          putMenuSection(store, newObj, menuSection.index);
-        }}
+        // onClick={() => {
+        //   const newObj = { ...menuSection, retracted: isOpen };
+        //   putMenuSection(store, newObj, menuSection.index);
+        // }}
         {...props}
       >
         <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">
@@ -150,13 +154,13 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                 onClick={(e) => stopPropagation(e, onTrashClick)}
                 title="Núvem"
               />
-              <AccordionIcon />
+              {/* <AccordionIcon /> */}
             </div>
           )}
-          {!admin && <AccordionIcon />}
+          {/* {!admin && <AccordionIcon />} */}
         </div>
-      </AccordionButton>
-    </div>
+      </AccordionItemButton>
+    </AccordionItemHeading>
   );
 };
 

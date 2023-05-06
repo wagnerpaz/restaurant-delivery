@@ -96,7 +96,7 @@ function App({
     add = "#11419b",
     remove = "#ce1414",
   } = theme?.colors || {};
-  const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
+  const { hero: heroPattern = "/istockphoto-515373062-612x612.webp" } =
     theme?.patterns || {};
 
   const heroColorVar = getRGBColor(hero, "hero");
