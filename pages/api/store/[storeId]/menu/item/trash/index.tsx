@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 
 import connectToDatabase from "/lib/mongoose";
-import Ingredients from "/models/Ingredients";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";

@@ -10,8 +10,8 @@ import DraggableGroup from "/components/DraggableGroup";
 import Fieldset from "/components/Fieldset";
 import FormControl from "/components/FormControl";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
-import { IExchangesItem, IMenuItem, ISidesItem } from "/models/MenuItem";
-import { IMenuSection, IStore } from "/models/Store";
+import { IExchangesItem, IMenuItem, ISidesItem } from "/models/types/MenuItem";
+import { IMenuSection, IStore } from "/models/types/Store";
 import ImageWithFallback from "/components/ImageWithFallback";
 
 interface EditMenuItemSidesFormProps

@@ -1,7 +1,5 @@
-import mongoose from "mongoose";
-
 import axiosInstance from "/lib/axiosInstance";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 const usePutStore = () => {
   const call = async (store: IStore) => {

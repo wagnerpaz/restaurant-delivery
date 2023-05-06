@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import connectToDatabase from "/lib/mongoose";
-import Store, { IMenuSection } from "/models/Store";
+import Store from "/models/Store";
+import { IMenuSection } from "/models/types/Store";
 
 async function section(req: NextApiRequest, res: NextApiResponse) {
   try {

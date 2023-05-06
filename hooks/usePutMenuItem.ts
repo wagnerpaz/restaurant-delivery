@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
-
 import axiosInstance from "/lib/axiosInstance";
-import { IMenuItem } from "/models/MenuItem";
-import { IStore } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IStore } from "/models/types/Store";
 
 const usePutMenuItem = () => {
   const call = async (

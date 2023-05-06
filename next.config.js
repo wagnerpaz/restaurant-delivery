@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig = withBundleAnalyzer({
   reactStrictMode: true,
   typescript: {
     // !! WARN !!
@@ -11,6 +16,6 @@ const nextConfig = {
   images: {
     domains: ["lh3.googleusercontent.com", "s3.sa-east-1.amazonaws.com"],
   },
-};
+});
 
 module.exports = nextConfig;

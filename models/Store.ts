@@ -1,44 +1,6 @@
-import mongoose, { Document, models, Schema } from "mongoose";
+import mongoose, { models, Schema } from "mongoose";
 
-import { IIngredient } from "./Ingredients";
-import { IMenuItem } from "./MenuItem";
-
-export interface IStore extends Document {
-  name: string;
-  logo?: string;
-  slug: string;
-  listed: boolean;
-  locations: ILocation[];
-  menu: {
-    sections: IMenuSection[];
-  };
-  theme: { colors: { hero: string } };
-}
-
-export interface IStoreIngredient {
-  ingredient: IIngredient;
-  price?: number;
-}
-
-export interface IMenuSection {
-  name: string;
-  index: number[];
-  editMode: "realistic" | "fast";
-  retracted?: boolean;
-  items: IMenuItem[];
-  sections: IMenuSection[];
-}
-
-export interface ILocation {
-  address: string;
-  address2: string;
-  number: string;
-  neighborhood: string;
-  state: string;
-  city: string;
-  postalCode: string;
-  main?: boolean;
-}
+import { IStore } from "./types/Store";
 
 const storeSchema: Schema = new mongoose.Schema<IStore>({
   name: { type: String, required: true },

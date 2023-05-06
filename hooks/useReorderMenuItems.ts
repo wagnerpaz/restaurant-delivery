@@ -2,7 +2,7 @@ import debounce from "lodash.debounce";
 import { useCallback } from "react";
 
 import axiosInstance from "/lib/axiosInstance";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 const useReorderMenuItems = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -4,8 +4,8 @@ import { Button, Input } from "@chakra-ui/react";
 
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";
-import { IMenuSection } from "/models/Store";
-import { IMenuItem } from "/models/MenuItem";
+import { IMenuSection } from "/models/types/Store";
+import { IMenuItem } from "/models/types/MenuItem";
 
 interface AddMenuSectionModalProps extends ComponentProps<typeof Modal> {
   menuSection: IMenuItem;

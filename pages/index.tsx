@@ -7,8 +7,8 @@ import ImageWithFallback from "/components/ImageWithFallback";
 import Link from "next/link";
 
 import { ssrHelpers } from "/lib/ssrHelpers";
-import { IStore } from "/models/Store";
-import { IUser } from "/models/User";
+import { IStore } from "/models/types/Store";
+import { IUser } from "/models/types/User";
 import storesMetaSSP from "/server-side-props/storeMetaSSP";
 
 interface HomeProps {

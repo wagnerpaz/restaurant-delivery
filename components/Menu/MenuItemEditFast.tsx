@@ -8,13 +8,13 @@ import isEqual from "lodash.isequal";
 import LocalInput from "../MemoInput";
 import EditableSection from "/components/EditableSection";
 
-import { IMenuItem, ItemTypeType } from "/models/MenuItem";
+import { IMenuItem, ItemTypeType } from "/models/types/MenuItem";
 import useLocalState from "/hooks/useLocalState";
 import MemoSimpleSelect from "../MemoSimpleSelect";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { StoreContext } from "../Store";
 import { MenuSectionContext } from "./MenuSection";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 interface MenuItemEditFastProps extends ComponentProps<"form"> {
   menuItem: IMenuItem;

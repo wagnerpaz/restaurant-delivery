@@ -1,5 +1,5 @@
 import axiosInstance from "/lib/axiosInstance";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 const useGetStoreMenuSectionItems = () => {
   const call = async (store: IStore, sectionIndex: number) => {

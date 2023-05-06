@@ -6,10 +6,10 @@ import {
   IMenuItem,
   IMenuItemCompositionItem,
   ISidesItem,
-} from "/models/MenuItem";
+} from "/models/types/MenuItem";
 import EditableSection from "../EditableSection";
 import { useSession } from "next-auth/react";
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
 import getHighlightedText from "/lib/getHighlightedText";
 import MoneyDisplay from "../MoneyDisplay";
 import { Button } from "@chakra-ui/react";

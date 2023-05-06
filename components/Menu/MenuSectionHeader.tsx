@@ -12,9 +12,8 @@ import {
   useAccordionItemState,
 } from "@chakra-ui/react";
 
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
 import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 import { StoreContext } from "../Store";
 import { MenuSectionContext } from "./MenuSection";
 
@@ -51,7 +50,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const admin = (session?.user as IUser)?.role === "admin";
 
   const { store } = useContext(StoreContext);
-  const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+  const { menuSection } = useContext(MenuSectionContext);
 
   const { isOpen } = useAccordionItemState();
 
@@ -75,7 +74,6 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
         onClick={() => {
           const newObj = { ...menuSection, retracted: isOpen };
           putMenuSection(store, newObj, menuSection.index);
-          setMenuSection(newObj);
         }}
         {...props}
       >

@@ -5,16 +5,15 @@ import { Button, Input, Select as SimpleSelect } from "@chakra-ui/react";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
-import { IIngredient } from "/models/Ingredients";
 import {
   IMenuItem,
   IMenuItemAdditionalsCategory,
   IMenuItemAdditionalsItem,
-} from "/models/MenuItem";
+} from "/models/types/MenuItem";
 import { Select } from "chakra-react-select";
 import FormControl from "/components/FormControl";
 import Fieldset from "/components/Fieldset";
-import Store, { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 import MoneyDisplay from "/components/MoneyDisplay";
 import MenuItemBySectionSelector from "/components/MenuItemBySectionSelector";
 

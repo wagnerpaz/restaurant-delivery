@@ -13,18 +13,18 @@ import {
 } from "@chakra-ui/react";
 import { signIn, useSession } from "next-auth/react";
 
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
 import MenuSectionsTree from "./MenuSectionsTree";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 
-interface MainMenuDrawerProps extends ComponentProps<typeof Drawer> {
+interface MainMenuDrawerProps
+  extends Omit<ComponentProps<typeof Drawer>, "children"> {
   store: IStore;
   onStoreDataClick: () => void;
 }
 
 const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   store,
-  children,
   isOpen,
   onClose,
   onStoreDataClick,
@@ -39,7 +39,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   };
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose}>
+    <Drawer isOpen={isOpen} onClose={onClose} isLazy={false}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton size="lg" />

@@ -2,7 +2,7 @@ import { ComponentProps } from "react";
 import classNames from "classnames";
 import { Button } from "@chakra-ui/react";
 
-import { IMenuSection, IStore } from "/models/Store";
+import { IMenuSection, IStore } from "/models/types/Store";
 import { useRouter } from "next/router";
 
 interface MenuSectionsAccordionProps extends ComponentProps<"nav"> {

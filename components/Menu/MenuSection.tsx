@@ -4,6 +4,7 @@ import {
   useContext,
   createContext,
   useEffect,
+  memo,
 } from "react";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
@@ -13,23 +14,22 @@ import {
   AccordionItem,
   AccordionPanel,
   AccordionPanelProps,
-  useAccordionItem,
-  useAccordionItemState,
   useToast,
 } from "@chakra-ui/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
-import { IUser } from "/models/User";
-import { IMenuItem } from "/models/MenuItem";
+import { IUser } from "/models/types/User";
+import { IMenuItem } from "/models/types/MenuItem";
 import DraggableGroup, { DraggableGroupProps } from "../DraggableGroup";
 import Draggable, { DraggableProps } from "../Draggable";
 import { moveTo } from "/lib/immutable";
 import MenuItem, { emptyMenuItem } from "./MenuItem";
-import { IMenuSection } from "/models/Store";
+import { IMenuSection } from "/models/types/Store";
 import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
+import isEqual from "lodash.isequal";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -74,7 +74,6 @@ export const MenuSectionContext = createContext<{
 
 const MenuSection: React.FC<MenuSectionProps> = ({
   className,
-  children,
   menuSection,
   isNew,
   onChangeItems = () => {},
@@ -189,11 +188,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             className="relative -top-[80px]"
           />
           <MenuSectionHeader
-            name={menuSection.name}
+            name={localMenuSection.name}
             length={foundItems.length}
             totalLength={localMenuSection.items.length}
             isNew={isNew}
-            editMode={menuSection.editMode}
+            editMode={localMenuSection.editMode}
             onAddMenuItemClick={onAddMenuItemClick}
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
@@ -267,4 +266,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   );
 };
 
-export default MenuSection;
+export default memo(
+  MenuSection,
+  (prev, next) =>
+    prev.menuSection === next.menuSection && prev.isNew === next.isNew
+);

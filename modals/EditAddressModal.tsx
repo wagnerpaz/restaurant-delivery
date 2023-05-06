@@ -7,7 +7,7 @@ import Fieldset from "/components/Fieldset";
 import Modal from "/components/Modal";
 import EditAddressForm from "/forms/EditAddressForm";
 import { replaceAt } from "/lib/immutable";
-import { ILocation } from "/models/Store";
+import { ILocation } from "/models/types/Store";
 
 interface EditAddressModalProps extends ComponentProps<typeof Modal> {}
 

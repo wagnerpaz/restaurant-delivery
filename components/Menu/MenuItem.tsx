@@ -3,8 +3,8 @@ import { useSession } from "next-auth/react";
 
 import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
 import MenuItemRealistic from "/components/Menu/MenuItemRealistic";
-import { IMenuItem } from "/models/MenuItem";
-import { IUser } from "/models/User";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IUser } from "/models/types/User";
 import { useRouter } from "next/router";
 import { StoreContext } from "../Store";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";

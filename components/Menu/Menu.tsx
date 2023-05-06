@@ -1,10 +1,10 @@
-import { ComponentProps, useMemo } from "react";
+import { ComponentProps, useMemo, memo } from "react";
 import { Accordion } from "@chakra-ui/react";
+import isEqual from "lodash.isequal";
 
-import { IMenuSection } from "/models/Store";
 import { listAllSections } from "/lib/menuSectionUtils";
 import MenuSection from "./MenuSection";
-import usePutStoreMenuSectionSections from "/hooks/usePutStoreMenuSectionSections";
+import { IMenuSection } from "/models/types/Store";
 
 interface MenuProps extends ComponentProps<"section"> {
   sections: IMenuSection[];
@@ -40,4 +40,6 @@ const Menu: React.FC<MenuProps> = ({
   );
 };
 
-export default Menu;
+export default memo(Menu, (prev, next) =>
+  isEqual(prev.sections, next.sections)
+);

@@ -5,8 +5,10 @@ import request from "request";
 import ColorThief from "colorthief";
 
 import connectToDatabase from "../lib/mongoose";
-import Store, { IMenuSection } from "../models/Store";
-import MenuItem, { IMenuItemAdditionalsCategory } from "../models/MenuItem";
+import Store, { IMenuSection } from "../models/types/Store";
+import MenuItem, {
+  IMenuItemAdditionalsCategory,
+} from "../models/types/MenuItem";
 import toPascalCase from "../lib/toPascalCase";
 
 // const CV_STORE_SLUG = "reizinho-do-acai";

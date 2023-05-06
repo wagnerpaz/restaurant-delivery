@@ -1,9 +1,9 @@
 import connectToDatabase from "../lib/mongoose";
-import Store, { IMenuSection } from "../models/Store";
+import Store, { IMenuSection } from "../models/types/Store";
 import sectionsPopulate from "../server-side-props/lib/sectionsPopulate";
 import dotenv from "dotenv";
 import Ingredients from "../models/Ingredients";
-import MenuItem from "../models/MenuItem";
+import MenuItem from "../models/types/MenuItem";
 import mongoose from "mongoose";
 
 dotenv.config();

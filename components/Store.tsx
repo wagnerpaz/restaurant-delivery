@@ -15,15 +15,14 @@ import { FaSearch } from "react-icons/fa";
 
 import Menu from "/components/Menu/Menu";
 import MenuSection, { emptyMenuSection } from "/components/Menu/MenuSection";
-import { ILocation, IMenuSection, IStore } from "/models/Store";
+import { ILocation, IMenuSection, IStore } from "/models/types/Store";
 import EditMenuItemModal from "/forms/EditMenuItemForm";
-import { IMenuItem } from "/models/MenuItem";
+import { IMenuItem } from "/models/types/MenuItem";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
-import { IIngredient } from "/models/Ingredients";
 import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import UserIcon from "/components/UserIcon";
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
 import useReorderMenuItems from "../hooks/useReorderMenuItems";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
@@ -34,7 +33,6 @@ import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import Image from "next/image";
 import Link from "next/link";
-import MainMenuDrawer from "./MainMenuDrawer";
 import defaultToastError from "/config/defaultToastError";
 import OrderMenuItemDetailsModal from "/modals/OrderMenuItemDetails";
 import { useRouter } from "next/router";
@@ -50,11 +48,11 @@ import EditMenuItemTrashModal from "/modals/EditMenuItemTrashModal";
 import ImageWithFallback from "./ImageWithFallback";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import DebouncedInput from "./DebouncedInput";
+import StoreHeader from "./StoreHeader";
 
 interface StoreProps {
   store: IStore;
   onStoreChange: (value: IStore, shouldSave: boolean) => void;
-  ingredients: IIngredient[];
   selectedLocation: ILocation;
 }
 
@@ -62,13 +60,23 @@ export const StoreContext = createContext<{
   store: IStore;
   setStore: (store: IStore) => void;
   search: string;
+  setSearch: (search: string) => void;
+  searchMobileVisible: boolean;
+  setSearchMobileVisible: (visible: boolean) => void;
+  isSearchMobileInScreen: boolean;
+  searchMobileElement: HTMLInputElement | null;
 }>({
   store: {} as IStore,
   setStore: () => {},
   search: "",
+  setSearch: () => {},
+  searchMobileVisible: false,
+  setSearchMobileVisible: () => {},
+  isSearchMobileInScreen: false,
+  searchMobileElement: null,
 });
 
-const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
+const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
   const toast = useToast();
   const router = useRouter();
 
@@ -77,12 +85,11 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const admin = (session?.user as IUser)?.role === "admin";
 
   const searchMobileRef = useRef<HTMLInputElement>();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
 
   const [clientUser, setClientUser] = useState<IUser>();
   const [clientStore, setClientStore] = useState(store);
-  const [clientIngredients, setClientIngredients] = useState(ingredients);
   const clientLocation = selectedLocation || clientStore?.locations?.[0];
 
   const [search, setSearch] = useState("");
@@ -146,7 +153,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
   const putMenuSection = usePutStoreMenuSection();
   const putMenuSectionSection = usePutStoreMenuSectionSection();
   const putUser = usePutUser();
-  const reorderMenuItems = useReorderMenuItems();
 
   useEffect(() => {
     if (searchMobileVisible) {
@@ -196,85 +202,21 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
 
   return (
     <StoreContext.Provider
-      value={{ store: clientStore, setStore: setClientStore, search }}
+      value={{
+        store: clientStore,
+        setStore: setClientStore,
+        search,
+        setSearch,
+        searchMobileVisible,
+        setSearchMobileVisible,
+        isSearchMobileInScreen,
+        searchMobileElement: searchMobileRef.current as HTMLInputElement,
+      }}
     >
       <div
         className={classNames("font-lato custom-scrollbar min-h-screen pb-40")}
       >
-        <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-md z-20 flex flex-row items-center w-full">
-          <div className="flex flex-row items-center gap-2 px-3 sm:px-6 w-full">
-            <ImageWithFallback
-              className="rounded-md w-[50px] h-[50px]"
-              src={clientStore?.logo}
-              alt={`${clientStore?.name} logo`}
-              width={50}
-              height={50}
-            />
-            <div className="flex-1 overflow-hidden hidden sm:block">
-              <h1 className="hidden md:block font-bold text-xl">
-                {clientStore?.name || "Nome da sua loja"}
-              </h1>
-              <address className="hidden md:block text-sm text-hero-a11y-medium overflow-hidden w-full text-ellipsis whitespace-nowrap">
-                <span className="font-bold mr-2 text-hero-a11y-high">
-                  {clientLocation?.city || "[Cidade]"} -{" "}
-                  {clientLocation?.state || "[ES]"}
-                </span>
-                <span>
-                  {clientLocation?.address || "[Endereço]"}{" "}
-                  {clientLocation?.number || "[Número]"},{" "}
-                  {clientLocation?.neighborhood || "[Bairro]"},{" "}
-                  {clientLocation?.postalCode || "[CEP]"}
-                </span>
-              </address>
-            </div>
-            <div className="flex-1" />
-            <DebouncedInput
-              id="search"
-              className="!w-full !min-w-0 max-w-xs !bg-main-100 !text-main-a11y-high hidden sm:block"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              placeholder="Pesquisar..."
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  setSearch("");
-                }
-              }}
-            ></DebouncedInput>
-            <Button
-              className="sm:!hidden !px-0"
-              variant="text"
-              onClick={() => {
-                if (hasModalOpen) {
-                  setSearchMobileVisible(true);
-                  searchMobileRef.current?.focus();
-                  closeModals();
-                } else {
-                  if (searchMobileVisible) {
-                    if (!isSearchMobileInScreen) {
-                      searchMobileRef.current?.focus();
-                    } else {
-                      setSearchMobileVisible(false);
-                    }
-                  } else {
-                    setSearchMobileVisible(true);
-                  }
-                }
-              }}
-            >
-              <FaSearch size={22} />
-            </Button>
-            <Button
-              className="flex flex-row gap-2 items-center !px-0"
-              variant="text"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <HiMenu size={36} />
-            </Button>
-            <UserIcon store={clientStore} />
-          </div>
-        </header>
+        <StoreHeader />
         {searchMobileVisible && (
           <Input
             ref={searchMobileRef}
@@ -331,15 +273,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             />
           </Link>
         </footer>
-        <MainMenuDrawer
-          store={clientStore}
-          isOpen={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          onStoreDataClick={() => {
-            setAddStoreModalOpen(true);
-            setDrawerOpen(false);
-          }}
-        />
         {editMenuItemObject && (
           <EditMenuItemModal
             open={
@@ -348,16 +281,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation, ingredients }) => {
             }
             onOpenChange={comeBackToStoreRoot}
             store={clientStore}
-            ingredients={clientIngredients}
             menuItem={editMenuItemObject}
             onStoreChange={async (newStore, shouldSave) => {
               setClientStore(newStore);
               if (shouldSave) {
                 await putStore(newStore);
               }
-            }}
-            onIngredientsChange={(newIngredients) => {
-              setClientIngredients(newIngredients);
             }}
             onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
               if (cancelled) {

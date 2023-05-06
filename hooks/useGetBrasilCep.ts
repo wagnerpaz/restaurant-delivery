@@ -2,7 +2,7 @@ import axios from "axios";
 import debounce from "lodash.debounce";
 import { useCallback } from "react";
 
-import { ILocation } from "/models/Store";
+import { ILocation } from "/models/types/Store";
 
 const useGetBrasilCep = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps

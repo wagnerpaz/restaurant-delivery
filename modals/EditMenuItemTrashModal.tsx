@@ -10,8 +10,8 @@ import useDeleteMenuItemFromTrash from "/hooks/useDeleteMenuItemFromTrash";
 import useGetMenuItemsTrash from "/hooks/useGetMenuItemTrash";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { navigateBySectionIndex } from "/lib/menuSectionUtils";
-import { IMenuItem } from "/models/MenuItem";
-import { IStore } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IStore } from "/models/types/Store";
 
 interface EditMenuItemTrashModalProps extends ComponentProps<typeof Modal> {
   store: IStore;

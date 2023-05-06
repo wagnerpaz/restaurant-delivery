@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "analyze": "cross-env ANALYZE=true next build",
+    "analyze:server": "cross-env BUNDLE_ANALYZE=server next build",
+    "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
     "delete.orphan.images": "node --no-warnings --loader ts-node/esm/transpile-only scripts/deleteOrphanImages.ts",
     "fetch.ifood.store": "node --no-warnings --loader ts-node/esm/transpile-only scripts/fetchIFoodStore.ts"
   },
@@ -16,6 +19,7 @@
     "@emotion/styled": "^11.10.6",
     "@headlessui/react": "^1.7.13",
     "@next-auth/mongodb-adapter": "^1.1.1",
+    "@next/bundle-analyzer": "^13.4.1",
     "@types/node": "18.15.10",
     "@types/react": "18.0.30",
     "@types/react-dom": "18.0.11",
@@ -24,11 +28,11 @@
     "busboy": "^1.6.0",
     "chakra-react-select": "^4.6.0",
     "classnames": "^2.3.2",
+    "cross-env": "^7.0.3",
     "deep-populate": "^1.0.0",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "formidable": "^2.1.1",
-    "framer-motion": "^10.12.2",
     "fs": "^0.0.1-security",
     "gridfs-stream": "^1.1.1",
     "lodash.clonedeep": "^4.5.0",
@@ -60,6 +64,7 @@
     "typescript": "5.0.2"
   },
   "devDependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@types/blob-stream": "^0.1.30",
     "@types/busboy": "^1.5.0",
     "@types/formidable": "^2.0.5",

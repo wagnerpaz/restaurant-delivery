@@ -11,8 +11,8 @@ import {
   navigateBySectionIndex,
 } from "/lib/menuSectionUtils";
 import removeDiacritics from "/lib/removeDiacritics";
-import { IMenuItem } from "/models/MenuItem";
-import { IMenuSection, IStore } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IMenuSection, IStore } from "/models/types/Store";
 
 interface MenuItemBySectionSelectorProps extends ComponentProps<"div"> {
   store: IStore;

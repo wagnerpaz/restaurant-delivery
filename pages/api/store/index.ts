@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import connectToDatabase from "/lib/mongoose";
-import Store, { IStore } from "/models/Store";
+import Store from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 async function createStore(req: NextApiRequest, res: NextApiResponse) {
   try {

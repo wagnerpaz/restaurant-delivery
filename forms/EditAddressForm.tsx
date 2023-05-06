@@ -7,7 +7,7 @@ import useGetBrasilStates from "/hooks/useGetBrasilStates";
 
 import applyCepMask from "/lib/cepMask";
 import isValidBRPostalCode from "/lib/isValidBrPostalCode";
-import { ILocation } from "/models/Store";
+import { ILocation } from "/models/types/Store";
 
 interface EditAddressFormProps extends ComponentProps<"div"> {}
 
