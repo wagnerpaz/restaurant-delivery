@@ -15,6 +15,7 @@ const DebouncedInput = ({ value, onChange, ...props }) => {
         setLocalValue(e.target.value);
       }}
       value={localValue}
+      {...props}
     />
   );
 };

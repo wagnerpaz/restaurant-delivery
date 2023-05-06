@@ -1,6 +1,6 @@
 import mongoose, { Document, models, Schema } from "mongoose";
-import { IIngredient } from "./Ingredients";
-import Store, { IMenuSection } from "./Store";
+
+export type ItemTypeType = "product" | "ingredient" | "ingredient-group";
 
 export interface IMenuItem {
   store: mongoose.Types.ObjectId;
@@ -16,7 +16,7 @@ export interface IMenuItem {
   };
   price?: number;
   pricePromotional?: number;
-  itemType: "product" | "ingredient" | "ingredient-group";
+  itemType: ItemTypeType;
   composition?: IMenuItemCompositionItem[];
   customizeType: "template" | "individual";
   customizeTemplateSectionIndex: string;

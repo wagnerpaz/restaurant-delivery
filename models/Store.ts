@@ -12,7 +12,6 @@ export interface IStore extends Document {
   menu: {
     sections: IMenuSection[];
   };
-  ingredients: IStoreIngredient[];
   theme: { colors: { hero: string } };
 }
 
@@ -23,7 +22,9 @@ export interface IStoreIngredient {
 
 export interface IMenuSection {
   name: string;
+  index: number[];
   editMode: "realistic" | "fast";
+  retracted?: boolean;
   items: IMenuItem[];
   sections: IMenuSection[];
 }
@@ -59,16 +60,6 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       main: Boolean,
     },
   ],
-  ingredients: [
-    {
-      ingredient: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "Ingredient",
-      },
-      price: Number,
-    },
-  ],
   theme: {
     colors: {
       hero: String,
@@ -85,6 +76,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
           enum: ["realistic", "fast"],
           default: "realistic",
         },
+        retracted: Boolean,
         items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
         sections: [
           {
@@ -95,6 +87,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
               enum: ["realistic", "fast"],
               default: "realistic",
             },
+            retracted: Boolean,
             items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
             sections: [
               {
@@ -105,6 +98,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
                   enum: ["realistic", "fast"],
                   default: "realistic",
                 },
+                retracted: Boolean,
                 items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
                 sections: [
                   {
@@ -115,6 +109,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
                       enum: ["realistic", "fast"],
                       default: "realistic",
                     },
+                    retracted: Boolean,
                     items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
                     sections: [
                       {
@@ -125,6 +120,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
                           enum: ["realistic", "fast"],
                           default: "realistic",
                         },
+                        retracted: Boolean,
                         items: [
                           { type: mongoose.Types.ObjectId, ref: "MenuItem" },
                         ],
@@ -137,6 +133,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
                               enum: ["realistic", "fast"],
                               default: "realistic",
                             },
+                            retracted: Boolean,
                             items: [
                               {
                                 type: mongoose.Types.ObjectId,

@@ -19,7 +19,7 @@ import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/Store";
 import { IIngredient } from "/models/Ingredients";
-import MenuItem from "/components/Menu/MenuItem";
+import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 import ImageEditorModal from "/modals/ImageEditorModal";
 import AddIngredientModal, {
   IIngredientSelection,
@@ -154,17 +154,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="flex flex-col lg:flex-row gap-4">
-          <MenuItem
+          <MenuItemRealistic
             className="w-full sm:!w-80"
-            id={edit._id}
-            name={edit.name}
-            nameDetail={edit.nameDetail}
-            mainImageId={edit.images?.main?.toString()}
-            price={edit.price}
-            pricePromotional={edit.pricePromotional}
-            descriptionShort={edit.details?.short}
-            composition={edit.composition}
-            sides={edit.sides}
+            menuItem={edit}
             index={-1}
             editable
             onClick={() => {}}

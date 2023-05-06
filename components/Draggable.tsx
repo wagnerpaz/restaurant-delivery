@@ -3,7 +3,7 @@ import { CSSProperties, ReactNode } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { MdDragIndicator } from "react-icons/md";
 
-interface DraggableProps {
+export interface DraggableProps {
   id: string;
   originalIndex: number;
   dragIndicator?: boolean;

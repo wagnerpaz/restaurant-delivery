@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentProps, useContext } from "react";
 import classNames from "classnames";
 import { FaCodeBranch, FaThList } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
@@ -6,9 +6,17 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
-import { AccordionButton, AccordionIcon } from "@chakra-ui/react";
+import {
+  AccordionButton,
+  AccordionIcon,
+  useAccordionItemState,
+} from "@chakra-ui/react";
 
 import { IUser } from "/models/User";
+import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
+import usePutMenuItem from "/hooks/usePutMenuItem";
+import { StoreContext } from "../Store";
+import { MenuSectionContext } from "./MenuSection";
 
 interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
@@ -42,6 +50,13 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
+  const { store } = useContext(StoreContext);
+  const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+
+  const { isOpen } = useAccordionItemState();
+
+  const putMenuSection = usePutStoreMenuSection();
+
   const stopPropagation = (
     e: MouseEvent,
     callback: (e: MouseEvent) => void
@@ -57,6 +72,11 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
           "flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high  ",
           className
         )}
+        onClick={() => {
+          const newObj = { ...menuSection, retracted: isOpen };
+          putMenuSection(store, newObj, menuSection.index);
+          setMenuSection(newObj);
+        }}
         {...props}
       >
         <div className="flex flex-row container align-center justify-between m-auto font-bold text-md sm:text-xl">

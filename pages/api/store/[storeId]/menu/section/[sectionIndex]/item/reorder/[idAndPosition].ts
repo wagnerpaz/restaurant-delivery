@@ -1,9 +1,7 @@
-import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import { moveTo } from "/lib/immutable";
 
 import connectToDatabase from "/lib/mongoose";
-import serializeJson from "/lib/serializeJson";
 import Store from "/models/Store";
 
 async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {

@@ -34,9 +34,7 @@ const MenuSectionsTree: React.FC<MenuSectionsAccordionProps> = ({
               }
             )}
             onClick={() => {
-              router.push(
-                "#menu-section-" + [...indexPath, sectionIndex].join("-")
-              );
+              router.push("#menu-section-" + section._id);
               onCloseDrawer();
             }}
           >

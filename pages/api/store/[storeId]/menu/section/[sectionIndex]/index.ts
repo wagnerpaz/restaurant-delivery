@@ -23,6 +23,8 @@ async function section(req: NextApiRequest, res: NextApiResponse) {
               requestSection.name,
             [`menu.sections.${sectionIndexSplit.join(".sections.")}.editMode`]:
               requestSection.editMode,
+            [`menu.sections.${sectionIndexSplit.join(".sections.")}.retracted`]:
+              requestSection.retracted,
           },
         }
       );

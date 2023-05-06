@@ -5,7 +5,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { ACCEPT } from "./Draggable";
 
-interface DraggableGroupProps extends ComponentProps<"div"> {}
+export interface DraggableGroupProps extends ComponentProps<"div"> {}
 
 const DraggableGroup: React.FC<DraggableGroupProps> = (props) => {
   return (
