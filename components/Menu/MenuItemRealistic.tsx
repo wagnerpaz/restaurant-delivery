@@ -1,4 +1,4 @@
-import { ComponentProps, useContext, useMemo } from "react";
+import { ComponentProps, useContext, useMemo, memo } from "react";
 import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -19,14 +19,13 @@ import { GRID_CONFIG } from "./MenuSection";
 import remToPix from "/lib/remToPix";
 import { StoreContext } from "../Store";
 import ScreenSizeContext from "/contexts/BrowserScreenSizeContext";
+import isEqual from "lodash.isequal";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   idPrefix?: string;
-  index: number;
   menuItem: IMenuItem;
   price?: number;
   pricePromotional?: number;
-  hidden?: boolean;
   descriptionShort?: string;
   descriptionLong?: string;
   composition?: IMenuItemCompositionItem[];
@@ -44,11 +43,8 @@ interface MenuItemProps extends ComponentProps<"div"> {
 const MenuItemRealistic: React.FC<MenuItemProps> = ({
   style,
   className,
-  children,
   idPrefix = "",
-  index,
   menuItem,
-  hidden,
   useEffects = false,
   portalTargetEditModal,
   onEditClick,
@@ -98,7 +94,6 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
         "menu-item-realist-container group",
         {
           "sm:hover:scale-[105%] transition-all": useEffects,
-          "opacity-50": hidden,
           "sm:rounded-tr-none": price,
         },
         className
@@ -131,6 +126,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             loading={
               (menuItemsRenderCount?.current || 0) <= 8 ? "eager" : "lazy"
             }
+            cdn
           />
         </EditableSection>
       </div>
@@ -224,4 +220,6 @@ export function calculateComponentWidth(screenWidth: number) {
   return width;
 }
 
-export default MenuItemRealistic;
+export default memo(MenuItemRealistic, (prev, next) =>
+  isEqual(prev.menuItem, next.menuItem)
+);

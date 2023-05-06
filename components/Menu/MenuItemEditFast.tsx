@@ -63,6 +63,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           width={38}
           height={38}
           alt={`${menuItem.name} hero image`}
+          cdn
         />
       </EditableSection>
       <MemoSimpleSelect

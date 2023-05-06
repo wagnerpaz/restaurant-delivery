@@ -35,6 +35,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
           alt={`${store?.name} logo`}
           width={50}
           height={50}
+          cdn
         />
         <div className="flex-1 overflow-hidden hidden sm:block">
           <h1 className="hidden md:block font-bold text-xl">

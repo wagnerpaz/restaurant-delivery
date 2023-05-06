@@ -47,12 +47,13 @@ const upload = (
             compressedImage.resize({ method: "scale", width: 500 });
             const resultImage = await compressedImage.toBuffer();
 
+            const fileName = `${file.newFilename}-${file.originalFilename}`;
             // upload the file to S3
             promises.push(
               s3
                 .upload({
                   Bucket: bucketName,
-                  Key: `${file.newFilename}-${file.originalFilename}`,
+                  Key: fileName,
                   Body: resultImage,
                   ContentType: file.mimetype as string,
                 })
@@ -63,7 +64,7 @@ const upload = (
           const result = promisesResults.reduce(
             (res, cur, index) => ({
               ...res,
-              [Object.keys(files)[index]]: cur.Location,
+              [Object.keys(files)[index]]: cur.Key,
             }),
             {}
           );

@@ -14,7 +14,11 @@ const nextConfig = withBundleAnalyzer({
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["lh3.googleusercontent.com", "s3.sa-east-1.amazonaws.com"],
+    domains: [
+      "lh3.googleusercontent.com",
+      "s3.sa-east-1.amazonaws.com",
+      "d16a0xpwbzkgv8.cloudfront.net",
+    ],
   },
   Image: {
     minimumCacheTTL: 60 * 10,

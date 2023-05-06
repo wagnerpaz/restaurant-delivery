@@ -65,6 +65,7 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
                     width={200}
                     height={200}
                     alt={`${store.name} logo`}
+                    cdn
                   />
                 </Link>
               ))}

@@ -12,6 +12,9 @@ import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { Input, useToast } from "@chakra-ui/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 import Menu from "/components/Menu/Menu";
 import { emptyMenuSection } from "/components/Menu/MenuSection";
@@ -21,16 +24,12 @@ import { IMenuItem } from "/models/types/MenuItem";
 import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
-import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
-import Image from "next/image";
-import Link from "next/link";
 import defaultToastError from "/config/defaultToastError";
-import { useRouter } from "next/router";
 import {
   findMenuItemSectionIndex,
   replaceObjectById,
@@ -55,6 +54,7 @@ const OrderMenuItemDetailsModal = dynamic(
   () => import("/modals/OrderMenuItemDetails"),
   { ssr: false }
 );
+const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
 
 interface StoreProps {
   store: IStore;
@@ -279,9 +279,9 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
             <Image
               className="w-[200px]"
               src="/logo.png"
-              width={99999}
-              height={99999}
-              alt="Rappid logo"
+              width={500}
+              height={157}
+              alt="Comanda Vip logo"
             />
           </Link>
         </footer>
