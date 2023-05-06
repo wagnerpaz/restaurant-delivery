@@ -9,7 +9,14 @@ import Store from "/models/Store";
 import { IStore } from "/models/types/Store";
 
 const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
+  const databaseConnectBefore = performance.now();
   await connectToDatabase();
+  const databaseConnectBeforeAfter = performance.now();
+  console.log(
+    `database connect took ${
+      databaseConnectBeforeAfter - databaseConnectBefore
+    } ms`
+  );
 
   //ensure that dependent schemas are loaded
   MenuItem.name;
@@ -32,6 +39,9 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
 
   // Convert the store object to a plain JavaScript object
   const storeObject = store && serializeJson(store?.toObject());
+  const jsonString = JSON.stringify(storeObject);
+  const bytes = new TextEncoder().encode(jsonString).byteLength;
+  console.log(`Initial store size is ${bytes / 1024} kbs`);
 
   // merge props and pass down to the next function
   return {
