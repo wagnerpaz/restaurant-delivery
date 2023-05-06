@@ -158,6 +158,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         width={500}
         height={500}
         alt={`${menuItem.name} hero image`}
+        cdn
       />
       <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-col sm:flex-row sm:items-center">
         <div className="flex flex-row gap-2 items-center justify-between">
@@ -353,6 +354,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                             src={item.ingredient.images?.main}
                             width={50}
                             height={50}
+                            cdn
                           />
                           <div>
                             <span className="flex-1">
@@ -460,6 +462,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                                     src={sectionMenuItem.images?.main}
                                     width={50}
                                     height={50}
+                                    cdn
                                   />
                                   <div className="flex flex-col gap-0">
                                     {sectionMenuItem.name}
