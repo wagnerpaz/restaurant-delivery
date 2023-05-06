@@ -1,6 +1,5 @@
 import { useState, useContext, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useInViewport } from "react-in-viewport";
 
 import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
 import MenuItemRealistic from "/components/Menu/MenuItemRealistic";
