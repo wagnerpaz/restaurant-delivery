@@ -15,6 +15,7 @@ const nextConfig = withBundleAnalyzer({
   },
   images: {
     domains: ["lh3.googleusercontent.com", "s3.sa-east-1.amazonaws.com"],
+    minimumCacheTTL: 60 * 10,
   },
 });
 
