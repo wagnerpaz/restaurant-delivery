@@ -33,6 +33,7 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
           : src
       }
       {...props}
+      unoptimized
     />
   );
 };

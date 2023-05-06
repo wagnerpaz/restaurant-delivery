@@ -56,6 +56,7 @@ const upload = (
                   Key: fileName,
                   Body: resultImage,
                   ContentType: file.mimetype as string,
+                  CacheControl: "max-age=31536000",
                 })
                 .promise()
             );

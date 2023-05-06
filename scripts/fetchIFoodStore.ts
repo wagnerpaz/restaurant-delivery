@@ -14,8 +14,8 @@ import { IMenuSection } from "/models/types/Store";
 // const CV_STORE_SLUG = "reizinho-do-acai";
 // const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
 
-// const CV_STORE_SLUG = "black-cave";
-// const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
+const CV_STORE_SLUG = "black-cave";
+const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
 
 // const CV_STORE_SLUG = "setor-1";
 // const MERCHANT_ID = "243ef5ae-7f07-4539-bd3c-fa291d744ddb";
@@ -26,8 +26,8 @@ import { IMenuSection } from "/models/types/Store";
 // const CV_STORE_SLUG = "forno-a-lenha-ristorante-e-pizzaria";
 // const MERCHANT_ID = "2a8fc2e2-e8f4-4fa1-86e9-8c1f117a559b";
 
-const CV_STORE_SLUG = "slow-jow-bbq";
-const MERCHANT_ID = "4c1d3587-45a1-4d2e-8ad1-45727fbbd0d6";
+// const CV_STORE_SLUG = "slow-jow-bbq";
+// const MERCHANT_ID = "4c1d3587-45a1-4d2e-8ad1-45727fbbd0d6";
 
 const IFOOD_API_ACCESS_KEY = "69f181d5-0046-4221-b7b2-deef62bd60d5";
 const IFOOD_API_SECRET_KEY = "9ef4fb4f-7a1d-4e0d-a9b1-9b82873297d8";
