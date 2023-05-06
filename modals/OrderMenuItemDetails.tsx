@@ -9,16 +9,21 @@ import {
   RadioGroup,
 } from "@chakra-ui/react";
 import classNames from "classnames";
-import { ComponentProps, useCallback, useMemo, useState } from "react";
+import {
+  ComponentProps,
+  useEffect,
+  useMemo,
+  useState,
+  useContext,
+} from "react";
 import { FaShoppingCart } from "react-icons/fa";
 
 import Modal from "/components/Modal";
 import MoneyDisplay from "/components/MoneyDisplay";
 import NumberInput from "/components/NumberInput";
 import { IMenuItem, ISidesItem } from "/models/types/MenuItem";
-import { IMenuSection, IStore } from "/models/types/Store";
 import { RiExchangeFill } from "react-icons/ri";
-import { IoAddCircleSharp, IoRemoveCircleSharp } from "react-icons/io5";
+import { IoRemoveCircleSharp } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import { MdPlaylistAddCircle } from "react-icons/md";
 import {
@@ -27,23 +32,34 @@ import {
 } from "/lib/menuSectionUtils";
 
 import ImageWithFallback from "/components/ImageWithFallback";
+import useGetMenuItemsAdditionals from "/hooks/useGetMenuItemAdditionals";
+import { StoreContext } from "/components/Store";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
-  store: IStore;
   menuItem: IMenuItem;
 }
 
 const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
-  store,
   contentClassName,
   menuItem,
   onOpenChange,
   ...props
 }) => {
+  const { store } = useContext(StoreContext);
+
   const priceNew = menuItem.pricePromotional
     ? menuItem.pricePromotional
     : menuItem.price;
   const priceOld = menuItem.pricePromotional ? menuItem.price : undefined;
+
+  const getMenuItemAdditionals = useGetMenuItemsAdditionals();
+  const [additionals, setAdditionals] = useState([]);
+  useEffect(() => {
+    async function exec() {
+      setAdditionals(await getMenuItemAdditionals(store, menuItem));
+    }
+    exec();
+  }, [getMenuItemAdditionals, menuItem, store]);
 
   const [order, setOrder] = useState<any>({
     removals: menuItem.composition?.map((i) => ({
@@ -124,16 +140,6 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
   const storeIngredients = useMemo(
     () => retriveAllMenuItems(store.menu.sections),
     [store.menu.sections]
-  );
-
-  const findCustomization = useCallback(
-    (toFoundBy: IMenuItem) =>
-      toFoundBy.customizeType === "template"
-        ? storeIngredients.find(
-            (f) => f._id === toFoundBy.customizeTemplateMenuItem?._id
-          )?.additionals
-        : toFoundBy.additionals,
-    [storeIngredients]
   );
 
   return (
@@ -322,7 +328,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 </AccordionPanel>
               </AccordionItem>
             ) : null}
-            {findCustomization(menuItem)?.map((additionalsCategory) => (
+            {additionals?.map((additionalsCategory) => (
               <AccordionItem key={additionalsCategory.categoryName}>
                 <AccordionButton>
                   <h3 className="text-lg mb-2 w-full text-start flex flex-row items-center gap-2">
