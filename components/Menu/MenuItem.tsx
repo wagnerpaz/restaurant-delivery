@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback, useRef } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
@@ -34,8 +34,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
   menuItem,
   useEffects,
 }) => {
-  const container = useRef<HTMLDivElement>(null);
-
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
