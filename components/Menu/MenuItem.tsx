@@ -40,8 +40,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const { store } = useContext(StoreContext);
+  const { store, menuItemsRenderCount } = useContext(StoreContext);
   const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+
+  if (menuItemsRenderCount) menuItemsRenderCount.current++;
 
   const toast = useToast();
   const router = useRouter();

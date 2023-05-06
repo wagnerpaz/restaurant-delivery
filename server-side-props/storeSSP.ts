@@ -9,6 +9,9 @@ import Store from "/models/Store";
 import { IStore } from "/models/types/Store";
 
 const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
+  console.log("-------------");
+  const allProcessBefore = performance.now();
+
   const databaseConnectBefore = performance.now();
   await connectToDatabase();
   const databaseConnectBeforeAfter = performance.now();
@@ -42,6 +45,9 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   const jsonString = JSON.stringify(storeObject);
   const bytes = new TextEncoder().encode(jsonString).byteLength;
   console.log(`Initial store size is ${bytes / 1024} kbs`);
+
+  const allProcessAfter = performance.now();
+  console.log(`all process took ${allProcessAfter - allProcessBefore} ms`);
 
   // merge props and pass down to the next function
   return {

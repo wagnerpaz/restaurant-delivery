@@ -1,32 +1,28 @@
 import {
   FC,
-  useCallback,
+  MutableRefObject,
   useEffect,
   useMemo,
   useRef,
   useState,
   createContext,
 } from "react";
-import { HiMenu } from "react-icons/hi";
 import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
-import { FaSearch } from "react-icons/fa";
+import dynamic from "next/dynamic";
+import { Input, useToast } from "@chakra-ui/react";
 
 import Menu from "/components/Menu/Menu";
-import MenuSection, { emptyMenuSection } from "/components/Menu/MenuSection";
+import { emptyMenuSection } from "/components/Menu/MenuSection";
 import { ILocation, IMenuSection, IStore } from "/models/types/Store";
-import EditMenuItemModal from "/forms/EditMenuItemForm";
+
 import { IMenuItem } from "/models/types/MenuItem";
-import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
-import UserIcon from "/components/UserIcon";
 import { IUser } from "/models/types/User";
-import useReorderMenuItems from "../hooks/useReorderMenuItems";
 import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
-import { Button, Input, useToast } from "@chakra-ui/react";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
@@ -34,7 +30,6 @@ import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import Image from "next/image";
 import Link from "next/link";
 import defaultToastError from "/config/defaultToastError";
-import OrderMenuItemDetailsModal from "/modals/OrderMenuItemDetails";
 import { useRouter } from "next/router";
 import {
   findMenuItemSectionIndex,
@@ -42,13 +37,24 @@ import {
   retriveAllMenuItems as retrieveAllMenuItems,
 } from "/lib/menuSectionUtils";
 import useGetStore from "/hooks/useGetStore";
-import EditAddressModal from "/modals/EditAddressModal";
 import usePutUser from "/hooks/usePutUser";
-import EditMenuItemTrashModal from "/modals/EditMenuItemTrashModal";
-import ImageWithFallback from "./ImageWithFallback";
 import { emptyMenuItem } from "./Menu/MenuItem";
-import DebouncedInput from "./DebouncedInput";
 import StoreHeader from "./StoreHeader";
+
+const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
+  ssr: false,
+});
+const EditMenuItemTrashModal = dynamic(
+  () => import("/modals/EditMenuItemTrashModal"),
+  { ssr: false }
+);
+const EditMenuItemModal = dynamic(() => import("/forms/EditMenuItemForm"), {
+  ssr: false,
+});
+const OrderMenuItemDetailsModal = dynamic(
+  () => import("/modals/OrderMenuItemDetails"),
+  { ssr: false }
+);
 
 interface StoreProps {
   store: IStore;
@@ -65,6 +71,7 @@ export const StoreContext = createContext<{
   setSearchMobileVisible: (visible: boolean) => void;
   isSearchMobileInScreen: boolean;
   searchMobileElement: HTMLInputElement | null;
+  menuItemsRenderCount: MutableRefObject<number> | null;
 }>({
   store: {} as IStore,
   setStore: () => {},
@@ -74,9 +81,13 @@ export const StoreContext = createContext<{
   setSearchMobileVisible: () => {},
   isSearchMobileInScreen: false,
   searchMobileElement: null,
+  menuItemsRenderCount: null,
 });
 
 const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
+  const menuItemsRenderCount = useRef(0);
+  menuItemsRenderCount.current = 0;
+
   const toast = useToast();
   const router = useRouter();
 
@@ -211,6 +222,7 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
         setSearchMobileVisible,
         isSearchMobileInScreen,
         searchMobileElement: searchMobileRef.current as HTMLInputElement,
+        menuItemsRenderCount,
       }}
     >
       <div
