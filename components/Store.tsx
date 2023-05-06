@@ -25,7 +25,6 @@ import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
 import usePutStore from "/hooks/usePutStore";
-import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
@@ -39,6 +38,7 @@ import useGetStore from "/hooks/useGetStore";
 import usePutUser from "/hooks/usePutUser";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import StoreHeader from "./StoreHeader";
+import { MdNoFood } from "react-icons/md";
 
 const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
   ssr: false,
@@ -55,6 +55,10 @@ const OrderMenuItemDetailsModal = dynamic(
   { ssr: false }
 );
 const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
+const AddMenuSectionModal = dynamic(
+  () => import("/modals/AddMenuSectionModal"),
+  { ssr: false }
+);
 
 interface StoreProps {
   store: IStore;
@@ -84,7 +88,7 @@ export const StoreContext = createContext<{
   menuItemsRenderCount: null,
 });
 
-const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
+const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
@@ -101,7 +105,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
 
   const [clientUser, setClientUser] = useState<IUser>();
   const [clientStore, setClientStore] = useState(store);
-  const clientLocation = selectedLocation || clientStore?.locations?.[0];
 
   const [search, setSearch] = useState("");
   const [searchMobileVisible, setSearchMobileVisible] = useState(false);
@@ -151,12 +154,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
   const restoreTrashForSectionIndexOpen =
     !!router.query.restoreTrashForSectionIndex;
 
-  const hasModalOpen =
-    addStoreModalOpen ||
-    editMenuItemModalOpen ||
-    editNewSectionModalOpen ||
-    orderMenuItemDetailsOpen;
-
   const getStore = useGetStore();
   const putStore = usePutStore();
   const putMenuItem = usePutMenuItem();
@@ -191,11 +188,6 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
       };
     }
   }, [searchMobileVisible]);
-
-  const closeModals = () => {
-    setAddStoreModalOpen(false);
-    setEditNewSectionModalOpen(false);
-  };
 
   const foundItemsCount = useRef(0);
 
@@ -253,26 +245,12 @@ const Store: FC<StoreProps> = ({ store, selectedLocation }) => {
               setClientStore(cloneStore);
             }}
           />
-          {/* {foundItemsCount.current === 0 && !admin && (
+          {menuItemsRenderCount.current === 0 && !admin && (
             <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
               <MdNoFood size={42} />
               Ops... nenhum produto encontrado!
             </span>
-          )} */}
-          {/* {admin && (
-            <Menu>
-              <MenuSection
-                isNew
-                onAddSectionClick={() => {
-                  setEditNewSectionObject({ ...emptyMenuSection });
-                  setEditNewSectionModalOpen(true);
-                  setEditNewSectionIndex([-1]);
-                  setEditNewSectionParentName("");
-                  setEditNewSectionMode("ADD");
-                }}
-              />
-            </Menu>
-          )} */}
+          )}
         </main>
         <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
           <Link href="/">
