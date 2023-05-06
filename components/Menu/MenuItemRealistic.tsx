@@ -86,6 +86,11 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
     [screenSizeWidth]
   );
 
+  const imageSize = useMemo(
+    () => (screenSizeType === "xs" ? remToPix(32) : width) - 4 * 2,
+    [screenSizeType, width]
+  );
+
   return (
     <div
       id={idPrefix + id}
@@ -120,8 +125,8 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
           <ImageWithFallback
             className="w-32 h-32 sm:w-full sm:h-full aspect-square bg-main-200 object-cover"
             src={mainImageId}
-            width={(screenSizeType === "xs" ? remToPix(32) : width) - 4 * 2}
-            height={remToPix(width)}
+            width={imageSize}
+            height={imageSize}
             alt={`${name} hero image`}
             priority
           />
