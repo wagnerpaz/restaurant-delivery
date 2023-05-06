@@ -35,9 +35,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
   useEffects,
 }) => {
   const container = useRef<HTMLDivElement>(null);
-  const { inViewport, enterCount, leaveCount } = useInViewport(container, {
-    threshold: 0.01,
-  });
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
