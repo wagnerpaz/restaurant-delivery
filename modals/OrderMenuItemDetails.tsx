@@ -19,19 +19,21 @@ import { FaShoppingCart } from "react-icons/fa";
 import Modal from "/components/Modal";
 import MoneyDisplay from "/components/MoneyDisplay";
 import NumberInput from "/components/NumberInput";
-import { IMenuItem, ISidesItem } from "/models/types/MenuItem";
+import {
+  IMenuItem,
+  IMenuItemAdditionalsCategory,
+  ISidesItem,
+} from "/models/types/MenuItem";
 import { RiExchangeFill } from "react-icons/ri";
 import { IoRemoveCircleSharp } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 import { MdPlaylistAddCircle } from "react-icons/md";
-import {
-  navigateBySectionIndex,
-  retriveAllMenuItems,
-} from "/lib/menuSectionUtils";
+import { navigateBySectionIndex } from "/lib/menuSectionUtils";
 
 import ImageWithFallback from "/components/ImageWithFallback";
 import useGetMenuItemsAdditionals from "/hooks/useGetMenuItemAdditionals";
 import { StoreContext } from "/components/Store";
+import { IOrder, IOrderExchange, IOrderItem } from "/models/types/Order";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   menuItem: IMenuItem;
@@ -45,11 +47,6 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
 }) => {
   const { store } = useContext(StoreContext);
 
-  const priceNew = menuItem.pricePromotional
-    ? menuItem.pricePromotional
-    : menuItem.price;
-  const priceOld = menuItem.pricePromotional ? menuItem.price : undefined;
-
   const getMenuItemAdditionals = useGetMenuItemsAdditionals();
   const [additionals, setAdditionals] = useState([]);
   useEffect(() => {
@@ -59,14 +56,14 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     exec();
   }, [getMenuItemAdditionals, menuItem, store]);
 
-  const [order, setOrder] = useState<any>({
+  const [order, setOrder] = useState<IOrder>({
     removals: menuItem.composition?.map((i) => ({
-      ingredient: i.ingredient,
-      quantity: i.quantity,
+      menuItem: i.ingredient as IMenuItem,
+      quantity: i.quantity as number,
     })),
     combo: menuItem.sides?.map((s) => ({
-      menuItem: s.menuItem,
-      replacement: s.menuItem,
+      menuItem: s.menuItem as IMenuItem,
+      replacement: s.menuItem as IMenuItem,
     })),
     additionals: [],
   });
@@ -77,9 +74,9 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         (orderIngredient: any) =>
           orderIngredient.quantity !==
           menuItem.composition?.find(
-            (f2) => f2.ingredient.name === orderIngredient.ingredient.name
+            (f2) => f2.ingredient?.name === orderIngredient.ingredient.name
           )?.quantity
-      ),
+      ) || [],
     [order, menuItem.composition]
   );
 
@@ -87,7 +84,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     () =>
       order.additionals?.filter(
         (orderIngredient: any) => orderIngredient.quantity > 0
-      ),
+      ) || [],
     [order]
   );
 
@@ -95,21 +92,21 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
     () =>
       order.combo?.filter(
         (comboItem: any) => comboItem.replacement._id !== comboItem.menuItem._id
-      ),
+      ) || [],
     [order]
   );
 
   const exchangesItemsBySide = (side: ISidesItem, menuItem: IMenuItem) => {
-    const result = side.exchanges
+    const result = side?.exchanges
       ?.map((ex) =>
-        ex.scope === "menu-section"
+        ex?.scope === "menu-section"
           ? navigateBySectionIndex(
               store.menu.sections,
-              ex.menuSectionIndex?.split(",").map((m) => +m) || []
+              ex?.menuSectionIndex?.split(",")?.map((m) => +m) || []
             ).items
           : null
       )[0]
-      .filter(
+      ?.filter(
         (f) => !menuItem.sides?.map((s) => s.menuItem._id).includes(f._id)
       );
     return result;
@@ -117,7 +114,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
 
   const calculatedPrice = useMemo(() => {
     return (
-      priceNew +
+      (menuItem.pricePromotional || menuItem.price || 0) +
       additionalsChange.reduce(
         (acc, curr) => acc + curr.quantity * curr.price * curr.charge,
         0
@@ -126,19 +123,19 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
         (acc, curr) =>
           acc +
           Math.max(
-            curr.replacement.price * curr.quantity -
-              curr.menuItem.price * curr.quantity,
+            (curr.replacement.price || 0) * (curr.quantity || 0) -
+              (curr.menuItem.price || 0) * curr.quantity,
             0
           ),
         0
       )
     );
-  }, [priceNew, additionalsChange, comboChange]);
-
-  const storeIngredients = useMemo(
-    () => retriveAllMenuItems(store.menu.sections),
-    [store.menu.sections]
-  );
+  }, [
+    menuItem.price,
+    menuItem.pricePromotional,
+    additionalsChange,
+    comboChange,
+  ]);
 
   return (
     <Modal
@@ -170,8 +167,8 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
             <MoneyDisplay
               className="text-2xl"
               oldValueClassName="text-lg"
-              value={calculatedPrice}
-              oldValue={priceOld}
+              value={menuItem.price}
+              promotional={menuItem.pricePromotional}
             />
           </div>
           <div
@@ -188,11 +185,11 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 <span className="font-bold">Remover: </span>
                 {removalsChange
                   .sort((ig1, ig2) =>
-                    ig1.ingredient.name > ig2.ingredient.name ? 1 : -1
+                    ig1.menuItem.name > ig2.menuItem.name ? 1 : -1
                   )
                   .map((ingRemove) => (
-                    <li className="inline" key={ingRemove.ingredient.name}>
-                      {ingRemove.ingredient.name}
+                    <li className="inline" key={ingRemove.menuItem.name}>
+                      {ingRemove.menuItem.name}
                     </li>
                   ))
                   .flatMap((item) => [item, ", "])
@@ -206,11 +203,11 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 <span className="font-bold">Adicionar: </span>
                 {additionalsChange
                   .sort((ig1, ig2) =>
-                    ig1.ingredient.name > ig2.ingredient.name ? 1 : -1
+                    ig1.menuItem.name > ig2.menuItem.name ? 1 : -1
                   )
                   .map((ingAdd) => (
-                    <li className="inline" key={ingAdd.ingredient.name}>
-                      {ingAdd.ingredient.name}
+                    <li className="inline" key={ingAdd.menuItem.name}>
+                      {ingAdd.menuItem.name}
                     </li>
                   ))
                   .flatMap((item) => [item, ", "])
@@ -275,6 +272,19 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
           ) : null}
         </div>
         <div className="sm:flex-1 sm:border-l-[1px] sm:border-main-a11y-low sm:pl-4">
+          {!additionals && (
+            <div className="ph-item bg-[transparent] border-none py-2 px-0">
+              <div className="ph-col-12">
+                <div className="ph-row">
+                  <div className="ph-col-12 big"></div>
+                  <div className="ph-col-12 big"></div>
+                  <div className="ph-col-12 big"></div>
+                  <div className="ph-col-12 big"></div>
+                  <div className="ph-col-12 big"></div>
+                </div>
+              </div>
+            </div>
+          )}
           <Accordion
             className="p-0 -mx-4"
             allowMultipleExpanded
@@ -295,28 +305,29 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                       .map((compositionItem) => (
                         <li
                           className="grid grid-cols-[1fr_max-content] items-center gap-4 border-b-[1px] py-2"
-                          key={compositionItem.ingredient._id}
+                          key={compositionItem.ingredient?._id}
                         >
-                          <span>{compositionItem.ingredient.name}</span>
+                          <span>{compositionItem.ingredient?.name}</span>
                           <NumberInput
                             value={
                               order.removals?.find(
-                                (f) =>
-                                  f.ingredient._id ===
-                                  compositionItem.ingredient._id
+                                (orderItem) =>
+                                  orderItem.menuItem._id ===
+                                  compositionItem.ingredient?._id
                               )?.quantity
                             }
                             onChange={(newValue) => {
                               setOrder({
                                 ...order,
                                 removals: [
-                                  ...(order.removals?.filter(
-                                    (f) =>
-                                      f.ingredient._id !==
-                                      compositionItem.ingredient._id
-                                  ) || []),
+                                  ...(order.removals || []).filter(
+                                    (orderItem: IOrderItem) =>
+                                      orderItem.menuItem._id !==
+                                      compositionItem.ingredient?._id
+                                  ),
                                   {
-                                    ingredient: compositionItem.ingredient,
+                                    menuItem:
+                                      compositionItem.ingredient as IMenuItem,
                                     quantity: newValue,
                                   },
                                 ],
@@ -331,83 +342,87 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 </AccordionItemPanel>
               </AccordionItem>
             ) : null}
-            {additionals?.map((additionalsCategory) => (
-              <AccordionItem
-                uuid={`additionals-${additionalsCategory._id}`}
-                key={additionalsCategory.categoryName}
-              >
-                <AccordionItemHeading>
-                  <AccordionItemButton className="flex flex-row items-center gap-2 px-4 py-2 min-h-12 text-main-a11y-high">
-                    <MdPlaylistAddCircle size={24} />
-                    <h3 className="text-lg w-full text-start ">
-                      {additionalsCategory.categoryName}{" "}
-                      <span className="text-main-a11y-medium font-normal">
-                        (0 de {additionalsCategory.max})
-                      </span>
-                    </h3>
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel className="px-4">
-                  <ul className="flex-1 text-sm">
-                    {additionalsCategory.items?.map((item) => (
-                      <li
-                        className="flex flex-row items-center justify-between [&:not(:last-child)]:border-b border-main-a11y-low gap-2 py-2"
-                        key={item.ingredient.name}
-                      >
-                        <div className="flex flex-row items-center gap-2">
-                          <ImageWithFallback
-                            className="rounded-md border border-solid border-main-a11y-low bg-main-100 object-cover w-[50px] h-[50px]"
-                            src={item.ingredient.images?.main}
-                            width={50}
-                            height={50}
-                            cdn
-                          />
-                          <div>
-                            <span className="flex-1">
-                              {item.ingredient.name}
-                            </span>
-                            {item.charge && (
-                              <MoneyDisplay
-                                className="mr-2"
-                                plus
-                                zeroInvisible
-                                value={item.ingredient.price}
-                                promotional={item.ingredient.pricePromotional}
-                              />
-                            )}
+            {additionals?.map(
+              (additionalsCategory: IMenuItemAdditionalsCategory) => (
+                <AccordionItem
+                  uuid={`additionals-${additionalsCategory._id}`}
+                  key={additionalsCategory.categoryName}
+                >
+                  <AccordionItemHeading>
+                    <AccordionItemButton className="flex flex-row items-center gap-2 px-4 py-2 min-h-12 text-main-a11y-high">
+                      <MdPlaylistAddCircle size={24} />
+                      <h3 className="text-lg w-full text-start ">
+                        {additionalsCategory.categoryName}{" "}
+                        <span className="text-main-a11y-medium font-normal">
+                          (0 de {additionalsCategory.max})
+                        </span>
+                      </h3>
+                    </AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel className="px-4">
+                    <ul className="flex-1 text-sm">
+                      {additionalsCategory.items?.map((item) => (
+                        <li
+                          className="flex flex-row items-center justify-between [&:not(:last-child)]:border-b border-main-a11y-low gap-2 py-2"
+                          key={item.ingredient.name}
+                        >
+                          <div className="flex flex-row items-center gap-2">
+                            <ImageWithFallback
+                              className="rounded-md border border-solid border-main-a11y-low bg-main-100 object-cover w-[50px] h-[50px]"
+                              src={item.ingredient.images?.main}
+                              width={50}
+                              height={50}
+                              cdn
+                              alt={`${item.ingredient.name} (adicional imagem)`}
+                            />
+                            <div>
+                              <span className="flex-1">
+                                {item.ingredient.name}
+                              </span>
+                              {item.charge && (
+                                <MoneyDisplay
+                                  className="mr-2"
+                                  plus
+                                  zeroInvisible
+                                  value={item.ingredient.price}
+                                  promotional={item.ingredient.pricePromotional}
+                                />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <NumberInput
-                          value={
-                            order.additionals.find(
-                              (f) => f.ingredient.name === item.ingredient.name
-                            )?.quantity
-                          }
-                          min={item.min}
-                          max={item.max}
-                          onChange={(e) =>
-                            setOrder({
-                              ...order,
-                              additionals: [
-                                ...order?.additionals?.filter(
-                                  (f) =>
-                                    f.ingredient.name !== item.ingredient.name
-                                ),
-                                {
-                                  ...item,
-                                  quantity: e,
-                                  price: item.ingredient.price,
-                                },
-                              ],
-                            })
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </AccordionItemPanel>
-              </AccordionItem>
-            ))}
+                          <NumberInput
+                            value={
+                              order.additionals?.find(
+                                (f) => f.menuItem.name === item.ingredient.name
+                              )?.quantity
+                            }
+                            min={item.min}
+                            max={item.max}
+                            onChange={(e) =>
+                              setOrder({
+                                ...order,
+                                additionals: [
+                                  ...(order?.additionals?.filter(
+                                    (orderItem: IOrderItem) =>
+                                      orderItem.menuItem.name !==
+                                      item.ingredient.name
+                                  ) || []),
+                                  {
+                                    menuItem: item.ingredient,
+                                    quantity: e,
+                                    // price: item.ingredient?.price || 0,
+                                  },
+                                ],
+                              })
+                            }
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionItemPanel>
+                </AccordionItem>
+              )
+            )}
             {menuItem.sides
               ?.filter((s) => (s.exchanges?.length || 0) > 0)
               .map(
@@ -431,23 +446,25 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                         <RadioGroup
                           value={
                             order.combo?.find(
-                              (f) => side.menuItem._id === f.menuItem._id
-                            ).replacement._id
+                              (orderExchange: IOrderExchange) =>
+                                side.menuItem._id === orderExchange.menuItem._id
+                            )?.replacement._id
                           }
                           onChange={(e) =>
                             setOrder({
                               ...order,
                               combo: [
-                                ...order.combo.filter(
-                                  (ci) => ci.menuItem?._id !== side.menuItem._id
-                                ),
+                                ...(order.combo?.filter(
+                                  (ci) =>
+                                    ci.menuItem?._id !== side.menuItem?._id
+                                ) || []),
                                 {
                                   menuItem: side.menuItem,
-                                  quantity: side.quantity,
+                                  quantity: side.quantity || 0,
                                   replacement: exchangesItemsBySide(
                                     side,
                                     menuItem
-                                  ).find((f) => f._id === e),
+                                  )?.find((f) => f._id === e) as IMenuItem,
                                 },
                               ],
                             })
@@ -460,7 +477,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                               value={side.menuItem._id}
                             />
                           </div>
-                          {exchangesItemsBySide(side, menuItem).map(
+                          {exchangesItemsBySide(side, menuItem)?.map(
                             (sectionMenuItem) => (
                               <div
                                 className="flex flex-row gap-2 items-center justify-between [&:not(:last-child)]:border-b-[1px] border-main-a11y-low py-2"
@@ -473,15 +490,16 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                                     width={50}
                                     height={50}
                                     cdn
+                                    alt={`Trocar por ${sectionMenuItem.name} imagem`}
                                   />
                                   <div className="flex flex-col gap-0">
                                     {sectionMenuItem.name}
                                     <MoneyDisplay
                                       plus
                                       value={Math.max(
-                                        (sectionMenuItem.price -
-                                          side.menuItem.price) *
-                                          side.quantity,
+                                        ((sectionMenuItem.price || 0) -
+                                          (side.menuItem.price || 0)) *
+                                          (side.quantity || 0),
                                         0
                                       )}
                                     />

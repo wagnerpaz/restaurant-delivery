@@ -44,6 +44,7 @@ export const emptyMenuSection: IMenuSection = {
 
 interface MenuSectionProps extends AccordionPanelProps {
   menuSection: IMenuSection;
+  type: "product" | "ingredient";
   isNew?: boolean;
   onChangeItems: (items: IMenuItem[]) => void;
   onAddMenuItemClick?: () => void;
@@ -69,6 +70,7 @@ export const MenuSectionContext = createContext<{
 
 const MenuSection: React.FC<MenuSectionProps> = ({
   className,
+  type,
   menuSection,
   isNew,
   onChangeItems = () => {},
@@ -161,7 +163,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   }, [localMenuSection, setLocalMenuSection, toast]);
 
   const foundItems = localMenuSection.items
-    .filter((f) => f.itemType === "product" || admin)
+    .filter((f) => f.itemType === type)
     .filter(
       (f) =>
         looseSearch(f.name, search) ||

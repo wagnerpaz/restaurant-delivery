@@ -11,7 +11,15 @@ import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { Input, useToast } from "@chakra-ui/react";
+import {
+  Input,
+  useToast,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+} from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -189,8 +197,6 @@ const Store: FC<StoreProps> = ({ store }) => {
     }
   }, [searchMobileVisible]);
 
-  const foundItemsCount = useRef(0);
-
   const comeBackToStoreRoot = (newValue: boolean) => {
     if (!newValue) {
       router.push(`/store/${clientStore.slug}`, undefined, {
@@ -231,27 +237,50 @@ const Store: FC<StoreProps> = ({ store }) => {
             placeholder="Pesquisar..."
           ></Input>
         )}
-        <main>
-          {(foundItemsCount.current = 0) || ""}
-          <Menu
-            sections={clientStore.menu.sections}
-            onChangeSection={(section) => {
-              const cloneStore = cloneDeep(clientStore);
-              cloneStore.menu.sections = replaceObjectById(
-                cloneStore.menu.sections,
-                section._id,
-                section
-              );
-              setClientStore(cloneStore);
-            }}
-          />
-          {menuItemsRenderCount.current === 0 && !admin && (
-            <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
-              <MdNoFood size={42} />
-              Ops... nenhum produto encontrado!
-            </span>
-          )}
-        </main>
+        <Tabs>
+          <TabPanels>
+            <TabPanel className="!p-0 -mt-3 min-h-[calc(100vh-var(--header-height))]">
+              <main>
+                <Menu
+                  type="product"
+                  sections={clientStore.menu.sections}
+                  onChangeSection={(section) => {
+                    const cloneStore = cloneDeep(clientStore);
+                    cloneStore.menu.sections = replaceObjectById(
+                      cloneStore.menu.sections,
+                      section._id,
+                      section
+                    );
+                    setClientStore(cloneStore);
+                  }}
+                />
+              </main>
+            </TabPanel>
+            <TabPanel className="!p-0 -mt-3 min-h-[calc(100vh-var(--header-height))]">
+              <main>
+                <Menu
+                  type="ingredient"
+                  sections={clientStore.menu.sections}
+                  onChangeSection={(section) => {
+                    const cloneStore = cloneDeep(clientStore);
+                    cloneStore.menu.sections = replaceObjectById(
+                      cloneStore.menu.sections,
+                      section._id,
+                      section
+                    );
+                    setClientStore(cloneStore);
+                  }}
+                />
+              </main>
+            </TabPanel>
+            {admin && (
+              <TabList className="sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10">
+                <Tab>Produtos</Tab>
+                <Tab>Ingredientes</Tab>
+              </TabList>
+            )}
+          </TabPanels>
+        </Tabs>
         <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
           <Link href="/">
             <Image

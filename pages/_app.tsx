@@ -153,6 +153,10 @@ function App({
   return (
     <>
       <Head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
+        />
         <style>
           {`:root{${heroColorVar}
              ${heroA11yHighColorVar}
