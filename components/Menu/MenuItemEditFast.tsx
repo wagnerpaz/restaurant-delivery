@@ -1,34 +1,45 @@
-import { Button, Select } from "@chakra-ui/react";
-import cloneDeep from "lodash.clonedeep";
-import isEqual from "lodash.isequal";
+import { ComponentProps, memo, useMemo, useContext, useCallback } from "react";
+import { Button } from "@chakra-ui/react";
 import ImageWithFallback from "/components/ImageWithFallback";
-import { ComponentProps, memo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
+import isEqual from "lodash.isequal";
 
-import DebouncedInput from "/components/DebouncedInput";
+import LocalInput from "../MemoInput";
 import EditableSection from "/components/EditableSection";
 
-import FormControl from "/components/FormControl";
-import { IMenuItem } from "/models/MenuItem";
+import { IMenuItem, ItemTypeType } from "/models/types/MenuItem";
+import useLocalState from "/hooks/useLocalState";
+import MemoSimpleSelect from "../MemoSimpleSelect";
+import usePutMenuItem from "/hooks/usePutMenuItem";
+import { StoreContext } from "../Store";
+import { MenuSectionContext } from "./MenuSection";
+import { IStore } from "/models/types/Store";
 
 interface MenuItemEditFastProps extends ComponentProps<"form"> {
   menuItem: IMenuItem;
   onMenuItemChange: (newMenuItem: IMenuItem) => void;
-  onSaveClick: () => Promise<boolean>;
   onEditClick: () => void;
   onDeleteClick: () => void;
 }
 
 const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
-  className,
   menuItem,
   onMenuItemChange,
-  onSaveClick,
   onEditClick,
   onDeleteClick,
 }) => {
-  const [saved, setSaved] = useState(cloneDeep(menuItem));
+  const { store } = useContext(StoreContext);
+  const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+
+  const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
+
+  const putMenuItem = usePutMenuItem();
+
+  const isLocalEqualToReal = useMemo(
+    () => isEqual(localMenuItem, menuItem),
+    [localMenuItem, menuItem]
+  );
 
   return (
     <form
@@ -36,93 +47,95 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
       onSubmit={async (e) => {
         e.preventDefault();
 
-        const wasReallySaved = await onSaveClick();
-        if (wasReallySaved) {
-          setSaved(cloneDeep(menuItem));
-        }
+        putMenuItem(store as IStore, localMenuItem, menuSection.index);
+        onMenuItemChange(localMenuItem);
       }}
     >
       <EditableSection
-        className="hidden sm:block"
+        className="hidden sm:block w-[38px] h-[38px] min-w-[38px]"
         iconsContainerClassName="!left-2 !top-2 bg-main-100 p-1 rounded-md opacity-70"
         hideDelete
         onEditClick={onEditClick}
       >
         <ImageWithFallback
-          className="border border-solid border-main-a11y-low rounded-md"
+          className="w-[38px] h-[38px] min-w-[38px] object-cover border border-solid border-main-a11y-low rounded-md"
           src={menuItem.images?.main}
           width={38}
           height={38}
           alt={`${menuItem.name} hero image`}
+          cdn
         />
       </EditableSection>
-      <FormControl className="w-full sm:w-12 min-w-fit" label="Tipo">
-        <Select
-          value={menuItem.itemType}
-          onChange={(e) =>
-            onMenuItemChange({ ...menuItem, itemType: e.target.value })
-          }
-        >
-          <option value="product">Produto</option>
-          <option value="ingredient">Ingrediente</option>
-        </Select>
-      </FormControl>
-      <FormControl className="flex-1 min-w-fit" label="Nome">
-        <DebouncedInput
-          value={menuItem.name}
-          onChange={(e) =>
-            onMenuItemChange({ ...menuItem, name: e.target.value })
-          }
-        />
-      </FormControl>
-      <FormControl className="w-full sm:w-32" label="Detalhe">
-        <DebouncedInput
-          value={menuItem.nameDetail}
-          onChange={(e) =>
-            onMenuItemChange({ ...menuItem, nameDetail: e.target.value })
-          }
-        />
-      </FormControl>
-      <FormControl className="flex-1 min-w-fit" label="Descrição (curta)">
-        <DebouncedInput
-          value={menuItem.details?.short}
-          onChange={(e) => {
-            onMenuItemChange({
-              ...menuItem,
-              details: { ...menuItem.details, short: e.target.value },
-            });
-          }}
-        />
-      </FormControl>
+      <MemoSimpleSelect
+        className="w-full sm:w-12 min-w-fit"
+        label="Tipo"
+        value={localMenuItem.itemType}
+        onChange={(e) =>
+          setLocalMenuItem({
+            ...localMenuItem,
+            itemType: e.target.value as unknown as ItemTypeType,
+          })
+        }
+      >
+        <option value="product">Produto</option>
+        <option value="ingredient">Ingrediente</option>
+      </MemoSimpleSelect>
+      <LocalInput
+        className="flex-1 min-w-0"
+        label="Nome"
+        value={localMenuItem.name}
+        onChange={(e) =>
+          setLocalMenuItem({ ...localMenuItem, name: e.target.value })
+        }
+      />
+      <LocalInput
+        className="w-full sm:w-32"
+        label="Detalhe"
+        value={localMenuItem.nameDetail}
+        onChange={(e) =>
+          setLocalMenuItem({ ...localMenuItem, nameDetail: e.target.value })
+        }
+      />
+      <LocalInput
+        className="flex-1 min-w-fit"
+        label="Descrição (curta)"
+        value={localMenuItem.details?.short}
+        onChange={(e) => {
+          setLocalMenuItem({
+            ...localMenuItem,
+            details: { ...localMenuItem.details, short: e.target.value },
+          });
+        }}
+      />
       <div className="flex flex-row gap-2">
-        <FormControl className="w-full sm:!w-16" label="Preço">
-          <DebouncedInput
-            type="number"
-            value={`${menuItem.price || 0}`}
-            onChange={(e) =>
-              onMenuItemChange({ ...menuItem, price: +e.target.value })
-            }
-          />
-        </FormControl>
-        <FormControl className="w-full sm:!w-16" label="Promo">
-          <DebouncedInput
-            type="number"
-            value={`${menuItem.pricePromotional || 0}`}
-            onChange={(e) =>
-              onMenuItemChange({
-                ...menuItem,
-                pricePromotional: +e.target.value,
-              })
-            }
-          />
-        </FormControl>
+        <LocalInput
+          className="w-full sm:!w-16"
+          label="Preço"
+          type="number"
+          value={localMenuItem.price || 0}
+          onChange={(e) =>
+            setLocalMenuItem({ ...localMenuItem, price: +e.target.value })
+          }
+        />
+        <LocalInput
+          className="w-full sm:!w-16"
+          label="Promo"
+          type="number"
+          value={localMenuItem.pricePromotional || 0}
+          onChange={(e) =>
+            setLocalMenuItem({
+              ...localMenuItem,
+              pricePromotional: +e.target.value,
+            })
+          }
+        />
       </div>
       <div className="flex flex-row gap-2">
         <Button
           className="w-full sm:w-auto"
           type="submit"
           size="md"
-          isDisabled={isEqual(saved, menuItem)}
+          isDisabled={isLocalEqualToReal}
         >
           <RiSave3Fill size={20} />
         </Button>
@@ -134,4 +147,6 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   );
 };
 
-export default memo(MenuItemEditFast);
+export default memo(MenuItemEditFast, (prevProps, nextProps) =>
+  isEqual(prevProps, nextProps)
+);

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useCallback } from "react";
 
-import { ILocation } from "/models/Store";
+import { ILocation } from "/models/types/Store";
 
 const useGetBrasilStates = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps

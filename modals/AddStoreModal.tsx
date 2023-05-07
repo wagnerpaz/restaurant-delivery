@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import classNames from "classnames";
 import { ComponentProps, useCallback, useEffect, useState } from "react";
 import { Button, Input, Select } from "@chakra-ui/react";
@@ -7,7 +6,7 @@ import { useRouter } from "next/router";
 import EditableSection from "/components/EditableSection";
 import Fieldset from "/components/Fieldset";
 import Modal from "/components/Modal";
-import { ILocation, IStore } from "/models/Store";
+import { ILocation, IStore } from "/models/types/Store";
 import ImageEditorModal from "./ImageEditorModal";
 import FormControl from "/components/FormControl";
 import EditAddressForm from "/forms/EditAddressForm";

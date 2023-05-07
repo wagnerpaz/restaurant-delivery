@@ -82,7 +82,7 @@ function App({
     main200 = "#F2F2F2",
     main300 = "#949494",
     mainA11yHigh = "#0e1111",
-    mainA11yMedium = "#729191",
+    mainA11yMedium = "#4A5959",
     mainA11yLow = "#e2e8f0",
     contrastHigh = "#FFFFFF",
     contrastMedium = "#F2F2F2",
@@ -96,7 +96,7 @@ function App({
     add = "#11419b",
     remove = "#ce1414",
   } = theme?.colors || {};
-  const { hero: heroPattern = "/istockphoto-515373062-612x612.jpg" } =
+  const { hero: heroPattern = "/istockphoto-515373062-612x612.webp" } =
     theme?.patterns || {};
 
   const heroColorVar = getRGBColor(hero, "hero");
@@ -142,7 +142,7 @@ function App({
   const addColorVar = getRGBColor(add, "add");
   const removeColorVar = getRGBColor(remove, "remove");
 
-  const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
+  const heroPatternVar = `--pattern-hero: url(${heroPattern})`;
 
   const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -153,9 +153,14 @@ function App({
   return (
     <>
       <Head>
+        {pageLoaded && (
+          <link
+            rel="stylesheet"
+            href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
+          />
+        )}
         <style>
-          :root{" "}
-          {`{${heroColorVar}
+          {`:root{${heroColorVar}
              ${heroA11yHighColorVar}
              ${heroA11yMediumColorVar}
              ${heroA11yLowColorVar}
@@ -192,19 +197,6 @@ function App({
           </SessionProvider>
         </ChakraProvider>
       </MyErrorBoundary>
-      {!pageLoaded && (
-        <div
-          style={{
-            backgroundColor: "white",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 99999,
-          }}
-        />
-      )}
     </>
   );
 }

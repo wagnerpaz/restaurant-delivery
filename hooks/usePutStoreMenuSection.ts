@@ -1,5 +1,5 @@
 import axiosInstance from "/lib/axiosInstance";
-import { IMenuSection, IStore } from "/models/Store";
+import { IMenuSection, IStore } from "/models/types/Store";
 
 const usePostStoreMenuSection = () => {
   const call = async (

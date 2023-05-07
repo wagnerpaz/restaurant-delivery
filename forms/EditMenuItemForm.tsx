@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
@@ -15,15 +14,12 @@ import {
 import { Select } from "@chakra-ui/react";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
-import { IMenuItem, IMenuItemCompositionItem } from "/models/MenuItem";
+import { IMenuItem, IMenuItemCompositionItem } from "/models/types/MenuItem";
 import Fieldset from "/components/Fieldset";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 import { IIngredient } from "/models/Ingredients";
-import MenuItem from "/components/Menu/MenuItem";
+import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 import ImageEditorModal from "/modals/ImageEditorModal";
-import AddIngredientModal, {
-  IIngredientSelection,
-} from "/modals/AddIngredientModal";
 import Modal from "/components/Modal";
 import EditMenuItemCompositionForm, {
   emptyCompositionItem,
@@ -154,17 +150,9 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
         onSubmit={(e) => e.preventDefault()}
       >
         <div className="flex flex-col lg:flex-row gap-4">
-          <MenuItem
+          <MenuItemRealistic
             className="w-full sm:!w-80"
-            id={edit._id}
-            name={edit.name}
-            nameDetail={edit.nameDetail}
-            mainImageId={edit.images?.main?.toString()}
-            price={edit.price}
-            pricePromotional={edit.pricePromotional}
-            descriptionShort={edit.details?.short}
-            composition={edit.composition}
-            sides={edit.sides}
+            menuItem={edit}
             index={-1}
             editable
             onClick={() => {}}
@@ -419,55 +407,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 main: newMainImageId,
               },
             } as IMenuItem);
-          }}
-        />
-        <AddIngredientModal
-          contentClassName="h-full"
-          store={store}
-          ingredients={ingredients}
-          initialSelection={addIngredientsInitialSelection}
-          open={addIngredientModalOpen}
-          onOpenChange={(newValue) => setAddIngredientModalOpen(newValue)}
-          portalTarget={() =>
-            document.querySelector("#edit-menu-item-form") as HTMLElement
-          }
-          onStoreChange={onStoreChange}
-          onIngredientsChange={onIngredientsChange}
-          onSelectionChange={(ingredientsSelection: IIngredientSelection[]) => {
-            const newComposition: IMenuItemCompositionItem[] = [];
-            const selected = ingredientsSelection.filter((f) => f.selected);
-
-            edit.composition.forEach((ci) => {
-              const found = selected.find(
-                (f) => f.ingredient._id === ci.ingredient?._id
-              );
-              if (found) {
-                newComposition.push({ ...ci, unitPrice: found.price });
-              }
-            });
-
-            selected
-              .filter(
-                (f) =>
-                  !newComposition
-                    .map((m) => m.ingredient._id)
-                    .includes(f.ingredient._id)
-              )
-              .forEach((is) => {
-                newComposition.push({
-                  ...emptyCompositionItem,
-                  ingredient: is.ingredient,
-                  unitPrice: is.price,
-                });
-              });
-
-            setEdit({
-              ...edit,
-              composition: newComposition.map((m, index) => ({
-                ...m,
-                id: index,
-              })),
-            });
           }}
         />
       </form>

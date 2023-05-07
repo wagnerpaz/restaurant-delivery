@@ -1,13 +1,19 @@
 import { Button } from "@chakra-ui/react";
 import classNames from "classnames";
-import { ComponentProps, useEffect, useMemo, useState } from "react";
+import {
+  ComponentProps,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from "react";
 import { FaChevronLeft, FaChevronRight, FaHouseUser } from "react-icons/fa";
 import Fieldset from "/components/Fieldset";
 
 import Modal from "/components/Modal";
 import EditAddressForm from "/forms/EditAddressForm";
 import { replaceAt } from "/lib/immutable";
-import { ILocation } from "/models/Store";
+import { ILocation } from "/models/types/Store";
 
 interface EditAddressModalProps extends ComponentProps<typeof Modal> {}
 
@@ -52,6 +58,14 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
     location.neighborhood ||
     location.number ||
     location.address2;
+
+  const handleLocationChange = useCallback(
+    (newLocation: ILocation) =>
+      setClientLocations((clientLocations) =>
+        replaceAt(clientLocations, index, newLocation)
+      ),
+    [index]
+  );
 
   return (
     <Modal
@@ -147,17 +161,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
 
       <EditAddressForm
         location={currentLocation}
-        onLocationChange={(
-          param: ILocation | ((oldLocation: ILocation) => ILocation)
-        ) => {
-          let newLocation;
-          if (typeof param === "function") {
-            newLocation = param(currentLocation);
-          } else {
-            newLocation = param;
-          }
-          setClientLocations(replaceAt(clientLocations, index, newLocation));
-        }}
+        onLocationChange={handleLocationChange}
       />
       <div className="sticky bottom-0 flex flex-row gap-2 pt-2 border-t border-hero -mx-4 translate-y-4 bg-main-100 p-4 z-20">
         <Button

@@ -3,8 +3,8 @@ import { ParsedUrlQuery } from "querystring";
 import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
 import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
-import Ingredients, { IIngredient } from "/models/Ingredients";
-import Store, { IStore } from "/models/Store";
+import Store from "/models/Store";
+import { IStore } from "/models/types/Store";
 
 const storesMetaSSP = (): TPipeGetServerSideProps => async (context, input) => {
   await connectToDatabase();

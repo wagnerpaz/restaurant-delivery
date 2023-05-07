@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import axiosInstance from "/lib/axiosInstance";
 
 const usePutUpload = () => {

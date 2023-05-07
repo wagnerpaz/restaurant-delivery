@@ -1,6 +1,6 @@
 import axiosInstance from "/lib/axiosInstance";
-import { IMenuItem } from "/models/MenuItem";
-import { IStore } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IStore } from "/models/types/Store";
 
 const useDeleteMenuItemFromTrash = (store: IStore) => {
   const call = async (menuItem: IMenuItem) => {

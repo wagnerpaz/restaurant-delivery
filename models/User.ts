@@ -1,12 +1,6 @@
 import mongoose, { models } from "mongoose";
-import type { AdapterUser } from "next-auth/adapters";
 
-import { ILocation } from "./Store";
-
-export interface IUser extends AdapterUser {
-  role: string;
-  locations: ILocation[];
-}
+import { IUser } from "./types/User";
 
 const schema = new mongoose.Schema<IUser>({
   name: {
@@ -43,6 +37,6 @@ const schema = new mongoose.Schema<IUser>({
   ],
 });
 
-const User = models.User || mongoose.model<AdapterUser>("User", schema);
+const User = models.User || mongoose.model<IUser>("User", schema);
 
 export default User;

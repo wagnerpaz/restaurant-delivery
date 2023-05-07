@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+const nextConfig = withBundleAnalyzer({
   reactStrictMode: true,
   typescript: {
     // !! WARN !!
@@ -9,8 +14,15 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["lh3.googleusercontent.com", "s3.sa-east-1.amazonaws.com"],
+    domains: [
+      "lh3.googleusercontent.com",
+      "s3.sa-east-1.amazonaws.com",
+      "d16a0xpwbzkgv8.cloudfront.net",
+    ],
   },
-};
+  experimental: {
+    optimizeCss: true, // enabling this will enable SSR for Tailwind
+  },
+});
 
 module.exports = nextConfig;

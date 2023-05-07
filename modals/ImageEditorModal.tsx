@@ -1,6 +1,5 @@
 import { ComponentProps, useState } from "react";
 import classNames from "classnames";
-import mongoose from "mongoose";
 import ReactCrop, {
   Crop,
   PixelCrop,

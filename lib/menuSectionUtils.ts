@@ -1,5 +1,5 @@
-import { IMenuItem } from "/models/MenuItem";
-import { IMenuSection } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IMenuSection } from "/models/types/Store";
 
 export function retriveAllMenuItems(sections: IMenuSection[]) {
   const menuItems: IMenuItem[] = [];
@@ -68,11 +68,27 @@ export function composeFullSectionNameByIndex(
   return nameArray.join(" • ");
 }
 
-export function listAllSections(allSections: IMenuSection[]): IMenuSection[] {
+export function listAllSections(
+  allSections: IMenuSection[],
+  previousNames?: string[],
+  previousIndexes?: number[]
+): IMenuSection[] {
   const result = [];
+  let index = 0;
   for (const curr of allSections) {
-    result.push(curr);
-    result.push(...listAllSections(curr.sections));
+    result.push({
+      ...curr,
+      name: [...(previousNames || []), curr.name].join(" • "),
+      index: [...(previousIndexes || []), index],
+    });
+    result.push(
+      ...listAllSections(
+        curr.sections,
+        [...(previousNames || []), curr.name],
+        [...(previousIndexes || []), index]
+      )
+    );
+    index++;
   }
   return result;
 }
@@ -94,4 +110,15 @@ export function listAllSectionsIndexes(
     index++;
   }
   return result;
+}
+
+export function replaceObjectById(arr, id, newObject) {
+  return arr.map((obj) => {
+    if (obj._id === id) {
+      return newObject;
+    } else if (obj.children) {
+      obj.sections = replaceObjectById(obj.sections, id, newObject);
+    }
+    return obj;
+  });
 }

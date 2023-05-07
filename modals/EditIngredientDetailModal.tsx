@@ -4,7 +4,7 @@ import { Button, Input } from "@chakra-ui/react";
 
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";
-import { IStore, IStoreIngredient } from "/models/Store";
+import { IStore, IStoreIngredient } from "/models/types/Store";
 
 interface EditIngredientDetailModalProps extends ComponentProps<typeof Modal> {
   store: IStore;

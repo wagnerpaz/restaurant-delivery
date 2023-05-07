@@ -1,7 +1,5 @@
-import mongoose from "mongoose";
-
 import axiosInstance from "/lib/axiosInstance";
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
 
 const usePutUser = () => {
   const call = async (user: IUser) => {

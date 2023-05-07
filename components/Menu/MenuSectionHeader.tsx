@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentProps, useContext } from "react";
 import classNames from "classnames";
 import { FaCodeBranch, FaThList } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
@@ -6,9 +6,12 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
-import { AccordionButton, AccordionIcon } from "@chakra-ui/react";
 
-import { IUser } from "/models/User";
+import { IUser } from "/models/types/User";
+import {
+  AccordionItemButton,
+  AccordionItemHeading,
+} from "react-accessible-accordion";
 
 interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
@@ -51,8 +54,11 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   };
 
   return (
-    <div className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2">
-      <AccordionButton
+    <AccordionItemHeading
+      aria-level={2}
+      className="bg-main-100 sticky top-[calc(var(--header-height)-2px)] z-10 shadow-md border-hero border-t-2"
+    >
+      <AccordionItemButton
         className={classNames(
           "flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high  ",
           className
@@ -132,13 +138,13 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                 onClick={(e) => stopPropagation(e, onTrashClick)}
                 title="Núvem"
               />
-              <AccordionIcon />
+              {/* <AccordionIcon /> */}
             </div>
           )}
-          {!admin && <AccordionIcon />}
+          {/* {!admin && <AccordionIcon />} */}
         </div>
-      </AccordionButton>
-    </div>
+      </AccordionItemButton>
+    </AccordionItemHeading>
   );
 };
 

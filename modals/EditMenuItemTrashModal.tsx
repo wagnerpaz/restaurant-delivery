@@ -3,15 +3,15 @@ import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "next/router";
 import { ComponentProps, useEffect, useMemo, useState } from "react";
-import MenuItem from "/components/Menu/MenuItem";
+import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 
 import Modal from "/components/Modal";
 import useDeleteMenuItemFromTrash from "/hooks/useDeleteMenuItemFromTrash";
 import useGetMenuItemsTrash from "/hooks/useGetMenuItemTrash";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { navigateBySectionIndex } from "/lib/menuSectionUtils";
-import { IMenuItem } from "/models/MenuItem";
-import { IStore } from "/models/Store";
+import { IMenuItem } from "/models/types/MenuItem";
+import { IStore } from "/models/types/Store";
 
 interface EditMenuItemTrashModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -66,7 +66,7 @@ const EditMenuItemTrashModal: React.FC<EditMenuItemTrashModalProps> = ({
       {menuItemTrash.length === 0 && <div>Nenhum item na lixeira</div>}
       <div className="sm:container sm:m-auto px-4 sm:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
         {menuItemTrash.map((menuItem, menuItemIndex) => (
-          <MenuItem
+          <MenuItemRealistic
             key={menuItem._id}
             name={menuItem.name}
             nameDetail={menuItem.nameDetail}
