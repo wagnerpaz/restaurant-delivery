@@ -153,10 +153,12 @@ function App({
   return (
     <>
       <Head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
-        />
+        {pageLoaded && (
+          <link
+            rel="stylesheet"
+            href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
+          />
+        )}
         <style>
           {`:root{${heroColorVar}
              ${heroA11yHighColorVar}
@@ -195,19 +197,6 @@ function App({
           </SessionProvider>
         </ChakraProvider>
       </MyErrorBoundary>
-      {/* {!pageLoaded && (
-        <div
-          style={{
-            backgroundColor: "white",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 99999,
-          }}
-        />
-      )} */}
     </>
   );
 }
