@@ -48,7 +48,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
   const { store } = useContext(StoreContext);
 
   const getMenuItemAdditionals = useGetMenuItemsAdditionals();
-  const [additionals, setAdditionals] = useState([]);
+  const [additionals, setAdditionals] = useState(null);
   useEffect(() => {
     async function exec() {
       setAdditionals(await getMenuItemAdditionals(store, menuItem));
