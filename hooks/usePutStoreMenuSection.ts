@@ -12,13 +12,13 @@ const usePostStoreMenuSection = () => {
         `/api/store/${store._id}/menu/section/${sectionIndex}`,
         newMenuSection
       );
-      return response;
+      return response.data;
     } else {
       const response = await axiosInstance.post(
         `/api/store/${store._id}/menu/section`,
         newMenuSection
       );
-      return response;
+      return response.data;
     }
   };
   return call;

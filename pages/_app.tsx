@@ -10,11 +10,14 @@ import {
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { VscError } from "react-icons/vsc";
+import NProgress from "nprogress";
+import Router from "next/router";
 
 import { getRGBColor } from "/lib/getRGBColor";
 
 import "/styles/globals.css";
 import "react-image-crop/dist/ReactCrop.css";
+import "nprogress/nprogress.css";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",
@@ -68,6 +71,18 @@ export const chakraTheme = extendTheme(
   },
   withDefaultColorScheme({ colorScheme: "blackAlpha" })
 );
+
+Router.events.on("routeChangeStart", () => {
+  NProgress.start();
+});
+
+Router.events.on("routeChangeComplete", () => {
+  NProgress.done();
+});
+
+Router.events.on("routeChangeError", () => {
+  NProgress.done();
+});
 
 function App({
   Component,

@@ -239,7 +239,7 @@ const Store: FC<StoreProps> = ({ store }) => {
         )}
         <Tabs>
           <TabPanels>
-            <TabPanel className="!p-0 -mt-3 min-h-[calc(100vh-var(--header-height))]">
+            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
               <main>
                 <Menu
                   type="product"
@@ -256,7 +256,7 @@ const Store: FC<StoreProps> = ({ store }) => {
                 />
               </main>
             </TabPanel>
-            <TabPanel className="!p-0 -mt-3 min-h-[calc(100vh-var(--header-height))]">
+            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
               <main>
                 <Menu
                   type="ingredient"

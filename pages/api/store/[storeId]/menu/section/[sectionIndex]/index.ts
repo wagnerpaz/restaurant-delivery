@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import connectToDatabase from "/lib/mongoose";
 import Store from "/models/Store";
 import { IMenuSection } from "/models/types/Store";
+import { navigateBySectionIndex } from "/lib/menuSectionUtils";
 
 async function section(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -29,7 +30,17 @@ async function section(req: NextApiRequest, res: NextApiResponse) {
           },
         }
       );
-      res.status(200).end();
+
+      const store = Store.findOne(
+        { _id: storeId },
+        { [`menu.sections.${sectionIndexSplit.join(".sections.")}`]: 1 }
+      );
+      res.status(200).json(
+        navigateBySectionIndex(
+          store.sections,
+          sectionIndexSplit.map((m) => +m)
+        )
+      );
     } else if (req.method === "DELETE") {
       const spliced = [...sectionIndexSplit];
       const lastIndex = spliced.splice(-1)[0];
