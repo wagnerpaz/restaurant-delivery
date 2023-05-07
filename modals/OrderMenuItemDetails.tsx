@@ -1,13 +1,11 @@
 import {
   Accordion,
-  AccordionButton,
-  AccordionIcon,
   AccordionItem,
-  AccordionPanel,
-  Button,
-  Radio,
-  RadioGroup,
-} from "@chakra-ui/react";
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel,
+} from "react-accessible-accordion";
+import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import classNames from "classnames";
 import {
   ComponentProps,
@@ -277,16 +275,20 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
           ) : null}
         </div>
         <div className="sm:flex-1 sm:border-l-[1px] sm:border-main-a11y-low sm:pl-4">
-          <Accordion className="p-0 -mx-4" allowMultiple>
+          <Accordion
+            className="p-0 -mx-4"
+            allowMultipleExpanded
+            preExpanded={["composition", "additionals", "sides"]}
+          >
             {menuItem.composition?.filter((c) => !c.essential).length ? (
-              <AccordionItem>
-                <AccordionButton>
-                  <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
-                    <IoRemoveCircleSharp size={24} />O que deseja retirar?
-                  </h3>{" "}
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel>
+              <AccordionItem uuid={"composition"}>
+                <AccordionItemHeading>
+                  <AccordionItemButton className="flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high">
+                    <IoRemoveCircleSharp size={24} />
+                    <h3 className="text-lg mb-2">O que deseja retirar?</h3>
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel className="px-4">
                   <ul className="text-sm">
                     {menuItem.composition
                       ?.filter((c) => !c.essential)
@@ -326,22 +328,26 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                         </li>
                       ))}
                   </ul>
-                </AccordionPanel>
+                </AccordionItemPanel>
               </AccordionItem>
             ) : null}
             {additionals?.map((additionalsCategory) => (
-              <AccordionItem key={additionalsCategory.categoryName}>
-                <AccordionButton>
-                  <h3 className="text-lg mb-2 w-full text-start flex flex-row items-center gap-2">
+              <AccordionItem
+                uuid={`additionals-${additionalsCategory._id}`}
+                key={additionalsCategory.categoryName}
+              >
+                <AccordionItemHeading>
+                  <AccordionItemButton className="flex flex-row items-center gap-2 px-4 py-2 min-h-12 text-main-a11y-high">
                     <MdPlaylistAddCircle size={24} />
-                    {additionalsCategory.categoryName}{" "}
-                    <span className="text-main-a11y-medium font-normal">
-                      (0 de {additionalsCategory.max})
-                    </span>
-                  </h3>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel className="!pt-0">
+                    <h3 className="text-lg w-full text-start ">
+                      {additionalsCategory.categoryName}{" "}
+                      <span className="text-main-a11y-medium font-normal">
+                        (0 de {additionalsCategory.max})
+                      </span>
+                    </h3>
+                  </AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel className="px-4">
                   <ul className="flex-1 text-sm">
                     {additionalsCategory.items?.map((item) => (
                       <li
@@ -399,7 +405,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                       </li>
                     ))}
                   </ul>
-                </AccordionPanel>
+                </AccordionItemPanel>
               </AccordionItem>
             ))}
             {menuItem.sides
@@ -409,15 +415,19 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                   (exchangesItemsBySide(side, menuItem)?.filter(
                     (f) => f._id !== side.menuItem._id
                   ).length || 0) > 0 && (
-                    <AccordionItem key={side.menuItem._id}>
-                      <AccordionButton>
-                        <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
-                          <RiExchangeFill size={24} />
-                          Trocar {side.menuItem.name} por:
-                        </h3>
-                        <AccordionIcon />
-                      </AccordionButton>
-                      <AccordionPanel className="flex flex-col gap-4">
+                    <AccordionItem
+                      uuid={`sides-${side._id}`}
+                      key={side.menuItem._id}
+                    >
+                      <AccordionItemHeading>
+                        <AccordionItemButton>
+                          <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
+                            <RiExchangeFill size={24} />
+                            Trocar {side.menuItem.name} por:
+                          </h3>
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel className="flex flex-col gap-4">
                         <RadioGroup
                           value={
                             order.combo?.find(
@@ -485,7 +495,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                             )
                           )}
                         </RadioGroup>
-                      </AccordionPanel>
+                      </AccordionItemPanel>
                     </AccordionItem>
                   )
               )}

@@ -142,7 +142,7 @@ function App({
   const addColorVar = getRGBColor(add, "add");
   const removeColorVar = getRGBColor(remove, "remove");
 
-  const heroPatternVar = `--pattern-hero: url('${heroPattern}')`;
+  const heroPatternVar = `--pattern-hero: url(${heroPattern})`;
 
   const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -154,8 +154,7 @@ function App({
     <>
       <Head>
         <style>
-          :root{" "}
-          {`{${heroColorVar}
+          {`:root{${heroColorVar}
              ${heroA11yHighColorVar}
              ${heroA11yMediumColorVar}
              ${heroA11yLowColorVar}
@@ -192,7 +191,7 @@ function App({
           </SessionProvider>
         </ChakraProvider>
       </MyErrorBoundary>
-      {!pageLoaded && (
+      {/* {!pageLoaded && (
         <div
           style={{
             backgroundColor: "white",
@@ -204,7 +203,7 @@ function App({
             zIndex: 99999,
           }}
         />
-      )}
+      )} */}
     </>
   );
 }

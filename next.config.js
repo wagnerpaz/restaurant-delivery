@@ -20,8 +20,8 @@ const nextConfig = withBundleAnalyzer({
       "d16a0xpwbzkgv8.cloudfront.net",
     ],
   },
-  Image: {
-    minimumCacheTTL: 60 * 10,
+  experimental: {
+    optimizeCss: true, // enabling this will enable SSR for Tailwind
   },
 });
 
