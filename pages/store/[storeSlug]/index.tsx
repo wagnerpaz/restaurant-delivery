@@ -19,7 +19,11 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
   return (
     <>
       <Head>
-        <link rel="icon" type="image/x-icon" href={store?.logo} />
+        <link
+          rel="icon"
+          type="image/x-icon"
+          href={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN_NAME}/${store?.logo}`}
+        />
         <title>{store?.name}</title>
       </Head>
       <ScreenSizeProvider>
