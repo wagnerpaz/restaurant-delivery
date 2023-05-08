@@ -18,7 +18,7 @@ import EditMenuItemAdditionalsForm, {
 } from "./EditMenuItemAdditionalsForm";
 import Input from "/components/form/Input";
 import ReactSelect from "/components/ReactSelect";
-import Textarea from "/components/form/TextArea";
+import Textarea from "/components/form/Textarea";
 import Button from "/components/form/Button";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
