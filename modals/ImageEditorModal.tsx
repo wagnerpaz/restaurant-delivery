@@ -13,6 +13,8 @@ import { imgPreview } from "/lib/image-crop/imgPreview";
 import usePutUpload from "/hooks/usePutUpload";
 import FormControl from "/components/FormControl";
 import ImageWithFallback from "/components/ImageWithFallback";
+import Input from "/components/form/Input";
+import Button from "/components/form/Button";
 
 interface DbImageEditorProps extends ComponentProps<typeof Modal> {
   upload: {

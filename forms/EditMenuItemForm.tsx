@@ -2,57 +2,46 @@ import { ComponentProps, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
 import { BsFillInfoCircleFill } from "react-icons/bs";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/types/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/types/Store";
-import { IIngredient } from "/models/Ingredients";
 import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 import ImageEditorModal from "/modals/ImageEditorModal";
 import Modal from "/components/Modal";
-import EditMenuItemCompositionForm, {
-  emptyCompositionItem,
-} from "/forms/EditMenuItemCompositionForm";
+import EditMenuItemCompositionForm from "/forms/EditMenuItemCompositionForm";
 import EditMenuItemSidesForm, { emptySidesItem } from "./EditMenuItemSidesForm";
 import FormControl from "/components/FormControl";
 import EditMenuItemAdditionalsForm, {
   emptyAdditionalsCategory,
 } from "./EditMenuItemAdditionalsForm";
+import Input from "/components/form/Input";
+import ReactSelect from "/components/ReactSelect";
+import Textarea from "/components/form/TextArea";
+import Button from "/components/form/Button";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
-  ingredients: IIngredient[];
   menuItem: IMenuItem;
   onMenuItemChange: (newValue?: IMenuItem, cancelled?: boolean) => void;
   onStoreChange: (newValue: IStore, shouldSave?: boolean) => void;
-  onIngredientsChange: (newValue: IIngredient[]) => void;
 }
 
 const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   className,
   children,
   store,
-  ingredients,
   menuItem,
   open,
   onOpenChange,
   onMenuItemChange = () => {},
   onStoreChange = () => {},
-  onIngredientsChange = () => {},
   ...props
 }) => {
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
-  const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
-
-  const addIngredientsInitialSelection = useMemo(
-    () =>
-      edit.composition?.map((ci) => ({
-        ingredient: ci.ingredient,
-        price: ci.unitPrice,
-      })) || [],
-    [edit]
-  );
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     const compositionIndexed = menuItem.composition?.map((c, index) => ({
@@ -108,10 +97,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     } else {
       cancel();
     }
-  };
-
-  const handleFillIngredients = () => {
-    setAddIngredientModalOpen(true);
   };
 
   const handleFillSides = () => {
@@ -172,7 +157,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 />
               </FormControl>
               <FormControl className="flex-1 min-w-fit" label="Tipo">
-                <Select
+                <ReactSelect
                   className="flex-1"
                   value={edit.itemType}
                   onChange={(e) => {
@@ -184,7 +169,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 >
                   <option value="product">Produto</option>
                   <option value="ingredient">Ingrediente</option>
-                </Select>
+                </ReactSelect>
               </FormControl>
             </div>
             <Fieldset className="flex flex-row gap-2" title="Preço">
@@ -271,14 +256,14 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           </div>
         </div>
 
-        <Tabs isLazy>
+        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
           <TabList>
             <Tab>Ingredientes Principais</Tab>
             <Tab>Customizar</Tab>
             <Tab>Combo</Tab>
           </TabList>
-          <TabPanels>
-            <TabPanel className="!px-0">
+          <TabPanel className="!px-0">
+            {tabIndex === 0 && (
               <Fieldset className="flex flex-col gap-2">
                 <div className="flex-1 flex flex-row items-center justify-between gap-4  mb-4">
                   <div className="flex-1 flex flex-row items-center gap-2">
@@ -296,10 +281,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                     className="min-w-[180px]"
                     label="Exibir Ingredientes"
                   >
-                    <Select>
+                    <ReactSelect>
                       <option>Sim</option>
                       <option>Não</option>
-                    </Select>
+                    </ReactSelect>
                   </FormControl>
                 </div>
                 <EditMenuItemCompositionForm
@@ -310,8 +295,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </Fieldset>
-            </TabPanel>
-            <TabPanel className="!px-0">
+            )}
+          </TabPanel>
+          <TabPanel className="!px-0">
+            {tabIndex === 1 && (
               <Fieldset className="flex flex-col gap-2 pt-6">
                 <EditMenuItemAdditionalsForm
                   store={store}
@@ -325,8 +312,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </Fieldset>
-            </TabPanel>
-            <TabPanel className="!px-0">
+            )}
+          </TabPanel>
+          <TabPanel className="!px-0">
+            {tabIndex === 3 && (
               <Fieldset className="flex flex-col gap-2">
                 <div className="flex flex-row items-center mb-4">
                   <div className="flex-1 flex flex-row items-center gap-2">
@@ -349,8 +338,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   onSidesChange={(sides) => setEdit({ ...edit, sides })}
                 />
               </Fieldset>
-            </TabPanel>
-          </TabPanels>
+            )}
+          </TabPanel>
         </Tabs>
         <div className="sticky bottom-0 flex flex-row justify-end gap-2 bg-main-100 z-20 py-3 px-4 -mx-4 translate-y-4 border-t border-hero">
           <Button className="w-32" variant="outline" onClick={handleCancel}>
