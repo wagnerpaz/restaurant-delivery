@@ -133,8 +133,9 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
       <div className={"menu-item-realistic-content-container"}>
         <div className="mt-1 min-h-[36px] sm:min-h-0">
           <Button
-            aria-label="Adicionar ao carrinho"
             className="sm:!hidden inline float-right !rounded-xl w-fit mx-0 !px-4 !py-2 !bg-hero !text-hero-a11y-high ml-1 mb-1"
+            size="sm"
+            aria-label="Adicionar ao carrinho"
             onClick={onClick}
           >
             <FaShoppingCart className="text-xl" />
@@ -195,7 +196,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
       </div>
       <div className="hidden sm:block absolute bottom-0 right-0 left-0 p-4">
         <Button
-          className="button-hero-1 !rounded-xl w-[calc(100%+1rem)] -mx-2"
+          className="button-hero-1 !w-[calc(100%+1rem)] -mx-2"
           onClick={onClick}
         >
           <FaShoppingCart className="text-xl" />

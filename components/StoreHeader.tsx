@@ -56,7 +56,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
             </address>
           </div>
         </div>
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-4">
           <DebouncedInput
             id="search"
             className="!w-full !min-w-0 max-w-xs !bg-main-100 !text-main-a11y-high hidden sm:block"

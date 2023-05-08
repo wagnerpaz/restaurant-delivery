@@ -26,6 +26,7 @@ const NumberInput = ({
           "!h-[30px]": !full,
           "h-full": full,
         })}
+        size="sm"
         isDisabled={+value - 1 < min}
         onClick={() => onChange(+value - step)}
       >
@@ -35,17 +36,18 @@ const NumberInput = ({
         value={+value}
         disabled
         style={{ opacity: 1 }}
-        className={classNames("!rounded-none !px-2 text-center", {
+        className={classNames("!rounded-none !px-2 text-center min-w-0", {
           "!min-w-10 !w-10 !h-[30px]": !full,
           "h-full": full,
         })}
       />
       <Button
-        isDisabled={+value + 1 > max}
         className={classNames("!rounded-l-none !w-fit !px-2", {
           "!h-[30px]": !full,
           "h-full": full,
         })}
+        size="sm"
+        isDisabled={+value + 1 > max}
         onClick={() => onChange(+value + step)}
       >
         <AiOutlinePlus />
