@@ -39,6 +39,7 @@ import usePutUser from "/hooks/usePutUser";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import StoreHeader from "./StoreHeader";
 import { MdNoFood } from "react-icons/md";
+import Input from "./form/Input";
 
 const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
   ssr: false,
