@@ -3,9 +3,9 @@ import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { VscError } from "react-icons/vsc";
 import NProgress from "nprogress";
 import Router from "next/router";
+import { BugBeetle } from "@phosphor-icons/react";
 
 import { getRGBColor } from "/lib/getRGBColor";
 
@@ -169,7 +169,7 @@ function MyErrorBoundary({ children }) {
     <ErrorBoundary
       fallback={
         <div className="w-screen h-screen flex flex-col items-center justify-center text-xl font-bold text-main-a11y-high">
-          <VscError size={60} />
+          <BugBeetle size={60} weight="fill" />
           Ops.. ocorreu um error crítico.
         </div>
       }

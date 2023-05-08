@@ -28,7 +28,6 @@ import usePutStore from "/hooks/usePutStore";
 import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
 import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
 import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
-import defaultToastError from "/config/defaultToastError";
 import {
   findMenuItemSectionIndex,
   replaceObjectById,
@@ -38,7 +37,6 @@ import useGetStore from "/hooks/useGetStore";
 import usePutUser from "/hooks/usePutUser";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import StoreHeader from "./StoreHeader";
-import { MdNoFood } from "react-icons/md";
 import Input from "./form/Input";
 
 const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {

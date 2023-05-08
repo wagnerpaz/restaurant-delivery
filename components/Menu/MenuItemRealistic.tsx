@@ -1,6 +1,6 @@
 import { ComponentProps, useContext, useMemo, memo } from "react";
 import classNames from "classnames";
-import { FaShoppingCart } from "react-icons/fa";
+import { ShoppingCart } from "@phosphor-icons/react";
 
 import {
   IMenuItem,
@@ -137,7 +137,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             className="sm:!hidden inline float-right !rounded-xl w-fit mx-0 !px-4 !py-2 !bg-hero !text-hero-a11y-high ml-1 mb-1"
             onClick={onClick}
           >
-            <FaShoppingCart className="text-xl" />
+            <ShoppingCart size={24} weight="fill" />
           </Button>
           <h3 className="block text-md font-bold !leading-tight mb-1">
             {getHighlightedText(name, search)}
@@ -198,7 +198,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
           className="button-hero-1 !rounded-xl w-[calc(100%+1rem)] -mx-2"
           onClick={onClick}
         >
-          <FaShoppingCart className="text-xl" />
+          <ShoppingCart size={24} weight="fill" />
           <span className="inline-block">Adicionar</span>
         </Button>
       </div>

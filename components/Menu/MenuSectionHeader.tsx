@@ -1,11 +1,14 @@
 import { ComponentProps, useContext } from "react";
 import classNames from "classnames";
-import { FaCodeBranch, FaThList } from "react-icons/fa";
-import { RiEditFill } from "react-icons/ri";
-import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
-import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
-import { MdMoveDown } from "react-icons/md";
+import {
+  Cloud,
+  PencilSimple,
+  GitBranch,
+  PlusCircle,
+  SquaresFour,
+  Rows,
+} from "@phosphor-icons/react";
 
 import { IUser } from "/models/types/User";
 import {
@@ -69,31 +72,34 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
           <div className="flex flex-row flex-wrap gap-x-2 items-center">
             {admin && !isNew && (
               <>
-                <RiEditFill
-                  className="cursor-pointer"
+                <PencilSimple
                   size={24}
+                  weight="fill"
+                  className="cursor-pointer"
                   title="Editar Seção"
                   onClick={(e) => stopPropagation(e, onEditSectionClick)}
                 />
-                <FaCodeBranch
-                  className="cursor-pointer"
+                <GitBranch
+                  weight="fill"
                   size={20}
+                  className="cursor-pointer"
                   title="Adicionar Sub-Seção do Menu"
                   onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
-                <MdMoveDown
+                {/* <MdMoveDown
                   className="cursor-pointer"
                   size={24}
                   title="Move Seção"
                   onClick={(e) => stopPropagation(e, onAddSectionClick)}
-                />
+                /> */}
               </>
             )}
             {admin && isNew && (
               <div className="flex flex-row gap-3 items-center text-sm">
-                <IoIosAddCircle
-                  className="mt-1 cursor-pointer"
+                <PlusCircle
                   size={24}
+                  weight="fill"
+                  className="mt-1 cursor-pointer"
                   title="Adicionar Seção do Menu"
                   onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
@@ -118,23 +124,26 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
           {admin && !isNew && (
             <div className="flex flex-row gap-3 items-center text-sm">
               {editMode === "realistic" ? (
-                <BsMicrosoft
-                  className="cursor-pointer mt-1"
+                <SquaresFour
                   size={20}
+                  weight="fill"
+                  className="cursor-pointer mt-1"
                   onClick={(e) => stopPropagation(e, onFastEditClick)}
                   title="Edição realista (cartões)"
                 />
               ) : (
-                <FaThList
-                  className="cursor-pointer mt-1"
+                <Rows
                   size={20}
+                  weight="fill"
+                  className="cursor-pointer mt-1"
                   onClick={(e) => stopPropagation(e, onFastEditClick)}
                   title="Edição rápida (lista)"
                 />
               )}
-              <BsFillCloudArrowUpFill
-                className="cursor-pointer mt-1"
+              <Cloud
                 size={26}
+                weight="fill"
+                className="cursor-pointer mt-1"
                 onClick={(e) => stopPropagation(e, onTrashClick)}
                 title="Núvem"
               />

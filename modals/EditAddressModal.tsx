@@ -7,7 +7,8 @@ import {
   useState,
   useCallback,
 } from "react";
-import { FaChevronLeft, FaChevronRight, FaHouseUser } from "react-icons/fa";
+import { HouseLine, CaretLeft, CaretRight } from "@phosphor-icons/react";
+
 import Fieldset from "/components/Fieldset";
 
 import Modal from "/components/Modal";
@@ -78,11 +79,11 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
     >
       <Fieldset className="border border-hero !p-0 flex flex-col !pt-4">
         <div className={classNames("flex flex-row gap-2 items-center")}>
-          <FaChevronLeft
+          <CaretLeft
+            size={24}
             className={classNames("ml-2 cursor-pointer", {
               "opacity-30 !cursor-not-allowed": index === 0,
             })}
-            size={24}
             onClick={() => {
               if (index > 0) {
                 setIndex(index - 1);
@@ -90,7 +91,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
             }}
           />
           <div className="border-l border-r border-hero flex-1 flex flex-row gap-2 items-center px-2">
-            <FaHouseUser size={60} />
+            <HouseLine size={60} weight="fill" />
             <address className="text-sm text-main-a11y-high flex flex-col w-full flex-1">
               <span className="font-bold mr-2 block">
                 {currentLocation?.city || "[Cidade]"} -{" "}
@@ -107,11 +108,11 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
               </span>
             </address>
           </div>
-          <FaChevronRight
+          <CaretRight
+            size={24}
             className={classNames("mr-2 cursor-pointer", {
               "opacity-30 !cursor-not-allowed": !isFilled(currentLocation),
             })}
-            size={24}
             onClick={() => {
               if (clientLocations[index + 1]) {
                 setIndex(index + 1);

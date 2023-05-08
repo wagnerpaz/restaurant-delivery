@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { FaAddressBook, FaSignOutAlt } from "react-icons/fa";
+import { AddressBook, SignOut } from "@phosphor-icons/react";
 
 import Button from "/components/form/Button";
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
@@ -55,7 +55,7 @@ const UserIcon = ({ store }) => {
                       setMenuOpened(false);
                     }}
                   >
-                    <FaAddressBook size={24} />
+                    <AddressBook size={24} weight="fill" />
                     Meu Endereço
                   </Button>
                 </nav>
@@ -66,7 +66,7 @@ const UserIcon = ({ store }) => {
                     signOut();
                   }}
                 >
-                  <FaSignOutAlt />
+                  <SignOut size={24} weight="fill" />
                   Sair
                 </Button>
               </div>,

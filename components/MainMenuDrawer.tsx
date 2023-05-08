@@ -1,10 +1,7 @@
 import { ComponentProps } from "react";
-import { FaUserCircle } from "react-icons/fa";
-import { RiStore3Fill } from "react-icons/ri";
 import { signIn, useSession } from "next-auth/react";
 
 import { IUser } from "/models/types/User";
-import MenuSectionsTree from "./MenuSectionsTree";
 import { IStore } from "/models/types/Store";
 
 interface MainMenuDrawerProps

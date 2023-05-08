@@ -13,7 +13,13 @@ import {
   useState,
   useContext,
 } from "react";
-import { FaShoppingCart } from "react-icons/fa";
+import {
+  ShoppingCart,
+  X,
+  CaretCircleUpDown,
+  MinusCircle,
+  PlusCircle,
+} from "@phosphor-icons/react";
 
 import Modal from "/components/Modal";
 import MoneyDisplay from "/components/MoneyDisplay";
@@ -23,16 +29,13 @@ import {
   IMenuItemAdditionalsCategory,
   ISidesItem,
 } from "/models/types/MenuItem";
-import { RiExchangeFill } from "react-icons/ri";
-import { IoRemoveCircleSharp } from "react-icons/io5";
-import { IoMdClose } from "react-icons/io";
-import { MdPlaylistAddCircle } from "react-icons/md";
 import { navigateBySectionIndex } from "/lib/menuSectionUtils";
 
 import ImageWithFallback from "/components/ImageWithFallback";
 import useGetMenuItemsAdditionals from "/hooks/useGetMenuItemAdditionals";
 import { StoreContext } from "/components/Store";
 import { IOrder, IOrderExchange, IOrderItem } from "/models/types/Order";
+import Button from "/components/form/Button";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   menuItem: IMenuItem;
@@ -174,7 +177,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
             className="cursor-pointer mt-1 sm:hidden"
             onClick={() => onOpenChange(false)}
           >
-            <IoMdClose size={30} />
+            <X size={30} />
           </div>
         </div>
         <ul className="flex-1 sm:text-right text-xs sm:pl-4">
@@ -239,7 +242,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
           className="cursor-pointer mt-1 hidden sm:block"
           onClick={() => onOpenChange(false)}
         >
-          <IoMdClose size={30} />
+          <X size={30} />
         </div>
       </div>
 
@@ -294,7 +297,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                 <AccordionItem uuid={"composition"}>
                   <AccordionItemHeading>
                     <AccordionItemButton className="flex flex-row items-center px-4 py-2 min-h-12 text-main-a11y-high">
-                      <IoRemoveCircleSharp size={24} />
+                      <MinusCircle size={24} weight="fill" />
                       <h3 className="text-lg mb-2">O que deseja retirar?</h3>
                     </AccordionItemButton>
                   </AccordionItemHeading>
@@ -350,7 +353,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                   >
                     <AccordionItemHeading>
                       <AccordionItemButton className="flex flex-row items-center gap-2 px-4 py-2 min-h-12 text-main-a11y-high">
-                        <MdPlaylistAddCircle size={24} />
+                        <PlusCircle weight="fill" size={24} />
                         <h3 className="text-lg w-full text-start ">
                           {additionalsCategory.categoryName}{" "}
                           <span className="text-main-a11y-medium font-normal">
@@ -440,7 +443,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                         <AccordionItemHeading>
                           <AccordionItemButton>
                             <h3 className="text-lg mb-2 flex-1 flex flex-row gap-2 items-center text-start">
-                              <RiExchangeFill size={24} />
+                              <CaretCircleUpDown size={24} weight="fill" />
                               Trocar {side.menuItem.name} por:
                             </h3>
                           </AccordionItemButton>
@@ -528,7 +531,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 justify-between h-18">
         <NumberInput full />
         <Button className="!bg-hero flex-1" isDisabled={calculatedPrice <= 0}>
-          <FaShoppingCart className="mr-2" />
+          <ShoppingCart size={24} weight="fill" className="mr-2" />
           Adicionar
         </Button>
       </div>

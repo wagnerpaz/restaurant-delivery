@@ -1,6 +1,6 @@
-import React, { MouseEventHandler, useContext } from "react";
+import React, { MouseEventHandler } from "react";
 import classNames from "classnames";
-import { MdEdit, MdDelete } from "react-icons/md";
+import { PencilSimple, TrashSimple } from "@phosphor-icons/react";
 
 const EditableSection: React.FC<Props> = ({
   className,
@@ -21,7 +21,9 @@ const EditableSection: React.FC<Props> = ({
             iconsContainerClassName
           )}
         >
-          <MdEdit
+          <PencilSimple
+            size={24}
+            weight="fill"
             className={classNames("z-20", { hidden: hideEdit })}
             onClick={(e) => {
               e.preventDefault();
@@ -29,7 +31,9 @@ const EditableSection: React.FC<Props> = ({
               onEditClick?.(e);
             }}
           />
-          <MdDelete
+          <TrashSimple
+            size={24}
+            weight="fill"
             className={classNames("z-20", { hidden: hideDelete })}
             onClick={(e) => {
               e.preventDefault();

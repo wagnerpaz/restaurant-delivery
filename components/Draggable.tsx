@@ -1,7 +1,7 @@
+import { DotsSixVertical } from "@phosphor-icons/react";
 import classNames from "classnames";
 import { CSSProperties, ReactNode } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { MdDragIndicator } from "react-icons/md";
 
 export interface DraggableProps {
   id: string;
@@ -85,7 +85,7 @@ const Draggable: React.FC<DraggableProps> = ({
       {dragIndicator && (
         <>
           <div ref={(node) => drag(node)}>
-            <MdDragIndicator className="cursor-move -mx-1" size={24} />
+            <DotsSixVertical size={24} weight="thin" />
           </div>
           <div className={classNames("flex-1", className)}>{children}</div>
         </>
