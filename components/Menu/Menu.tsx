@@ -5,6 +5,7 @@ import isEqual from "lodash.isequal";
 import { listAllSections } from "/lib/menuSectionUtils";
 import MenuSection from "./MenuSection";
 import { IMenuSection } from "/models/types/Store";
+import { MdNoFood } from "react-icons/md";
 import { StoreContext } from "../Store";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/types/User";

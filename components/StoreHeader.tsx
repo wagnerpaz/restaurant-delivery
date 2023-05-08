@@ -1,5 +1,6 @@
 import { ComponentProps, useContext, useState } from "react";
-import { MagnifyingGlass, List } from "@phosphor-icons/react";
+import { FaSearch } from "react-icons/fa";
+import { HiMenu } from "react-icons/hi";
 
 import Button from "/components/form/Button";
 import DebouncedInput from "./DebouncedInput";
@@ -86,7 +87,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
               }
             }}
           >
-            <MagnifyingGlass size={22} weight="thin" />
+            <FaSearch size={22} />
           </Button>
           <Button
             className="flex flex-row gap-2 items-center !px-0"
@@ -94,7 +95,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
             aria-label="Pesquisar"
             onClick={() => setDrawerOpen(true)}
           >
-            <List size={36} weight="thin" />
+            <HiMenu size={36} />
           </Button>
           <UserIcon store={store} />
         </div>

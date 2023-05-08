@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { PlusCircle, MinusCircle } from "@phosphor-icons/react";
+import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import { insertAt, moveTo, replaceAt, swap } from "/lib/immutable";
@@ -15,7 +15,6 @@ import FormControl from "/components/FormControl";
 import { IStore } from "/models/types/Store";
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 import MenuItemBySectionSelector from "/components/MenuItemBySectionSelector";
-import Button from "/components/form/Button";
 
 interface EditMenuItemCompositionFormProps
   extends ComponentProps<typeof DraggableGroup> {
@@ -157,7 +156,7 @@ const EditMenuItemCompositionForm: React.FC<
                     ])
                   }
                 >
-                  <MinusCircle size={24} weight="fill" />
+                  <IoMdCloseCircle size={24} />
                 </Button>
                 <Button
                   className="text-main-a11y-high"
@@ -175,7 +174,7 @@ const EditMenuItemCompositionForm: React.FC<
                     )
                   }
                 >
-                  <PlusCircle size={24} weight="fill" className="color" />
+                  <IoIosAddCircle className="color" size={24} />
                 </Button>
               </div>
             </Draggable>

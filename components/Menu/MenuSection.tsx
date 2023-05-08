@@ -9,8 +9,8 @@ import {
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
-import { Plus } from "@phosphor-icons/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -262,8 +262,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     }
                   )}
                 >
-                  <Plus
-                    size={24}
+                  <HiPlus
                     className={classNames("", {
                       "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
                       "w-10 h-10 p-1 ": menuSection.editMode === "fast",

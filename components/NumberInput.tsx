@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { Minus, Plus } from "@phosphor-icons/react";
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import Button from "./form/Button";
 import Input from "./form/Input";
@@ -29,7 +29,7 @@ const NumberInput = ({
         isDisabled={+value - 1 < min}
         onClick={() => onChange(+value - step)}
       >
-        <Minus size={24} weight="thin" />
+        <AiOutlineMinus />
       </Button>
       <Input
         value={+value}
@@ -48,7 +48,7 @@ const NumberInput = ({
         })}
         onClick={() => onChange(+value + step)}
       >
-        <Plus size={24} weight="thin" />
+        <AiOutlinePlus />
       </Button>
     </div>
   );

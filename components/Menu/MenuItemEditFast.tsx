@@ -1,8 +1,9 @@
 import { ComponentProps, memo, useMemo, useContext, useCallback } from "react";
 import Button from "/components/form/Button";
 import ImageWithFallback from "/components/ImageWithFallback";
+import { IoMdClose } from "react-icons/io";
+import { RiSave3Fill } from "react-icons/ri";
 import isEqual from "lodash.isequal";
-import { FloppyDiskBack, X } from "@phosphor-icons/react";
 
 import LocalInput from "../MemoInput";
 import EditableSection from "/components/EditableSection";
@@ -136,10 +137,10 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           size="md"
           isDisabled={isLocalEqualToReal}
         >
-          <FloppyDiskBack size={20} weight="fill" />
+          <RiSave3Fill size={20} />
         </Button>
         <Button className="w-full sm:w-auto" size="md" onClick={onDeleteClick}>
-          <X size={20} />
+          <IoMdClose size={20} />
         </Button>
       </div>
     </form>

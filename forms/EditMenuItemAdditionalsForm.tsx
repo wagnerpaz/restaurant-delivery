@@ -1,5 +1,5 @@
 import { ComponentProps, useCallback, useRef } from "react";
-import { PlusCircle, MinusCircle } from "@phosphor-icons/react";
+import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
 
 import Button from "/components/form/Button";
 import Input from "/components/form/Input";
@@ -180,7 +180,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                         ])
                       }
                     >
-                      <MinusCircle size={24} weight="fill" />
+                      <IoMdCloseCircle size={24} />
                     </Button>
                     <Button
                       className="text-main-a11y-high"
@@ -198,12 +198,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                         )
                       }
                     >
-                      <PlusCircle
-                        size={24}
-                        weight="fill"
-                        className="color"
-                        size={24}
-                      />
+                      <IoIosAddCircle className="color" size={24} />
                     </Button>
                   </div>
                 </div>
@@ -326,7 +321,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                               )
                           )}
                         >
-                          <MinusCircle size={24} weight="fill" />
+                          <IoMdCloseCircle size={24} />
                         </Button>
                         <Button
                           className="text-main-a11y-high"
@@ -340,11 +335,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                             ]
                           )}
                         >
-                          <PlusCircle
-                            size={24}
-                            weight="fill"
-                            className="color"
-                          />
+                          <IoIosAddCircle className="color" size={24} />
                         </Button>
                       </div>
                     </div>

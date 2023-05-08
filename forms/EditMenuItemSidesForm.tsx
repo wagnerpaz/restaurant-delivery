@@ -1,4 +1,6 @@
 import React, { ComponentProps, useCallback, useMemo, useRef } from "react";
+import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
+import { RiExchangeFill } from "react-icons/ri";
 
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 import Draggable from "/components/Draggable";

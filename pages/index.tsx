@@ -1,7 +1,7 @@
 import Button from "/components/form/Button";
 import { GetServerSideProps, NextPage } from "next";
 import { signIn, useSession } from "next-auth/react";
-import { UserCircle } from "@phosphor-icons/react";
+import { FaUserCircle } from "react-icons/fa";
 import Head from "next/head";
 import ImageWithFallback from "/components/ImageWithFallback";
 import Link from "next/link";
@@ -44,7 +44,7 @@ const Home: NextPage<HomeProps> = ({ stores }) => {
               className="!bg-hero w-48 !m-auto flex flex-row items-center gap-2"
               onClick={() => signIn()}
             >
-              <UserCircle size={24} weight="fill" />
+              <FaUserCircle />
               Entrar
             </Button>
           </div>

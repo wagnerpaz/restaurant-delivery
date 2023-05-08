@@ -1,10 +1,12 @@
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
+import { BsFillInfoCircleFill } from "react-icons/bs";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/types/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/types/Store";
+import { IIngredient } from "/models/Ingredients";
 import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 import ImageEditorModal from "/modals/ImageEditorModal";
 import Modal from "/components/Modal";
