@@ -108,6 +108,7 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
               src={upload.id}
               width={999}
               height={999}
+              cdn
             />
           )}
         </div>

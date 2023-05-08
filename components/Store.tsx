@@ -163,6 +163,8 @@ const Store: FC<StoreProps> = ({ store }) => {
   const putMenuSectionSection = usePutStoreMenuSectionSection();
   const putUser = usePutUser();
 
+  const [tabIndex, setTabIndex] = useState(0);
+
   useEffect(() => {
     if (searchMobileVisible) {
       searchMobileRef.current?.focus();
@@ -228,8 +230,8 @@ const Store: FC<StoreProps> = ({ store }) => {
             placeholder="Pesquisar..."
           ></Input>
         )}
-        <Tabs>
-          <TabPanel className="!p-0">
+        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+          <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
             <main>
               <Menu
                 type="product"
@@ -246,7 +248,7 @@ const Store: FC<StoreProps> = ({ store }) => {
               />
             </main>
           </TabPanel>
-          <TabPanel className="!p-0">
+          <TabPanel className={classNames({ "min-h-screen": tabIndex === 1 })}>
             <main>
               <Menu
                 type="ingredient"
@@ -263,14 +265,27 @@ const Store: FC<StoreProps> = ({ store }) => {
               />
             </main>
           </TabPanel>
-          {admin && (
-            <TabList className="sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10">
-              <Tab>Produtos</Tab>
-              <Tab>Ingredientes</Tab>
-            </TabList>
-          )}
+          <TabList
+            className={classNames(
+              "sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10",
+              { hidden: !admin }
+            )}
+          >
+            <Tab
+              className="react-tabs__tab tab"
+              selectedClassName="tab-selected"
+            >
+              Produtos
+            </Tab>
+            <Tab
+              className="react-tabs__tab tab"
+              selectedClassName="tab-selected"
+            >
+              Ingredientes
+            </Tab>
+          </TabList>
         </Tabs>
-        <footer className="bg-comanda-hero p-6 h-[var(--footer-height)] w-full flex flex-row items-center">
+        <footer className="bg-comanda-hero absolute z-10 p-6 h-[var(--footer-height)] w-full flex flex-row items-center">
           <Link href="/">
             <Image
               className="w-[200px]"

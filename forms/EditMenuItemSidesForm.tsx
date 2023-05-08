@@ -133,10 +133,11 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                           <div className="flex flex-row items-center gap-2">
                             <ImageWithFallback
                               className="rounded-md"
-                              src={sidesItem.menuItem.images?.main?.toString()}
+                              src={sidesItem.menuItem.images?.main}
                               width={30}
                               height={30}
                               alt="menu item foto"
+                              cdn
                             />
                             {sidesItem.menuItem.name}
                           </div>
@@ -151,10 +152,11 @@ const EditMenuItemSidesForm: React.FC<EditMenuItemSidesFormProps> = ({
                             <div className="flex flex-row items-center gap-2">
                               <ImageWithFallback
                                 className="rounded-md"
-                                src={menuItem.images?.main?.toString()}
+                                src={menuItem.images?.main}
                                 width={30}
                                 height={30}
                                 alt="menu item foto"
+                                cdn
                               />
                               {menuItem.name} ({menuItem.nameDetail})
                             </div>

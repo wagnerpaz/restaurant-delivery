@@ -82,7 +82,15 @@
   }
 
   .button-hero-1 {
-    @apply uppercase mt-2 !px-6 !py-6 flex flex-row gap-2 items-center justify-center !bg-hero !text-hero-a11y-high;
+    @apply uppercase !px-6 !py-4 flex flex-row gap-2 items-center justify-center bg-hero text-hero-a11y-high;
+  }
+
+  .tab {
+    @apply border-0 border-solid border-[transparent] !border-b-4 focus:after:content-none text-main-a11y-medium;
+  }
+
+  .tab-selected {
+    @apply !border-hero !text-main-a11y-high font-bold;
   }
 }
 

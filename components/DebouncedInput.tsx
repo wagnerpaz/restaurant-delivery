@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import useDebounce from "/lib/hooks/useDebounce";
+import Input from "./form/Input";
 
 const DebouncedInput = ({ value, onChange, ...props }) => {
   const [localValue, setLocalValue] = useState(value);
@@ -8,7 +9,7 @@ const DebouncedInput = ({ value, onChange, ...props }) => {
   const debouncedOnChange = useDebounce(onChange);
 
   return (
-    <input
+    <Input
       onChange={(e) => {
         debouncedOnChange(e);
         setLocalValue(e.target.value);

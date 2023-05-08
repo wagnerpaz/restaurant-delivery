@@ -75,6 +75,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               src={clientStore.logo}
               width={200}
               height={200}
+              cdn
             />
           </EditableSection>
           <div className="w-full flex-1 flex flex-col gap-6">
