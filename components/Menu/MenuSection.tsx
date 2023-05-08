@@ -25,6 +25,8 @@ import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
+import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
+import defaultToastError from "/config/defaultToastError";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -43,6 +45,7 @@ export const emptyMenuSection: IMenuSection = {
 };
 
 interface MenuSectionProps extends AccordionPanelProps {
+  className?: string;
   menuSection: IMenuSection;
   type: "product" | "ingredient";
   isNew?: boolean;
@@ -162,6 +165,28 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     }
   }, [localMenuSection, setLocalMenuSection, toast]);
 
+  const putStoreMenuSection = usePutStoreMenuSection();
+  const handleFastEditClick = () => {
+    async function exec() {
+      setLocalMenuSection(
+        await putStoreMenuSection(
+          store,
+          {
+            ...localMenuSection,
+            editMode: "fast",
+          },
+          localMenuSection.index
+        )
+      );
+    }
+
+    try {
+      exec();
+    } catch (err) {
+      defaultToastError(err);
+    }
+  };
+
   const foundItems = localMenuSection.items
     .filter((f) => f.itemType === type)
     .filter(
@@ -194,7 +219,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
             onTrashClick={onTrashClick}
-            onFastEditClick={onFastEditClick}
+            onFastEditClick={handleFastEditClick}
           />
           <AccordionItemPanel
             className={classNames(

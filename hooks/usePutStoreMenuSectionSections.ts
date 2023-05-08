@@ -11,7 +11,7 @@ const usePutStoreMenuSectionSections = () => {
       `/api/store/${store._id}/menu/section/${sectionIndex}/section`,
       newMenuSection
     );
-    return response;
+    return response.data;
   };
   return call;
 };
