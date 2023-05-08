@@ -1,17 +1,6 @@
 import { ComponentProps, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
-import {
-  Button,
-  Input,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Textarea,
-} from "@chakra-ui/react";
-import { Select } from "@chakra-ui/react";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
 import { IMenuItem, IMenuItemCompositionItem } from "/models/types/MenuItem";

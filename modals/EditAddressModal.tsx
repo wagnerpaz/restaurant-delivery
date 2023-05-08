@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import Button from "/components/form/Button";
 import classNames from "classnames";
 import {
   ComponentProps,

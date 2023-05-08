@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { ComponentProps, useState } from "react";
-import { Button, Input } from "@chakra-ui/react";
 
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";

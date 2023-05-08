@@ -1,10 +1,8 @@
-import { Select } from "chakra-react-select";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { ComponentProps, useMemo } from "react";
 import { onlyText } from "react-children-utilities";
 import MoneyDisplay from "./MoneyDisplay";
 
-import FormControl from "/components/FormControl";
 import {
   composeFullSectionNameByIndex,
   listAllSectionsIndexes,
@@ -13,6 +11,7 @@ import {
 import removeDiacritics from "/lib/removeDiacritics";
 import { IMenuItem } from "/models/types/MenuItem";
 import { IMenuSection, IStore } from "/models/types/Store";
+import ReactSelect from "./ReactSelect";
 
 interface MenuItemBySectionSelectorProps extends ComponentProps<"div"> {
   store: IStore;
@@ -70,91 +69,90 @@ const MenuItemBySectionSelector: React.FC<MenuItemBySectionSelectorProps> = ({
 
   return (
     <div className="flex flex-row flex-1 gap-4">
-      <FormControl className="flex-1" label="Seção">
-        <Select
-          useBasicStyles
-          menuPosition="fixed"
-          menuPlacement="auto"
-          menuPortalTarget={menuPortalTarget}
-          classNames={{ menuPortal: () => "!z-50" }}
-          value={{
-            value: menuSectionIndex,
-            label: menuSectionFullName,
-          }}
-          options={[...allSectionsIndexesListed].map((sectionIndex) => ({
-            value: sectionIndex.join(","),
-            label: composeFullSectionNameByIndex(
-              store.menu.sections,
-              sectionIndex
-            ),
-          }))}
-          onChange={(e) => onMenuSectionChange(e?.value)}
-        />
-      </FormControl>
-      <FormControl className="flex-1" label="Item">
-        <Select
-          useBasicStyles
-          menuPosition="fixed"
-          menuPlacement="auto"
-          menuPortalTarget={menuPortalTarget}
-          classNames={{ menuPortal: () => "!z-50" }}
-          filterOption={({ label }, inputValue) =>
-            removeDiacritics(onlyText(label.props.children))
-              .toLowerCase()
-              .includes(removeDiacritics(inputValue).toLowerCase())
-          }
-          value={{
-            value: menuItem?._id,
-            label: (
-              <div className="flex flex-row items-center gap-2 justify-between w-full">
-                <div className="flex flex-row items-center">
-                  {menuItem?.images?.main && (
+      <ReactSelect
+        label="Seção"
+        useBasicStyles
+        menuPosition="fixed"
+        menuPlacement="auto"
+        menuPortalTarget={menuPortalTarget}
+        classNames={{ menuPortal: () => "!z-50", container: () => "flex-1" }}
+        value={{
+          value: menuSectionIndex,
+          label: menuSectionFullName,
+        }}
+        options={[...allSectionsIndexesListed].map((sectionIndex) => ({
+          value: sectionIndex.join(","),
+          label: composeFullSectionNameByIndex(
+            store.menu.sections,
+            sectionIndex
+          ),
+        }))}
+        onChange={(e) => onMenuSectionChange(e?.value)}
+      />
+      <ReactSelect
+        useBasicStyles
+        menuPosition="fixed"
+        menuPlacement="auto"
+        menuPortalTarget={menuPortalTarget}
+        classNames={{ menuPortal: () => "!z-50", container: () => "flex-1" }}
+        filterOption={({ label }, inputValue) =>
+          removeDiacritics(onlyText(label.props.children))
+            .toLowerCase()
+            .includes(removeDiacritics(inputValue).toLowerCase())
+        }
+        value={{
+          value: menuItem?._id,
+          label: (
+            <div className="flex flex-row items-center gap-2 justify-between w-full">
+              <div className="flex flex-row items-center">
+                {menuItem?.images?.main && (
+                  <ImageWithFallback
+                    className="rounded-md"
+                    src={menuItem?.images?.main}
+                    width={30}
+                    height={30}
+                    alt="Ingrediente foto"
+                    cdn
+                  />
+                )}
+                {menuItem?.name || (allowAll && "Todos")}
+              </div>
+              <MoneyDisplay zeroInvisible plus value={menuItem?.price} />
+            </div>
+          ),
+        }}
+        options={allowAllIfPossible(
+          [...selectedSectionItems]
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .map((menuItem) => ({
+              value: menuItem._id,
+              label: (
+                <div className="flex flex-row items-center justify-between gap-2 w-full">
+                  <div className="flex flex-row items-center">
                     <ImageWithFallback
                       className="rounded-md"
-                      src={menuItem?.images?.main?.toString()}
+                      src={menuItem.images?.main?.toString()}
                       width={30}
                       height={30}
-                      alt="Ingrediente foto"
+                      alt="menu item foto"
+                      cdn
                     />
-                  )}
-                  {menuItem?.name || (allowAll && "Todos")}
-                </div>
-                <MoneyDisplay zeroInvisible plus value={menuItem?.price} />
-              </div>
-            ),
-          }}
-          options={allowAllIfPossible(
-            [...selectedSectionItems]
-              .sort((a, b) => (a.name > b.name ? 1 : -1))
-              .map((menuItem) => ({
-                value: menuItem._id,
-                label: (
-                  <div className="flex flex-row items-center justify-between gap-2 w-full">
-                    <div className="flex flex-row items-center">
-                      <ImageWithFallback
-                        className="rounded-md"
-                        src={menuItem.images?.main?.toString()}
-                        width={30}
-                        height={30}
-                        alt="menu item foto"
-                      />
-                      <span>
-                        {menuItem.name}
-                        {menuItem.nameDetail && ` (${menuItem.nameDetail})`}
-                      </span>
-                    </div>
-                    <MoneyDisplay zeroInvisible plus value={menuItem.price} />
+                    <span>
+                      {menuItem.name}
+                      {menuItem.nameDetail && ` (${menuItem.nameDetail})`}
+                    </span>
                   </div>
-                ),
-              }))
-          )}
-          onChange={(e) =>
-            onMenuItemChange(
-              selectedSectionItems.find((f) => f._id === e?.value) || null
-            )
-          }
-        />
-      </FormControl>
+                  <MoneyDisplay zeroInvisible plus value={menuItem.price} />
+                </div>
+              ),
+            }))
+        )}
+        onChange={(e) =>
+          onMenuItemChange(
+            selectedSectionItems.find((f) => f._id === e?.value) || null
+          )
+        }
+      />
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import { memo } from "react";
-import { Select, SelectProps } from "@chakra-ui/react";
 
 import FormControl from "/components/FormControl";
+import ReactSelect from "./ReactSelect";
 
-interface LocalSimpleSelectProps extends SelectProps {
+interface LocalSimpleSelectProps {
   label?: string;
   className: string;
 }
@@ -15,7 +15,7 @@ const LocalSimpleSelect: React.FC<LocalSimpleSelectProps> = ({
 }) => {
   return (
     <FormControl className={className} label={label || ""}>
-      <Select {...props} />
+      <ReactSelect {...props} />
     </FormControl>
   );
 };

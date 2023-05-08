@@ -1,5 +1,5 @@
 import { ComponentProps, memo, useMemo, useContext, useCallback } from "react";
-import { Button } from "@chakra-ui/react";
+import Button from "/components/form/Button";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";

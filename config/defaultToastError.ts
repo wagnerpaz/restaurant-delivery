@@ -1,6 +1,4 @@
-import { UseToastOptions } from "@chakra-ui/react";
-
-const defaultToastError = (err): UseToastOptions => {
+const defaultToastError = (err) => {
   return {
     title: "Ocorreu um erro",
     description:

@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import { IUser } from "/models/types/User";
 import getHighlightedText from "/lib/getHighlightedText";
 import MoneyDisplay from "../MoneyDisplay";
-import { Button } from "@chakra-ui/react";
+import Button from "/components/form/Button";
 import ImageWithFallback from "/components/ImageWithFallback";
 import getTailwindScreenSize from "/lib/tailwind/getTailwindScreenSize";
 import { GRID_CONFIG } from "./MenuSection";

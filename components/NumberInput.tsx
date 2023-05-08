@@ -1,6 +1,8 @@
-import { Button, Input } from "@chakra-ui/react";
 import classNames from "classnames";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+
+import Button from "./form/Button";
+import Input from "./form/Input";
 
 const NumberInput = ({
   className = "",

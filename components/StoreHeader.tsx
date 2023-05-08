@@ -1,8 +1,8 @@
-import { Button } from "@chakra-ui/react";
 import { ComponentProps, useContext, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiMenu } from "react-icons/hi";
 
+import Button from "/components/form/Button";
 import DebouncedInput from "./DebouncedInput";
 import ImageWithFallback from "./ImageWithFallback";
 import MainMenuDrawer from "./MainMenuDrawer";

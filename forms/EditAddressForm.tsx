@@ -1,9 +1,11 @@
-import { Input, Select, useToast } from "@chakra-ui/react";
 import { ComponentProps, useEffect, useState } from "react";
 import FormControl from "/components/FormControl";
 import useGetBrasilCep from "/hooks/useGetBrasilCep";
 import useGetBrasilCities from "/hooks/useGetBrasilCities";
 import useGetBrasilStates from "/hooks/useGetBrasilStates";
+
+import Input from "/components/form/Input";
+import Select from "/components/ReactSelect";
 
 import applyCepMask from "/lib/cepMask";
 import isValidBRPostalCode from "/lib/isValidBrPostalCode";
@@ -18,7 +20,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   const [brasilStates, setBrasilStates] = useState([]);
   const [brasilCities, setBrasilCities] = useState([]);
 
-  const toast = useToast();
+  // const toast = useToast();
 
   const getBrasilCep = useGetBrasilCep();
   const getBrasilStates = useGetBrasilStates();
@@ -55,12 +57,12 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
             postalCode: postalCode,
           });
         } catch (err) {
-          toast({ status: "warning", title: "CEP não encontrado." });
+          // toast({ status: "warning", title: "CEP não encontrado." });
         }
       }
     }
     exec();
-  }, [postalCode, getBrasilCep, onLocationChange, toast]);
+  }, [postalCode, getBrasilCep, onLocationChange]);
 
   return (
     <div className="flex flex-col gap-6 pt-6 flex-1">

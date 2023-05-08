@@ -1,7 +1,9 @@
 import { ComponentProps, useCallback, useRef } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
-import { Button, Input, Select as SimpleSelect } from "@chakra-ui/react";
 
+import Button from "/components/form/Button";
+import Input from "/components/form/Input";
+import Select from "/components/ReactSelect";
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import { insertAt, replaceAt, swap } from "/lib/immutable";
@@ -10,7 +12,6 @@ import {
   IMenuItemAdditionalsCategory,
   IMenuItemAdditionalsItem,
 } from "/models/types/MenuItem";
-import { Select } from "chakra-react-select";
 import FormControl from "/components/FormControl";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/types/Store";
@@ -89,7 +90,7 @@ const EditMenuItemAdditionalsForm: React.FC<
     <div ref={containerRef}>
       <Fieldset className="flex flex-row items-center gap-2 mb-6">
         <FormControl className="flex-1 min-w-fit" label="Definição">
-          <SimpleSelect
+          <Select
             value={menuItem.customizeType}
             onChange={(e) =>
               onMenuItemChange({ ...menuItem, customizeType: e.target.value })
@@ -97,7 +98,7 @@ const EditMenuItemAdditionalsForm: React.FC<
           >
             <option value="template">Usar Modelo</option>
             <option value="individual">Usar Individual</option>
-          </SimpleSelect>
+          </Select>
         </FormControl>
         {menuItem.customizeType === "template" && (
           <MenuItemBySectionSelector
@@ -282,7 +283,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                         />
                       </FormControl>
                       <FormControl className="w-20" label="Cobrar">
-                        <SimpleSelect
+                        <Select
                           value={`${item.charge}`}
                           onChange={handleModifyAdditionalsProp(
                             additionalsCategory,
@@ -305,7 +306,7 @@ const EditMenuItemAdditionalsForm: React.FC<
                           <option key="false" value="false">
                             Não
                           </option>
-                        </SimpleSelect>
+                        </Select>
                       </FormControl>
                       <div className="flex flex-row">
                         <Button

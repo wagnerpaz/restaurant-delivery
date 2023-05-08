@@ -11,7 +11,6 @@ import ReactCrop, {
 import Modal from "/components/Modal";
 import { imgPreview } from "/lib/image-crop/imgPreview";
 import usePutUpload from "/hooks/usePutUpload";
-import { Button, Input } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
 import ImageWithFallback from "/components/ImageWithFallback";
 

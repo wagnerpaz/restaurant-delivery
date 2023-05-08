@@ -5,7 +5,6 @@ import {
   AccordionItemHeading,
   AccordionItemPanel,
 } from "react-accessible-accordion";
-import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import classNames from "classnames";
 import {
   ComponentProps,

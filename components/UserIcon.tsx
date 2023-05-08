@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { Button } from "@chakra-ui/react";
 import { createPortal } from "react-dom";
 import { FaAddressBook, FaSignOutAlt } from "react-icons/fa";
 
+import Button from "/components/form/Button";
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { useRouter } from "next/router";
 

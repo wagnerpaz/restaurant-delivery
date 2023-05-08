@@ -11,7 +11,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
-import { useToast } from "@chakra-ui/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -86,7 +85,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 }) => {
   const { store, search } = useContext(StoreContext);
   const router = useRouter();
-  const toast = useToast();
+  // const toast = useToast();
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -150,10 +149,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const handleAddMenuItemFast = useCallback(() => {
     if (localMenuSection.items.find((f) => !f._id)) {
-      toast({
-        title: "Salve todos os novos itens antes de adicionar outro.",
-        status: "warning",
-      });
+      // toast({
+      //   title: "Salve todos os novos itens antes de adicionar outro.",
+      //   status: "warning",
+      // });
     } else {
       setLocalMenuSection({
         ...localMenuSection,
@@ -163,7 +162,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         ],
       });
     }
-  }, [localMenuSection, setLocalMenuSection, toast]);
+  }, [localMenuSection, setLocalMenuSection]);
 
   const putStoreMenuSection = usePutStoreMenuSection();
   const handleFastEditClick = () => {

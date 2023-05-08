@@ -11,18 +11,10 @@ import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import {
-  Input,
-  useToast,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 import Menu from "/components/Menu/Menu";
 import { emptyMenuSection } from "/components/Menu/MenuSection";
@@ -100,7 +92,7 @@ const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
-  const toast = useToast();
+  // const toast = useToast();
   const router = useRouter();
 
   const { data: session, status } = useSession();
@@ -223,9 +215,7 @@ const Store: FC<StoreProps> = ({ store }) => {
         menuItemsRenderCount,
       }}
     >
-      <div
-        className={classNames("font-lato custom-scrollbar min-h-screen pb-40")}
-      >
+      <div className={classNames("font-lato custom-scrollbar min-h-screen")}>
         <StoreHeader />
         {searchMobileVisible && (
           <Input
@@ -238,50 +228,48 @@ const Store: FC<StoreProps> = ({ store }) => {
           ></Input>
         )}
         <Tabs>
-          <TabPanels>
-            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
-              <main>
-                <Menu
-                  type="product"
-                  sections={clientStore.menu.sections}
-                  onChangeSection={(section) => {
-                    const cloneStore = cloneDeep(clientStore);
-                    cloneStore.menu.sections = replaceObjectById(
-                      cloneStore.menu.sections,
-                      section._id,
-                      section
-                    );
-                    setClientStore(cloneStore);
-                  }}
-                />
-              </main>
-            </TabPanel>
-            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
-              <main>
-                <Menu
-                  type="ingredient"
-                  sections={clientStore.menu.sections}
-                  onChangeSection={(section) => {
-                    const cloneStore = cloneDeep(clientStore);
-                    cloneStore.menu.sections = replaceObjectById(
-                      cloneStore.menu.sections,
-                      section._id,
-                      section
-                    );
-                    setClientStore(cloneStore);
-                  }}
-                />
-              </main>
-            </TabPanel>
-            {admin && (
-              <TabList className="sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10">
-                <Tab>Produtos</Tab>
-                <Tab>Ingredientes</Tab>
-              </TabList>
-            )}
-          </TabPanels>
+          <TabPanel className="!p-0">
+            <main>
+              <Menu
+                type="product"
+                sections={clientStore.menu.sections}
+                onChangeSection={(section) => {
+                  const cloneStore = cloneDeep(clientStore);
+                  cloneStore.menu.sections = replaceObjectById(
+                    cloneStore.menu.sections,
+                    section._id,
+                    section
+                  );
+                  setClientStore(cloneStore);
+                }}
+              />
+            </main>
+          </TabPanel>
+          <TabPanel className="!p-0">
+            <main>
+              <Menu
+                type="ingredient"
+                sections={clientStore.menu.sections}
+                onChangeSection={(section) => {
+                  const cloneStore = cloneDeep(clientStore);
+                  cloneStore.menu.sections = replaceObjectById(
+                    cloneStore.menu.sections,
+                    section._id,
+                    section
+                  );
+                  setClientStore(cloneStore);
+                }}
+              />
+            </main>
+          </TabPanel>
+          {admin && (
+            <TabList className="sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10">
+              <Tab>Produtos</Tab>
+              <Tab>Ingredientes</Tab>
+            </TabList>
+          )}
         </Tabs>
-        <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
+        <footer className="bg-comanda-hero p-6 h-[var(--footer-height)] w-full flex flex-row items-center">
           <Link href="/">
             <Image
               className="w-[200px]"
@@ -333,7 +321,7 @@ const Store: FC<StoreProps> = ({ store }) => {
                 setClientStore(updatedStore);
                 comeBackToStoreRoot(false);
               } catch (err: any) {
-                toast(defaultToastError(err));
+                // toast(defaultToastError(err));
               }
             }}
           />
@@ -357,7 +345,7 @@ const Store: FC<StoreProps> = ({ store }) => {
                   setClientStore(serverStore);
                   setAddStoreModalOpen(false);
                 } catch (err: any) {
-                  toast(defaultToastError(err));
+                  // toast(defaultToastError(err));
                 }
               } else {
                 setClientStore(value);
@@ -424,7 +412,7 @@ const Store: FC<StoreProps> = ({ store }) => {
 
                 setClientStore(cloneStore);
               } catch (err: any) {
-                toast(defaultToastError(err));
+                // toast(defaultToastError(err));
               }
 
               setEditNewSectionModalOpen(false);
@@ -462,7 +450,7 @@ const Store: FC<StoreProps> = ({ store }) => {
                   setEditNewSectionIndex([-1]);
                   setEditNewSectionParentName("");
                 } catch (err: any) {
-                  toast(defaultToastError(err));
+                  // toast(defaultToastError(err));
                 }
               }
             }}
