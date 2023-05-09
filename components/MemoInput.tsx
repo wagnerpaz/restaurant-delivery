@@ -8,7 +8,7 @@ interface LocalInputProps {
   className: string;
 }
 
-const LocalInput: React.FC<LocalInputProps> = ({
+const MemoInput: React.FC<LocalInputProps> = ({
   className,
   label,
   ...props
@@ -21,6 +21,6 @@ const LocalInput: React.FC<LocalInputProps> = ({
 };
 
 export default memo(
-  LocalInput,
+  MemoInput,
   (prevProps, nextProps) => prevProps.value === nextProps.value
 );

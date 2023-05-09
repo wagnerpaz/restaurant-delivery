@@ -7,6 +7,8 @@ import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { IStore } from "/models/types/Store";
+import MenuSection from "/models/MenuSection";
+import section from "/pages/api/store/[storeId]/menu/section";
 
 const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   console.log("-------------");
@@ -23,27 +25,24 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
 
   //ensure that dependent schemas are loaded
   MenuItem.name;
+  MenuSection.name;
 
   const { params } = context;
   const { storeSlug, locationSlug } = params as ParsedUrlQuery;
 
-  const populate = {
-    path: "menu",
-    populate: sectionsPopulate(
-      sectionsPopulate(sectionsPopulate(sectionsPopulate(sectionsPopulate())))
-    ),
-  };
-
   const store: IStore | null = await Store.findOne({
     slug: storeSlug,
+    active: true,
   })
-    .populate(populate)
+    .populate({ path: "menu.sections", populate: { path: "items" } })
     .exec();
+  console.log(store);
 
   // Convert the store object to a plain JavaScript object
   const storeObject = store && serializeJson(store?.toObject());
   const jsonString = JSON.stringify(storeObject);
   const bytes = new TextEncoder().encode(jsonString).byteLength;
+  console.log(storeObject);
   console.log(`Initial store size is ${bytes / 1024} kbs`);
 
   const allProcessAfter = performance.now();

@@ -3,8 +3,12 @@ import { ComponentProps, useState } from "react";
 
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";
-import { IMenuSection } from "/models/types/Store";
+import { IMenuSection } from "/models/types/MenuSection";
 import { IMenuItem } from "/models/types/MenuItem";
+import Input from "/components/form/Input";
+import Button from "/components/form/Button";
+
+import { emptyMenuSection } from "/components/Menu/MenuSection";
 
 interface AddMenuSectionModalProps extends ComponentProps<typeof Modal> {
   menuSection: IMenuItem;
@@ -25,7 +29,9 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
   onDelete,
   ...props
 }) => {
-  const [name, setName] = useState(menuSection.name);
+  const [name, setName] = useState(
+    mode === "ADD" ? emptyMenuSection.name : menuSection.name
+  );
 
   return (
     <Modal

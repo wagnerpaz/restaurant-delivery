@@ -16,6 +16,8 @@ import ImageWithFallback from "/components/ImageWithFallback";
 import Input from "/components/form/Input";
 import Button from "/components/form/Button";
 
+import "react-image-crop/dist/ReactCrop.css";
+
 interface DbImageEditorProps extends ComponentProps<typeof Modal> {
   upload: {
     path: string;

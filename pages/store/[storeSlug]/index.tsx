@@ -35,9 +35,8 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
 
 export const getStaticProps: GetServerSideProps = ssrHelpers.pipe(storeSSP());
 export async function getStaticPaths() {
-  console.log("will get static paths");
   await connectToDatabase();
-  const slugs = await StoreModel.find({}, { slug: 1 });
+  const slugs = await StoreModel.find({ active: true }, { slug: 1 });
   console.log("slugs", slugs);
   return {
     paths: slugs.map(({ slug }) => ({ params: { storeSlug: slug } })),

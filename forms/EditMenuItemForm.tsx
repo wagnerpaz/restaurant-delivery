@@ -1,10 +1,10 @@
-import { ComponentProps, useEffect, useMemo, useState } from "react";
+import { ComponentProps, useEffect, useContext, useState } from "react";
 import classNames from "classnames";
 import isEqual from "lodash.isequal";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
-import { IMenuItem, IMenuItemCompositionItem } from "/models/types/MenuItem";
+import { IMenuItem } from "/models/types/MenuItem";
 import Fieldset from "/components/Fieldset";
 import { IStore } from "/models/types/Store";
 import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
@@ -20,6 +20,7 @@ import Input from "/components/form/Input";
 import ReactSelect from "/components/ReactSelect";
 import Textarea from "/components/form/Textarea";
 import Button from "/components/form/Button";
+import { StoreContext } from "/components/Store";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -31,7 +32,6 @@ interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
 const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   className,
   children,
-  store,
   menuItem,
   open,
   onOpenChange,
@@ -39,6 +39,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   onStoreChange = () => {},
   ...props
 }) => {
+  const { store } = useContext(StoreContext);
+
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);

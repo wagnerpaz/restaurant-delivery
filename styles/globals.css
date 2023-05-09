@@ -8,6 +8,7 @@
   font-family: "Lato";
   font-style: normal;
   font-weight: 400;
+  font-display: swap;
   src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjxAwXjeu.woff2)
     format("woff2");
   unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
@@ -18,6 +19,7 @@
   font-family: "Lato";
   font-style: normal;
   font-weight: 400;
+  font-display: swap;
   src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXg.woff2)
     format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
@@ -29,6 +31,7 @@
   font-family: "Lato";
   font-style: normal;
   font-weight: 700;
+  font-display: swap;
   src: url(https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwaPGR_p.woff2)
     format("woff2");
   unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
@@ -39,6 +42,7 @@
   font-family: "Lato";
   font-style: normal;
   font-weight: 700;
+  font-display: swap;
   src: url(https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ.woff2)
     format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,

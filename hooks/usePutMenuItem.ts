@@ -6,17 +6,17 @@ const usePutMenuItem = () => {
   const call = async (
     store: IStore,
     menuItem: IMenuItem,
-    sectionIndex?: number[]
+    sectionId?: string
   ) => {
     if (menuItem._id) {
       const response = await axiosInstance.put(
-        `/api/store/${store._id}/menu/section/${sectionIndex}/item/${menuItem._id}`,
+        `/api/store/${store._id}/menu/section/${sectionId}/item/${menuItem._id}`,
         menuItem
       );
       return response.data;
     } else {
       const response = await axiosInstance.post(
-        `/api/store/${store._id}/menu/section/${sectionIndex}/item`,
+        `/api/store/${store._id}/menu/section/${sectionId}/item`,
         menuItem
       );
       return response.data;

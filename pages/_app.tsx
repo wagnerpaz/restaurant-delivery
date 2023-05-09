@@ -11,7 +11,6 @@ import { getRGBColor } from "/lib/getRGBColor";
 
 import "react-tabs/style/react-tabs.css";
 import "/styles/globals.css";
-import "react-image-crop/dist/ReactCrop.css";
 import "nprogress/nprogress.css";
 
 const activeLabelStyles = {
@@ -105,6 +104,8 @@ function App({
 
   const heroPatternVar = `--pattern-hero: url(${heroPattern})`;
 
+  useEffect(() => {});
+
   const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
@@ -114,12 +115,6 @@ function App({
   return (
     <>
       <Head>
-        {pageLoaded && (
-          <link
-            rel="stylesheet"
-            href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
-          />
-        )}
         <style>
           {`:root{${heroColorVar}
              ${heroA11yHighColorVar}

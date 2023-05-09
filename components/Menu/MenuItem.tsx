@@ -10,6 +10,7 @@ import { StoreContext } from "../Store";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
 import defaultToastError from "/config/defaultToastError";
 import { MenuSectionContext } from "./MenuSection";
+import useLocalState from "/hooks/useLocalState";
 
 interface MenuItemProps {
   editMode: "realistic" | "fast";
@@ -42,10 +43,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
   if (menuItemsRenderCount) menuItemsRenderCount.current++;
 
-  // const toast = useToast();
   const router = useRouter();
 
-  const [localMenuItem, setLocalMenuItem] = useState(menuItem);
+  const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
 
   const deleteMenuItem = useDeleteMenuItem();
 

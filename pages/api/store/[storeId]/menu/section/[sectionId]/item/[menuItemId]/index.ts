@@ -5,16 +5,15 @@ import connectToDatabase from "/lib/mongoose";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
+import revalidateCall from "/lib/revalidateCall";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
     const storeId = req.query.storeId as string;
-    const sectionIndex = req.query.sectionIndex as string;
+    const sectionId = req.query.sectionId as string;
     const menuItemId = req.query.menuItemId as string;
 
     const session = await getServerSession(req, res, authOptions);
-
-    const sectionIndexSplit = sectionIndex.split(",");
 
     await connectToDatabase();
 
@@ -27,15 +26,8 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
         )
           .populate("composition.ingredient")
           .exec();
-        await Store.updateOne(
-          { _id: storeId },
-          {
-            $addToSet: {
-              [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
-                menuItemId,
-            },
-          }
-        );
+        const { slug } = await Store.findById(storeId, { slug: 1 });
+        await res.revalidate(`/store/${slug}`);
         res.status(200).json(serverMenuItem.toObject());
       } else if (req.method === "DELETE") {
         await Store.updateOne(

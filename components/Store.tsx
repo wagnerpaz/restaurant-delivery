@@ -17,17 +17,12 @@ import { useRouter } from "next/router";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 import Menu from "/components/Menu/Menu";
-import { emptyMenuSection } from "/components/Menu/MenuSection";
-import { ILocation, IMenuSection, IStore } from "/models/types/Store";
+import { ILocation, IStore } from "/models/types/Store";
 
 import { IMenuItem } from "/models/types/MenuItem";
-import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
 import usePutStore from "/hooks/usePutStore";
-import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
-import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
-import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import {
   findMenuItemSectionIndex,
   replaceObjectById,
@@ -91,6 +86,8 @@ const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
+  console.log("Server Store", store);
+
   // const toast = useToast();
   const router = useRouter();
 
@@ -107,31 +104,6 @@ const Store: FC<StoreProps> = ({ store }) => {
 
   const [search, setSearch] = useState("");
   const [searchMobileVisible, setSearchMobileVisible] = useState(false);
-
-  const editMenuItemObject = useMemo(
-    () =>
-      retrieveAllMenuItems(clientStore?.menu?.sections || []).find(
-        (f) => f._id === router.query.editMenuItemId
-      ) ||
-      (router.query.addMenuItemBySection && {
-        ...emptyMenuItem,
-        itemType: "product",
-      }),
-    [
-      clientStore?.menu?.sections,
-      router.query.editMenuItemId,
-      router.query.addMenuItemBySection,
-    ]
-  );
-  const editMenuItemModalOpen = !!router.query.editMenuItemId;
-
-  const [editNewSectionIndex, setEditNewSectionIndex] = useState([-1]);
-  const [editNewSectionModalOpen, setEditNewSectionModalOpen] = useState(false);
-  const [editNewSectionParentName, setEditNewSectionParentName] = useState("");
-  const [editNewSectionObject, setEditNewSectionObject] = useState({
-    ...emptyMenuSection,
-  });
-  const [editNewSectionMode, setEditNewSectionMode] = useState("");
 
   const [addStoreModalOpen, setAddStoreModalOpen] = useState(!clientStore);
 
@@ -153,12 +125,7 @@ const Store: FC<StoreProps> = ({ store }) => {
   const restoreTrashForSectionIndexOpen =
     !!router.query.restoreTrashForSectionIndex;
 
-  const getStore = useGetStore();
   const putStore = usePutStore();
-  const putMenuItem = usePutMenuItem();
-  const deleteMenuSection = useDeleteStoreMenuSection();
-  const putMenuSection = usePutStoreMenuSection();
-  const putMenuSectionSection = usePutStoreMenuSectionSection();
   const putUser = usePutUser();
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -231,36 +198,12 @@ const Store: FC<StoreProps> = ({ store }) => {
         <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
             <main>
-              <Menu
-                type="product"
-                sections={clientStore.menu.sections}
-                onChangeSection={(section) => {
-                  const cloneStore = cloneDeep(clientStore);
-                  cloneStore.menu.sections = replaceObjectById(
-                    cloneStore.menu.sections,
-                    section._id,
-                    section
-                  );
-                  setClientStore(cloneStore);
-                }}
-              />
+              <Menu type="product" sections={clientStore.menu.sections} />
             </main>
           </TabPanel>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 1 })}>
             <main>
-              <Menu
-                type="ingredient"
-                sections={clientStore.menu.sections}
-                onChangeSection={(section) => {
-                  const cloneStore = cloneDeep(clientStore);
-                  cloneStore.menu.sections = replaceObjectById(
-                    cloneStore.menu.sections,
-                    section._id,
-                    section
-                  );
-                  setClientStore(cloneStore);
-                }}
-              />
+              <Menu type="ingredient" sections={clientStore.menu.sections} />
             </main>
           </TabPanel>
           <TabList
@@ -294,52 +237,7 @@ const Store: FC<StoreProps> = ({ store }) => {
             />
           </Link>
         </footer>
-        {editMenuItemObject && (
-          <EditMenuItemModal
-            open={
-              !!router.query.editMenuItemId ||
-              !!router.query.addMenuItemBySection
-            }
-            onOpenChange={comeBackToStoreRoot}
-            store={clientStore}
-            menuItem={editMenuItemObject}
-            onStoreChange={async (newStore, shouldSave) => {
-              setClientStore(newStore);
-              if (shouldSave) {
-                await putStore(newStore);
-              }
-            }}
-            onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
-              if (cancelled) {
-                return;
-              }
 
-              let editMenuSectionIndex;
-              if (newMenuItem?._id) {
-                editMenuSectionIndex = findMenuItemSectionIndex(
-                  clientStore.menu.sections,
-                  newMenuItem
-                );
-              } else {
-                editMenuSectionIndex =
-                  `${router.query.addMenuItemBySection}`?.split(",");
-              }
-
-              try {
-                await putMenuItem(
-                  clientStore,
-                  newMenuItem,
-                  editMenuSectionIndex
-                );
-                const updatedStore = await getStore(clientStore._id);
-                setClientStore(updatedStore);
-                comeBackToStoreRoot(false);
-              } catch (err: any) {
-                // toast(defaultToastError(err));
-              }
-            }}
-          />
-        )}
         {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
           <OrderMenuItemDetailsModal
             store={clientStore}
@@ -369,105 +267,6 @@ const Store: FC<StoreProps> = ({ store }) => {
             noAutoClose={!clientStore}
             open={addStoreModalOpen}
             onOpenChange={(value) => setAddStoreModalOpen(value)}
-          />
-        )}
-        {editNewSectionModalOpen && (
-          <AddMenuSectionModal
-            portalTarget={() => null}
-            mode={editNewSectionMode}
-            parentName={editNewSectionParentName}
-            menuSection={editNewSectionObject}
-            open={editNewSectionModalOpen}
-            onOpenChange={(value) => setEditNewSectionModalOpen(value)}
-            onSave={async (value) => {
-              try {
-                if (editNewSectionMode === "EDIT") {
-                  await putMenuSection(clientStore, value, editNewSectionIndex);
-                } else {
-                  if (editNewSectionIndex[0] >= 0) {
-                    await putMenuSectionSection(
-                      clientStore,
-                      editNewSectionIndex,
-                      value
-                    );
-                  } else {
-                    await putMenuSection(clientStore, value);
-                  }
-                }
-
-                const cloneStore = cloneDeep(clientStore);
-
-                let sections;
-                let section = cloneStore.menu as IMenuSection;
-                if (
-                  editNewSectionMode === "ADD" ||
-                  editNewSectionMode === "ADD-SUB"
-                ) {
-                  if (editNewSectionIndex[0] >= 0) {
-                    for (const index of editNewSectionIndex) {
-                      section = section.sections[index];
-                    }
-                    sections = section.sections;
-                    sections.push(value);
-                  } else {
-                    sections = cloneStore.menu.sections;
-                    sections.push(value);
-                  }
-                } else {
-                  if (editNewSectionIndex[0] >= 0) {
-                    for (const index of editNewSectionIndex) {
-                      section = section.sections[index];
-                    }
-                  } else {
-                    section = section.sections[0];
-                  }
-                  Object.assign(section, value);
-                }
-
-                setClientStore(cloneStore);
-              } catch (err: any) {
-                // toast(defaultToastError(err));
-              }
-
-              setEditNewSectionModalOpen(false);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
-            }}
-            onCancel={() => {
-              setEditNewSectionModalOpen(false);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
-            }}
-            onDelete={async () => {
-              const confirmed = confirm(
-                `Você tem certeza que deseja remover a seção "${editNewSectionObject.name}" com todos os seus items?`
-              );
-
-              if (confirmed) {
-                try {
-                  await deleteMenuSection(clientStore, editNewSectionIndex);
-
-                  const cloneStore = cloneDeep(clientStore);
-
-                  const indexSpliced = [...editNewSectionIndex];
-                  const lastIndex = indexSpliced.splice(-1)[0];
-
-                  let section = cloneStore.menu as IMenuSection;
-                  for (const index of indexSpliced) {
-                    section = section.sections[index];
-                  }
-                  section.sections = removeAt(section.sections, lastIndex);
-
-                  setClientStore(cloneStore);
-
-                  setEditNewSectionModalOpen(false);
-                  setEditNewSectionIndex([-1]);
-                  setEditNewSectionParentName("");
-                } catch (err: any) {
-                  // toast(defaultToastError(err));
-                }
-              }
-            }}
           />
         )}
         {editUserAddressesOpen && (

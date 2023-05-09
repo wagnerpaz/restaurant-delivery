@@ -1,4 +1,4 @@
-export type ItemTypeType = "product" | "ingredient" | "ingredient-group";
+export type ItemTypeType = "product" | "ingredient";
 
 export interface IMenuItem {
   store: IStore;

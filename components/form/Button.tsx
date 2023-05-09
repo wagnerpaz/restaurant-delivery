@@ -18,7 +18,7 @@ const Button = ({
           "bg-hero text-hero-a11y-high uppercase font-bold":
             variant === "contained",
           "border border-hero": variant === "outline",
-          "!px-0": "text",
+          "!px-0": variant === "text",
           "opacity-50 cursor-not-allowed": isDisabled,
         },
         className

@@ -4,12 +4,10 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        /> */}
+          rel="stylesheet"
+          href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
+        />
       </Head>
       <body className="custom-scrollbar">
         <Main />
