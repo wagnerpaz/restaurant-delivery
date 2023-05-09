@@ -1,5 +1,4 @@
-import { ComponentProps, memo, useMemo, useContext, useCallback } from "react";
-import Button from "/components/form/Button";
+import { ComponentProps, memo, useMemo, useState, useContext } from "react";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
@@ -16,7 +15,6 @@ import { StoreContext } from "../Store";
 import { MenuSectionContext } from "./MenuSection";
 import { IStore } from "/models/types/Store";
 import { replaceAt } from "/lib/immutable";
-import { IMenuSection } from "/models/types/MenuSection";
 import MemoButton from "/components/MemoButton";
 
 const TYPE_OPTIONS = {
@@ -40,7 +38,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   const { menuSection, setMenuSection } = useContext(MenuSectionContext);
 
   const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
-  console.log(localMenuItem, menuItem);
+  const [saving, setSaving] = useState(false);
 
   const putMenuItem = usePutMenuItem();
 
@@ -50,10 +48,14 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   );
 
   const handleSubmit = async (e) => {
+    console.log("will submit");
     e.preventDefault();
+    setSaving(true);
     const saved = await putMenuItem(
       store as IStore,
-      localMenuItem,
+      localMenuItem._id.startsWith("_tmp_")
+        ? { ...localMenuItem, _id: undefined }
+        : localMenuItem._id,
       menuSection._id
     );
 
@@ -65,6 +67,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           : [...menuSection.items, saved];
       return { ...menuSection, items };
     });
+    setSaving(false);
   };
 
   return (
@@ -89,6 +92,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
       </EditableSection>
       <MemoReactSelect
         className="w-full sm:w-36"
+        disabled={saving}
         label="Tipo"
         value={{
           value: localMenuItem.itemType,
@@ -105,68 +109,73 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           },
         ]}
         onChange={({ value }) =>
-          setLocalMenuItem({
+          setLocalMenuItem((localMenuItem) => ({
             ...localMenuItem,
             itemType: value as unknown as ItemTypeType,
-          })
+          }))
         }
       />
       <MemoInput
         className="flex-1 min-w-0"
+        isDisabled={saving}
         label="Nome"
         value={localMenuItem.name}
         onChange={(e) =>
-          setLocalMenuItem({
+          setLocalMenuItem((localMenuItem) => ({
             ...localMenuItem,
             name: e.target.value,
-          })
+          }))
         }
       />
       <MemoInput
         className="w-full sm:w-32"
+        isDisabled={saving}
         label="Detalhe"
         value={localMenuItem.nameDetail}
         onChange={(e) =>
-          setLocalMenuItem({
+          setLocalMenuItem((localMenuItem) => ({
             ...localMenuItem,
             nameDetail: e.target.value,
-          })
+          }))
         }
       />
       <MemoInput
         className="flex-1 min-w-fit"
+        isDisabled={saving}
         label="Descrição (curta)"
         value={localMenuItem.details?.short}
         onChange={(e) => {
-          setLocalMenuItem({
+          setLocalMenuItem((localMenuItem) => ({
             ...localMenuItem,
             details: { ...localMenuItem.details, short: e.target.value },
-          });
+          }));
         }}
       />
       <div className="flex flex-row gap-2">
         <MemoInput
           className="w-full sm:!w-16"
+          isDisabled={saving}
           label="Preço"
           type="number"
           value={localMenuItem.price || 0}
           onChange={(e) =>
-            setLocalMenuItem({
+            setLocalMenuItem((localMenuItem) => ({
               ...localMenuItem,
               price: +e.target.value,
-            })
+            }))
           }
         />
         <MemoInput
           className="w-full sm:!w-16"
+          isDisabled={saving}
           label="Promo"
           type="number"
           value={localMenuItem.pricePromotional || 0}
           onChange={(e) =>
-            setLocalMenuItem({
+            setLocalMenuItem((localMenuItem) => ({
               ...localMenuItem,
               pricePromotional: +e.target.value,
-            })
+            }))
           }
         />
       </div>
@@ -175,11 +184,17 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           className="!px-3"
           type="submit"
           size="sm"
-          isDisabled={isLocalEqualToReal}
+          isDisabled={isLocalEqualToReal || saving}
         >
           <RiSave3Fill size={20} />
         </MemoButton>
-        <MemoButton className="!px-3 h-auto" size="sm" onClick={onDeleteClick}>
+        <MemoButton
+          type="button"
+          className="!px-3 h-auto"
+          size="sm"
+          isDisabled={saving}
+          onClick={onDeleteClick}
+        >
           <IoMdClose size={20} />
         </MemoButton>
       </div>

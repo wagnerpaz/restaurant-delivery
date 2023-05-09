@@ -6,6 +6,7 @@ import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
 import revalidateCall from "/lib/revalidateCall";
+import MenuSection from "/models/MenuSection";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -30,24 +31,12 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
         await res.revalidate(`/store/${slug}`);
         res.status(200).json(serverMenuItem.toObject());
       } else if (req.method === "DELETE") {
-        await Store.updateOne(
-          { _id: storeId },
-          {
-            $pull: {
-              [`menu.sections.${sectionIndexSplit.join(".sections.")}.items`]:
-                menuItemId,
-            },
-          }
+        await MenuSection.updateOne(
+          { _id: sectionId },
+          { $pull: { items: menuItemId } }
         );
-
-        const store = await Store.findById(storeId);
-        let section = store.menu;
-        for (const index of sectionIndexSplit) {
-          section = section.sections[index];
-        }
-        const menuItems = section.items;
-
-        res.status(200).json(menuItems);
+        const { items } = await MenuSection.findById(sectionId, { items: 1 });
+        res.status(200).json(items);
       } else {
         res.status(405).json({ message: "Method not allowed" });
       }

@@ -22,5 +22,7 @@ const MemoInput: React.FC<LocalInputProps> = ({
 
 export default memo(
   MemoInput,
-  (prevProps, nextProps) => prevProps.value === nextProps.value
+  (prevProps, nextProps) =>
+    prevProps.value === nextProps.value &&
+    prevProps.isDisabled === prevProps.isDisabled
 );

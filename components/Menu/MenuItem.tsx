@@ -22,8 +22,9 @@ interface MenuItemProps {
 export const emptyMenuItem: IMenuItem = {
   itemType: "product",
   name: "",
+  nameDetail: "",
   price: 0,
-  details: {},
+  details: { short: "" },
   images: {},
   composition: [],
   customizeType: "template",
@@ -66,7 +67,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
     if (confirmed) {
       try {
         if (menuItem._id) {
-          await deleteMenuItem(store, menuSection.index, menuItem);
+          await deleteMenuItem(store, menuSection, menuItem);
         }
 
         setMenuSection({

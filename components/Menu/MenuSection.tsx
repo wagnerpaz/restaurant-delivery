@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
+import { v4 as uuidv4 } from "uuid";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -156,20 +157,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   };
 
   const handleAddMenuItemFast = useCallback(() => {
-    if (localMenuSection.items.find((f) => !f._id)) {
-      // toast({
-      //   title: "Salve todos os novos itens antes de adicionar outro.",
-      //   status: "warning",
-      // });
-    } else {
-      setLocalMenuSection({
-        ...localMenuSection,
-        items: [
-          ...localMenuSection.items,
-          { ...emptyMenuItem, itemType: type },
-        ],
-      });
-    }
+    setLocalMenuSection({
+      ...localMenuSection,
+      items: [
+        ...localMenuSection.items,
+        { ...emptyMenuItem, _id: `_tmp_${uuidv4()}`, itemType: type },
+      ],
+    });
   }, [localMenuSection, setLocalMenuSection, type]);
 
   const putStoreMenuSection = usePutStoreMenuSection();
@@ -204,6 +198,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         looseSearch(f.nameDetail || "", search) ||
         looseSearch(f.details?.short || "", search)
     );
+
+  console.log("localMenuSection", localMenuSection);
 
   return (
     <MenuSectionContext.Provider
