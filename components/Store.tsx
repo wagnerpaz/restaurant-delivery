@@ -11,32 +11,18 @@ import classNames from "classnames";
 import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import {
-  Input,
-  useToast,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 import Menu from "/components/Menu/Menu";
-import { emptyMenuSection } from "/components/Menu/MenuSection";
-import { ILocation, IMenuSection, IStore } from "/models/types/Store";
+import { ILocation, IStore } from "/models/types/Store";
 
 import { IMenuItem } from "/models/types/MenuItem";
-import { removeAt } from "/lib/immutable";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
 import usePutStore from "/hooks/usePutStore";
-import usePutStoreMenuSectionSection from "/hooks/usePutStoreMenuSectionSections";
-import usePutStoreMenuSection from "../hooks/usePutStoreMenuSection";
-import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
-import defaultToastError from "/config/defaultToastError";
 import {
   findMenuItemSectionIndex,
   replaceObjectById,
@@ -46,7 +32,7 @@ import useGetStore from "/hooks/useGetStore";
 import usePutUser from "/hooks/usePutUser";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import StoreHeader from "./StoreHeader";
-import { MdNoFood } from "react-icons/md";
+import Input from "./form/Input";
 
 const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
   ssr: false,
@@ -100,7 +86,9 @@ const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
-  const toast = useToast();
+  console.log("Server Store", store);
+
+  // const toast = useToast();
   const router = useRouter();
 
   const { data: session, status } = useSession();
@@ -116,31 +104,6 @@ const Store: FC<StoreProps> = ({ store }) => {
 
   const [search, setSearch] = useState("");
   const [searchMobileVisible, setSearchMobileVisible] = useState(false);
-
-  const editMenuItemObject = useMemo(
-    () =>
-      retrieveAllMenuItems(clientStore?.menu?.sections || []).find(
-        (f) => f._id === router.query.editMenuItemId
-      ) ||
-      (router.query.addMenuItemBySection && {
-        ...emptyMenuItem,
-        itemType: "product",
-      }),
-    [
-      clientStore?.menu?.sections,
-      router.query.editMenuItemId,
-      router.query.addMenuItemBySection,
-    ]
-  );
-  const editMenuItemModalOpen = !!router.query.editMenuItemId;
-
-  const [editNewSectionIndex, setEditNewSectionIndex] = useState([-1]);
-  const [editNewSectionModalOpen, setEditNewSectionModalOpen] = useState(false);
-  const [editNewSectionParentName, setEditNewSectionParentName] = useState("");
-  const [editNewSectionObject, setEditNewSectionObject] = useState({
-    ...emptyMenuSection,
-  });
-  const [editNewSectionMode, setEditNewSectionMode] = useState("");
 
   const [addStoreModalOpen, setAddStoreModalOpen] = useState(!clientStore);
 
@@ -162,13 +125,10 @@ const Store: FC<StoreProps> = ({ store }) => {
   const restoreTrashForSectionIndexOpen =
     !!router.query.restoreTrashForSectionIndex;
 
-  const getStore = useGetStore();
   const putStore = usePutStore();
-  const putMenuItem = usePutMenuItem();
-  const deleteMenuSection = useDeleteStoreMenuSection();
-  const putMenuSection = usePutStoreMenuSection();
-  const putMenuSectionSection = usePutStoreMenuSectionSection();
   const putUser = usePutUser();
+
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     if (searchMobileVisible) {
@@ -223,9 +183,7 @@ const Store: FC<StoreProps> = ({ store }) => {
         menuItemsRenderCount,
       }}
     >
-      <div
-        className={classNames("font-lato custom-scrollbar min-h-screen pb-40")}
-      >
+      <div className={classNames("font-lato custom-scrollbar min-h-screen")}>
         <StoreHeader />
         {searchMobileVisible && (
           <Input
@@ -237,51 +195,38 @@ const Store: FC<StoreProps> = ({ store }) => {
             placeholder="Pesquisar..."
           ></Input>
         )}
-        <Tabs>
-          <TabPanels>
-            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
-              <main>
-                <Menu
-                  type="product"
-                  sections={clientStore.menu.sections}
-                  onChangeSection={(section) => {
-                    const cloneStore = cloneDeep(clientStore);
-                    cloneStore.menu.sections = replaceObjectById(
-                      cloneStore.menu.sections,
-                      section._id,
-                      section
-                    );
-                    setClientStore(cloneStore);
-                  }}
-                />
-              </main>
-            </TabPanel>
-            <TabPanel className="!p-0 min-h-[calc(100vh-var(--header-height))]">
-              <main>
-                <Menu
-                  type="ingredient"
-                  sections={clientStore.menu.sections}
-                  onChangeSection={(section) => {
-                    const cloneStore = cloneDeep(clientStore);
-                    cloneStore.menu.sections = replaceObjectById(
-                      cloneStore.menu.sections,
-                      section._id,
-                      section
-                    );
-                    setClientStore(cloneStore);
-                  }}
-                />
-              </main>
-            </TabPanel>
-            {admin && (
-              <TabList className="sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10">
-                <Tab>Produtos</Tab>
-                <Tab>Ingredientes</Tab>
-              </TabList>
+        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+          <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
+            <main>
+              <Menu type="product" sections={clientStore.menu.sections} />
+            </main>
+          </TabPanel>
+          <TabPanel className={classNames({ "min-h-screen": tabIndex === 1 })}>
+            <main>
+              <Menu type="ingredient" sections={clientStore.menu.sections} />
+            </main>
+          </TabPanel>
+          <TabList
+            className={classNames(
+              "sticky bottom-0 border-t-2 border-solid border-hero bg-main-100 !z-10",
+              { hidden: !admin }
             )}
-          </TabPanels>
+          >
+            <Tab
+              className="react-tabs__tab tab"
+              selectedClassName="tab-selected"
+            >
+              Produtos
+            </Tab>
+            <Tab
+              className="react-tabs__tab tab"
+              selectedClassName="tab-selected"
+            >
+              Ingredientes
+            </Tab>
+          </TabList>
         </Tabs>
-        <footer className="bg-comanda-hero p-6 absolute h-[var(--footer-height)] bottom-0 w-full flex flex-row items-center">
+        <footer className="bg-comanda-hero absolute z-10 p-6 h-[var(--footer-height)] w-full flex flex-row items-center">
           <Link href="/">
             <Image
               className="w-[200px]"
@@ -292,52 +237,7 @@ const Store: FC<StoreProps> = ({ store }) => {
             />
           </Link>
         </footer>
-        {editMenuItemObject && (
-          <EditMenuItemModal
-            open={
-              !!router.query.editMenuItemId ||
-              !!router.query.addMenuItemBySection
-            }
-            onOpenChange={comeBackToStoreRoot}
-            store={clientStore}
-            menuItem={editMenuItemObject}
-            onStoreChange={async (newStore, shouldSave) => {
-              setClientStore(newStore);
-              if (shouldSave) {
-                await putStore(newStore);
-              }
-            }}
-            onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
-              if (cancelled) {
-                return;
-              }
 
-              let editMenuSectionIndex;
-              if (newMenuItem?._id) {
-                editMenuSectionIndex = findMenuItemSectionIndex(
-                  clientStore.menu.sections,
-                  newMenuItem
-                );
-              } else {
-                editMenuSectionIndex =
-                  `${router.query.addMenuItemBySection}`?.split(",");
-              }
-
-              try {
-                await putMenuItem(
-                  clientStore,
-                  newMenuItem,
-                  editMenuSectionIndex
-                );
-                const updatedStore = await getStore(clientStore._id);
-                setClientStore(updatedStore);
-                comeBackToStoreRoot(false);
-              } catch (err: any) {
-                toast(defaultToastError(err));
-              }
-            }}
-          />
-        )}
         {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
           <OrderMenuItemDetailsModal
             store={clientStore}
@@ -357,7 +257,7 @@ const Store: FC<StoreProps> = ({ store }) => {
                   setClientStore(serverStore);
                   setAddStoreModalOpen(false);
                 } catch (err: any) {
-                  toast(defaultToastError(err));
+                  // toast(defaultToastError(err));
                 }
               } else {
                 setClientStore(value);
@@ -367,105 +267,6 @@ const Store: FC<StoreProps> = ({ store }) => {
             noAutoClose={!clientStore}
             open={addStoreModalOpen}
             onOpenChange={(value) => setAddStoreModalOpen(value)}
-          />
-        )}
-        {editNewSectionModalOpen && (
-          <AddMenuSectionModal
-            portalTarget={() => null}
-            mode={editNewSectionMode}
-            parentName={editNewSectionParentName}
-            menuSection={editNewSectionObject}
-            open={editNewSectionModalOpen}
-            onOpenChange={(value) => setEditNewSectionModalOpen(value)}
-            onSave={async (value) => {
-              try {
-                if (editNewSectionMode === "EDIT") {
-                  await putMenuSection(clientStore, value, editNewSectionIndex);
-                } else {
-                  if (editNewSectionIndex[0] >= 0) {
-                    await putMenuSectionSection(
-                      clientStore,
-                      editNewSectionIndex,
-                      value
-                    );
-                  } else {
-                    await putMenuSection(clientStore, value);
-                  }
-                }
-
-                const cloneStore = cloneDeep(clientStore);
-
-                let sections;
-                let section = cloneStore.menu as IMenuSection;
-                if (
-                  editNewSectionMode === "ADD" ||
-                  editNewSectionMode === "ADD-SUB"
-                ) {
-                  if (editNewSectionIndex[0] >= 0) {
-                    for (const index of editNewSectionIndex) {
-                      section = section.sections[index];
-                    }
-                    sections = section.sections;
-                    sections.push(value);
-                  } else {
-                    sections = cloneStore.menu.sections;
-                    sections.push(value);
-                  }
-                } else {
-                  if (editNewSectionIndex[0] >= 0) {
-                    for (const index of editNewSectionIndex) {
-                      section = section.sections[index];
-                    }
-                  } else {
-                    section = section.sections[0];
-                  }
-                  Object.assign(section, value);
-                }
-
-                setClientStore(cloneStore);
-              } catch (err: any) {
-                toast(defaultToastError(err));
-              }
-
-              setEditNewSectionModalOpen(false);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
-            }}
-            onCancel={() => {
-              setEditNewSectionModalOpen(false);
-              setEditNewSectionIndex([-1]);
-              setEditNewSectionParentName("");
-            }}
-            onDelete={async () => {
-              const confirmed = confirm(
-                `Você tem certeza que deseja remover a seção "${editNewSectionObject.name}" com todos os seus items?`
-              );
-
-              if (confirmed) {
-                try {
-                  await deleteMenuSection(clientStore, editNewSectionIndex);
-
-                  const cloneStore = cloneDeep(clientStore);
-
-                  const indexSpliced = [...editNewSectionIndex];
-                  const lastIndex = indexSpliced.splice(-1)[0];
-
-                  let section = cloneStore.menu as IMenuSection;
-                  for (const index of indexSpliced) {
-                    section = section.sections[index];
-                  }
-                  section.sections = removeAt(section.sections, lastIndex);
-
-                  setClientStore(cloneStore);
-
-                  setEditNewSectionModalOpen(false);
-                  setEditNewSectionIndex([-1]);
-                  setEditNewSectionParentName("");
-                } catch (err: any) {
-                  toast(defaultToastError(err));
-                }
-              }
-            }}
           />
         )}
         {editUserAddressesOpen && (

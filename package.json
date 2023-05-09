@@ -14,11 +14,12 @@
     "fetch.ifood.store": "node --no-warnings --loader ts-node/esm/transpile-only scripts/fetchIFoodStore.ts"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.5.5",
+    "@headlessui-float/react": "^0.11.2",
+    "@headlessui/react": "^1.7.14",
     "@next-auth/mongodb-adapter": "^1.1.1",
+    "@popperjs/core": "^2.11.7",
     "aws-sdk": "^2.1370.0",
     "axios": "^1.3.4",
-    "chakra-react-select": "^4.6.0",
     "classnames": "^2.3.2",
     "formidable": "^2.1.1",
     "lodash.clonedeep": "^4.5.0",
@@ -40,6 +41,9 @@
     "react-error-boundary": "^4.0.4",
     "react-icons": "^4.8.0",
     "react-image-crop": "^10.0.7",
+    "react-popper": "^2.3.0",
+    "react-select": "^5.7.3",
+    "react-tabs": "^6.0.1",
     "react-tailwindcss-select": "^1.8.5",
     "tinify": "^1.7.1"
   },

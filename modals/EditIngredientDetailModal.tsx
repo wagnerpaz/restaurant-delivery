@@ -1,7 +1,8 @@
 import classNames from "classnames";
 import { ComponentProps, useState } from "react";
-import { Button, Input } from "@chakra-ui/react";
 
+import Input from "/components/form/Input";
+import Button from "/components/form/Button";
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";
 import { IStore, IStoreIngredient } from "/models/types/Store";

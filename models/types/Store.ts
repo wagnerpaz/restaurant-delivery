@@ -1,6 +1,7 @@
-import { IMenuItem } from "./MenuItem";
+import { IMenuSection } from "./MenuSection";
 
 export interface IStore extends Document {
+  active?: boolean;
   name: string;
   logo?: string;
   slug: string;
@@ -10,15 +11,6 @@ export interface IStore extends Document {
     sections: IMenuSection[];
   };
   theme: { colors: { hero: string } };
-}
-
-export interface IMenuSection {
-  name: string;
-  index: number[];
-  editMode: "realistic" | "fast";
-  retracted?: boolean;
-  items: IMenuItem[];
-  sections: IMenuSection[];
 }
 
 export interface ILocation {

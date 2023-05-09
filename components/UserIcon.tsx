@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import { Button } from "@chakra-ui/react";
 import { createPortal } from "react-dom";
 import { FaAddressBook, FaSignOutAlt } from "react-icons/fa";
 
+import Button from "/components/form/Button";
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { useRouter } from "next/router";
 
@@ -42,7 +42,7 @@ const UserIcon = ({ store }) => {
                 <small className="block">Autenticado como</small>
                 <strong>{session.user.email ?? session.user.name}</strong>
                 <div className="border-b -mx-4 pb-3 border-main-a11y-low" />
-                <nav className="-mx-4 mt-1 flex ">
+                <nav className="mt-1 flex">
                   <Button
                     className="flex-row items-center gap-2"
                     variant="text"

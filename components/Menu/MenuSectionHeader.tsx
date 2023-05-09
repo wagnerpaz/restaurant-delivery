@@ -1,6 +1,6 @@
 import { ComponentProps, useContext } from "react";
 import classNames from "classnames";
-import { FaCodeBranch, FaThList } from "react-icons/fa";
+import { FaThList } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
@@ -74,12 +74,6 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                   size={24}
                   title="Editar Seção"
                   onClick={(e) => stopPropagation(e, onEditSectionClick)}
-                />
-                <FaCodeBranch
-                  className="cursor-pointer"
-                  size={20}
-                  title="Adicionar Sub-Seção do Menu"
-                  onClick={(e) => stopPropagation(e, onAddSectionClick)}
                 />
                 <MdMoveDown
                   className="cursor-pointer"

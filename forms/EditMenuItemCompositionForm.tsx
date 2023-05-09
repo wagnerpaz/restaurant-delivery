@@ -1,25 +1,17 @@
-import {
-  ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ComponentProps, useCallback, useMemo, useRef } from "react";
 import { IoIosAddCircle, IoMdCloseCircle } from "react-icons/io";
+
 import Draggable from "/components/Draggable";
 import DraggableGroup from "/components/DraggableGroup";
 import { insertAt, moveTo, replaceAt, swap } from "/lib/immutable";
-import { IIngredient } from "/models/Ingredients";
-import { IMenuItemCompositionItem } from "/models/MenuItem";
-import { Select } from "chakra-react-select";
-import { Select as SimpleSelect } from "@chakra-ui/react";
+import { IMenuItemCompositionItem } from "/models/types/MenuItem";
 import FormControl from "/components/FormControl";
-import { Button, Input } from "@chakra-ui/react";
-import DbImage from "/components/DbImage";
-import { IStore } from "/models/Store";
+import { IStore } from "/models/types/Store";
 import { retriveAllMenuItems } from "/lib/menuSectionUtils";
 import MenuItemBySectionSelector from "/components/MenuItemBySectionSelector";
+import Input from "/components/form/Input";
+import Button from "/components/form/Button";
+import ReactSelect from "/components/ReactSelect";
 
 interface EditMenuItemCompositionFormProps
   extends ComponentProps<typeof DraggableGroup> {
@@ -131,7 +123,7 @@ const EditMenuItemCompositionForm: React.FC<
                 />
               </FormControl>
               <FormControl className="w-24" label="Essencial">
-                <SimpleSelect
+                <ReactSelect
                   value={`${compositionItem.essential}`}
                   onChange={handleModifyCompositionProp(
                     compositionItem,
@@ -148,7 +140,7 @@ const EditMenuItemCompositionForm: React.FC<
                   <option key="false" value="false">
                     Não
                   </option>
-                </SimpleSelect>
+                </ReactSelect>
               </FormControl>
               <div className="flex flex-row">
                 <Button

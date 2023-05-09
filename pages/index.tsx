@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import Button from "/components/form/Button";
 import { GetServerSideProps, NextPage } from "next";
 import { signIn, useSession } from "next-auth/react";
 import { FaUserCircle } from "react-icons/fa";

@@ -8,9 +8,9 @@ import { IUser } from "/models/types/User";
 import { useRouter } from "next/router";
 import { StoreContext } from "../Store";
 import useDeleteMenuItem from "/hooks/useDeleteMenuItem";
-import { useToast } from "@chakra-ui/react";
 import defaultToastError from "/config/defaultToastError";
 import { MenuSectionContext } from "./MenuSection";
+import useLocalState from "/hooks/useLocalState";
 
 interface MenuItemProps {
   editMode: "realistic" | "fast";
@@ -43,10 +43,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
   if (menuItemsRenderCount) menuItemsRenderCount.current++;
 
-  const toast = useToast();
   const router = useRouter();
 
-  const [localMenuItem, setLocalMenuItem] = useState(menuItem);
+  const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
 
   const deleteMenuItem = useDeleteMenuItem();
 
@@ -75,10 +74,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
           items: menuSection.items.filter((f) => f._id !== menuItem._id),
         });
       } catch (err: any) {
-        toast(defaultToastError(err));
+        // toast(defaultToastError(err));
       }
     }
-  }, [deleteMenuItem, menuItem, menuSection, setMenuSection, store, toast]);
+  }, [deleteMenuItem, menuItem, menuSection, setMenuSection, store]);
 
   return editMode === "realistic" || !admin ? (
     <MenuItemRealistic

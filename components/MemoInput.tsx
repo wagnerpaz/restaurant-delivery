@@ -1,14 +1,14 @@
 import { memo } from "react";
-import { Input, InputProps } from "@chakra-ui/react";
 
+import Input from "/components/form/Input";
 import FormControl from "/components/FormControl";
 
-interface LocalInputProps extends InputProps {
+interface LocalInputProps {
   label?: string;
   className: string;
 }
 
-const LocalInput: React.FC<LocalInputProps> = ({
+const MemoInput: React.FC<LocalInputProps> = ({
   className,
   label,
   ...props
@@ -21,6 +21,6 @@ const LocalInput: React.FC<LocalInputProps> = ({
 };
 
 export default memo(
-  LocalInput,
+  MemoInput,
   (prevProps, nextProps) => prevProps.value === nextProps.value
 );

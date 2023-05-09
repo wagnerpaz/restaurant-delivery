@@ -11,9 +11,12 @@ import ReactCrop, {
 import Modal from "/components/Modal";
 import { imgPreview } from "/lib/image-crop/imgPreview";
 import usePutUpload from "/hooks/usePutUpload";
-import { Button, Input } from "@chakra-ui/react";
 import FormControl from "/components/FormControl";
 import ImageWithFallback from "/components/ImageWithFallback";
+import Input from "/components/form/Input";
+import Button from "/components/form/Button";
+
+import "react-image-crop/dist/ReactCrop.css";
 
 interface DbImageEditorProps extends ComponentProps<typeof Modal> {
   upload: {
@@ -109,6 +112,7 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
               src={upload.id}
               width={999}
               height={999}
+              cdn
             />
           )}
         </div>

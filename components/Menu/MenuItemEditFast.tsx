@@ -1,20 +1,28 @@
 import { ComponentProps, memo, useMemo, useContext, useCallback } from "react";
-import { Button } from "@chakra-ui/react";
+import Button from "/components/form/Button";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
 import isEqual from "lodash.isequal";
 
-import LocalInput from "../MemoInput";
+import MemoInput from "../MemoInput";
 import EditableSection from "/components/EditableSection";
 
 import { IMenuItem, ItemTypeType } from "/models/types/MenuItem";
 import useLocalState from "/hooks/useLocalState";
-import MemoSimpleSelect from "../MemoSimpleSelect";
+import MemoReactSelect from "../MemoReactSelect";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import { StoreContext } from "../Store";
 import { MenuSectionContext } from "./MenuSection";
 import { IStore } from "/models/types/Store";
+import { replaceAt } from "/lib/immutable";
+import { IMenuSection } from "/models/types/MenuSection";
+import MemoButton from "/components/MemoButton";
+
+const TYPE_OPTIONS = {
+  product: "Produto",
+  ingredient: "Ingrediente",
+};
 
 interface MenuItemEditFastProps extends ComponentProps<"form"> {
   menuItem: IMenuItem;
@@ -25,7 +33,6 @@ interface MenuItemEditFastProps extends ComponentProps<"form"> {
 
 const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   menuItem,
-  onMenuItemChange,
   onEditClick,
   onDeleteClick,
 }) => {
@@ -33,6 +40,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   const { menuSection, setMenuSection } = useContext(MenuSectionContext);
 
   const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
+  console.log(localMenuItem, menuItem);
 
   const putMenuItem = usePutMenuItem();
 
@@ -41,15 +49,28 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
     [localMenuItem, menuItem]
   );
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const saved = await putMenuItem(
+      store as IStore,
+      localMenuItem,
+      menuSection._id
+    );
+
+    setMenuSection((menuSection) => {
+      const index = menuSection.items.findIndex((f) => f._id === saved._id);
+      const items =
+        index >= 0
+          ? replaceAt(menuSection.items, index, saved)
+          : [...menuSection.items, saved];
+      return { ...menuSection, items };
+    });
+  };
+
   return (
     <form
       className="flex flex-col sm:flex-row gap-6 sm:gap-2 bg-main-100 w-full p-2 pt-5 shadow-md border border-main-a11y-low rounded-md"
-      onSubmit={async (e) => {
-        e.preventDefault();
-
-        putMenuItem(store as IStore, localMenuItem, menuSection.index);
-        onMenuItemChange(localMenuItem);
-      }}
+      onSubmit={handleSubmit}
     >
       <EditableSection
         className="hidden sm:block w-[38px] h-[38px] min-w-[38px]"
@@ -66,37 +87,53 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           cdn
         />
       </EditableSection>
-      <MemoSimpleSelect
-        className="w-full sm:w-12 min-w-fit"
+      <MemoReactSelect
+        className="w-full sm:w-36"
         label="Tipo"
-        value={localMenuItem.itemType}
-        onChange={(e) =>
+        value={{
+          value: localMenuItem.itemType,
+          label: TYPE_OPTIONS[localMenuItem.itemType],
+        }}
+        options={[
+          {
+            value: Object.keys(TYPE_OPTIONS)[0],
+            label: Object.values(TYPE_OPTIONS)[0],
+          },
+          {
+            value: Object.keys(TYPE_OPTIONS)[1],
+            label: Object.values(TYPE_OPTIONS)[1],
+          },
+        ]}
+        onChange={({ value }) =>
           setLocalMenuItem({
             ...localMenuItem,
-            itemType: e.target.value as unknown as ItemTypeType,
+            itemType: value as unknown as ItemTypeType,
           })
         }
-      >
-        <option value="product">Produto</option>
-        <option value="ingredient">Ingrediente</option>
-      </MemoSimpleSelect>
-      <LocalInput
+      />
+      <MemoInput
         className="flex-1 min-w-0"
         label="Nome"
         value={localMenuItem.name}
         onChange={(e) =>
-          setLocalMenuItem({ ...localMenuItem, name: e.target.value })
+          setLocalMenuItem({
+            ...localMenuItem,
+            name: e.target.value,
+          })
         }
       />
-      <LocalInput
+      <MemoInput
         className="w-full sm:w-32"
         label="Detalhe"
         value={localMenuItem.nameDetail}
         onChange={(e) =>
-          setLocalMenuItem({ ...localMenuItem, nameDetail: e.target.value })
+          setLocalMenuItem({
+            ...localMenuItem,
+            nameDetail: e.target.value,
+          })
         }
       />
-      <LocalInput
+      <MemoInput
         className="flex-1 min-w-fit"
         label="Descrição (curta)"
         value={localMenuItem.details?.short}
@@ -108,16 +145,19 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         }}
       />
       <div className="flex flex-row gap-2">
-        <LocalInput
+        <MemoInput
           className="w-full sm:!w-16"
           label="Preço"
           type="number"
           value={localMenuItem.price || 0}
           onChange={(e) =>
-            setLocalMenuItem({ ...localMenuItem, price: +e.target.value })
+            setLocalMenuItem({
+              ...localMenuItem,
+              price: +e.target.value,
+            })
           }
         />
-        <LocalInput
+        <MemoInput
           className="w-full sm:!w-16"
           label="Promo"
           type="number"
@@ -131,17 +171,17 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         />
       </div>
       <div className="flex flex-row gap-2">
-        <Button
-          className="w-full sm:w-auto"
+        <MemoButton
+          className="!px-3"
           type="submit"
-          size="md"
+          size="sm"
           isDisabled={isLocalEqualToReal}
         >
           <RiSave3Fill size={20} />
-        </Button>
-        <Button className="w-full sm:w-auto" size="md" onClick={onDeleteClick}>
+        </MemoButton>
+        <MemoButton className="!px-3 h-auto" size="sm" onClick={onDeleteClick}>
           <IoMdClose size={20} />
-        </Button>
+        </MemoButton>
       </div>
     </form>
   );

@@ -1,7 +1,10 @@
 import classNames from "classnames";
 import { ComponentProps, useCallback, useEffect, useState } from "react";
-import { Button, Input, Select } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+
+import Button from "/components/form/Button";
+import Input from "/components/form/Input";
+import ReactSelect from "/components/ReactSelect";
 
 import EditableSection from "/components/EditableSection";
 import Fieldset from "/components/Fieldset";
@@ -72,6 +75,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               src={clientStore.logo}
               width={200}
               height={200}
+              cdn
             />
           </EditableSection>
           <div className="w-full flex-1 flex flex-col gap-6">
@@ -91,7 +95,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               <Input value={`/store/${clientStore.slug}`} disabled />
             </FormControl>
             <FormControl className="flex-1 min-w-fit" label="Listada">
-              <Select
+              <ReactSelect
                 value={`${clientStore.listed}`}
                 onChange={(e) =>
                   setClientStore({
@@ -102,7 +106,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               >
                 <option value="true">Sim</option>
                 <option value="false">Não</option>
-              </Select>
+              </ReactSelect>
             </FormControl>
           </div>
         </div>

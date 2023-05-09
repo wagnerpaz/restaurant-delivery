@@ -5,7 +5,6 @@ import {
   AccordionItemHeading,
   AccordionItemPanel,
 } from "react-accessible-accordion";
-import { Button, Radio, RadioGroup } from "@chakra-ui/react";
 import classNames from "classnames";
 import {
   ComponentProps,
@@ -34,6 +33,7 @@ import ImageWithFallback from "/components/ImageWithFallback";
 import useGetMenuItemsAdditionals from "/hooks/useGetMenuItemAdditionals";
 import { StoreContext } from "/components/Store";
 import { IOrder, IOrderExchange, IOrderItem } from "/models/types/Order";
+import Button from "/components/form/Button";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   menuItem: IMenuItem;
@@ -528,7 +528,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
       </div>
       <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 justify-between h-18">
         <NumberInput full />
-        <Button className="!bg-hero flex-1" isDisabled={calculatedPrice <= 0}>
+        <Button className="flex-1" isDisabled={calculatedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
           Adicionar
         </Button>

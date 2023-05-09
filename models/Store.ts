@@ -3,6 +3,7 @@ import mongoose, { models, Schema } from "mongoose";
 import { IStore } from "./types/Store";
 
 const storeSchema: Schema = new mongoose.Schema<IStore>({
+  active: Boolean,
   name: { type: String, required: true },
   logo: {
     type: String,
@@ -22,98 +23,13 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
       main: Boolean,
     },
   ],
+  menu: {
+    sections: [{ type: mongoose.Types.ObjectId, ref: "MenuSection" }],
+  },
   theme: {
     colors: {
       hero: String,
     },
-  },
-  menu: {
-    //five levels of nested sections
-    sections: [
-      {
-        name: String,
-        editMode: {
-          type: String,
-          required: true,
-          enum: ["realistic", "fast"],
-          default: "realistic",
-        },
-        retracted: Boolean,
-        items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
-        sections: [
-          {
-            name: String,
-            editMode: {
-              type: String,
-              required: true,
-              enum: ["realistic", "fast"],
-              default: "realistic",
-            },
-            retracted: Boolean,
-            items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
-            sections: [
-              {
-                name: String,
-                editMode: {
-                  type: String,
-                  required: true,
-                  enum: ["realistic", "fast"],
-                  default: "realistic",
-                },
-                retracted: Boolean,
-                items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
-                sections: [
-                  {
-                    name: String,
-                    editMode: {
-                      type: String,
-                      required: true,
-                      enum: ["realistic", "fast"],
-                      default: "realistic",
-                    },
-                    retracted: Boolean,
-                    items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],
-                    sections: [
-                      {
-                        name: String,
-                        editMode: {
-                          type: String,
-                          required: true,
-                          enum: ["realistic", "fast"],
-                          default: "realistic",
-                        },
-                        retracted: Boolean,
-                        items: [
-                          { type: mongoose.Types.ObjectId, ref: "MenuItem" },
-                        ],
-                        sections: [
-                          {
-                            name: String,
-                            editMode: {
-                              type: String,
-                              required: true,
-                              enum: ["realistic", "fast"],
-                              default: "realistic",
-                            },
-                            retracted: Boolean,
-                            items: [
-                              {
-                                type: mongoose.Types.ObjectId,
-                                ref: "MenuItem",
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
   },
 });
 

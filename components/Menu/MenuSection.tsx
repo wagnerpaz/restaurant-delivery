@@ -1,17 +1,9 @@
-import {
-  useMemo,
-  useCallback,
-  useContext,
-  createContext,
-  useEffect,
-  memo,
-} from "react";
+import { useMemo, useCallback, useContext, createContext, memo } from "react";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
-import { useToast } from "@chakra-ui/react";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -20,13 +12,16 @@ import DraggableGroup, { DraggableGroupProps } from "../DraggableGroup";
 import Draggable, { DraggableProps } from "../Draggable";
 import { moveTo } from "/lib/immutable";
 import MenuItem, { emptyMenuItem } from "./MenuItem";
-import { IMenuSection } from "/models/types/Store";
+import { IMenuSection } from "/models/types/MenuSection";
 import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
 import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
 import defaultToastError from "/config/defaultToastError";
+import EditMenuItemModal from "/forms/EditMenuItemForm";
+import usePutMenuItem from "/hooks/usePutMenuItem";
+import isEqual from "lodash.isequal";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -41,10 +36,9 @@ export const GRID_CONFIG = {
 export const emptyMenuSection: IMenuSection = {
   name: "",
   items: [],
-  sections: [],
 };
 
-interface MenuSectionProps extends AccordionPanelProps {
+interface MenuSectionProps {
   className?: string;
   menuSection: IMenuSection;
   type: "product" | "ingredient";
@@ -66,7 +60,6 @@ export const MenuSectionContext = createContext<{
     index: [],
     editMode: "realistic",
     items: [],
-    sections: [],
   },
   setMenuSection: () => {},
 });
@@ -86,7 +79,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 }) => {
   const { store, search } = useContext(StoreContext);
   const router = useRouter();
-  const toast = useToast();
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -108,7 +100,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [admin]
   );
 
-  useEffect(() => {}, []);
+  const editMenuItemObject = useMemo(
+    () =>
+      router.query.addMenuItemBySection && {
+        ...emptyMenuItem,
+        itemType: "product",
+      },
+    [router.query.addMenuItemBySection]
+  );
+
+  const comeBackToStoreRoot = (newValue: boolean) => {
+    if (!newValue) {
+      router.push(`/store/${store.slug}`, undefined, {
+        shallow: true,
+      });
+    }
+  };
 
   const onFindMenuItem = useCallback(
     (id: string) => {
@@ -150,22 +157,24 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const handleAddMenuItemFast = useCallback(() => {
     if (localMenuSection.items.find((f) => !f._id)) {
-      toast({
-        title: "Salve todos os novos itens antes de adicionar outro.",
-        status: "warning",
-      });
+      // toast({
+      //   title: "Salve todos os novos itens antes de adicionar outro.",
+      //   status: "warning",
+      // });
     } else {
       setLocalMenuSection({
         ...localMenuSection,
         items: [
           ...localMenuSection.items,
-          { ...emptyMenuItem, itemType: "ingredient" },
+          { ...emptyMenuItem, itemType: type },
         ],
       });
     }
-  }, [localMenuSection, setLocalMenuSection, toast]);
+  }, [localMenuSection, setLocalMenuSection, type]);
 
   const putStoreMenuSection = usePutStoreMenuSection();
+  const putMenuItem = usePutMenuItem();
+
   const handleFastEditClick = () => {
     async function exec() {
       setLocalMenuSection(
@@ -203,7 +212,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         setMenuSection: setLocalMenuSection,
       }}
     >
-      {foundItems.length > 0 && (
+      {(foundItems.length > 0 || admin) && (
         <AccordionItem className="!border-t-0" uuid={menuSection._id}>
           <div
             id={"menu-section-" + menuSection._id}
@@ -222,6 +231,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             onFastEditClick={handleFastEditClick}
           />
           <AccordionItemPanel
+            id={`${menuSection._id}`}
             className={classNames(
               "sm:container sm:m-auto !px-2 sm:!px-8",
               {
@@ -234,7 +244,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             )}
             {...props}
           >
-            <AdminDraggableGroup className="contents">
+            <AdminDraggableGroup id={`${menuSection._id}`} className="contents">
               {foundItems.map((menuItem, menuItemIndex) => (
                 <AdminDraggable
                   dragIndicator={menuSection.editMode === "fast" && admin}
@@ -262,25 +272,59 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                         menuSection.editMode === "fast",
                     }
                   )}
+                  onClick={() => {
+                    if (menuSection.editMode === "realistic") {
+                      handleAddMenuItem();
+                    } else if (menuSection.editMode === "fast") {
+                      handleAddMenuItemFast();
+                    }
+                  }}
                 >
                   <HiPlus
                     className={classNames("", {
                       "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
                       "w-10 h-10 p-1 ": menuSection.editMode === "fast",
                     })}
-                    onClick={() => {
-                      if (menuSection.editMode === "realistic") {
-                        handleAddMenuItem();
-                      } else if (menuSection.editMode === "fast") {
-                        handleAddMenuItemFast();
-                      }
-                    }}
                   />
                 </div>
               )}
             </AdminDraggableGroup>
           </AccordionItemPanel>
         </AccordionItem>
+      )}
+      {editMenuItemObject && (
+        <EditMenuItemModal
+          open={
+            !!router.query.editMenuItemId || !!router.query.addMenuItemBySection
+          }
+          onOpenChange={comeBackToStoreRoot}
+          menuItem={editMenuItemObject}
+          onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
+            if (cancelled) {
+              return;
+            }
+
+            let editMenuSectionIndex;
+            if (newMenuItem?._id) {
+              editMenuSectionIndex = findMenuItemSectionIndex(
+                clientStore.menu.sections,
+                newMenuItem
+              );
+            } else {
+              editMenuSectionIndex =
+                `${router.query.addMenuItemBySection}`?.split(",");
+            }
+
+            try {
+              await putMenuItem(clientStore, newMenuItem, editMenuSectionIndex);
+              const updatedStore = await getStore(clientStore._id);
+              setClientStore(updatedStore);
+              comeBackToStoreRoot(false);
+            } catch (err: any) {
+              // toast(defaultToastError(err));
+            }
+          }}
+        />
       )}
     </MenuSectionContext.Provider>
   );
@@ -289,5 +333,5 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 export default memo(
   MenuSection,
   (prev, next) =>
-    prev.menuSection === next.menuSection && prev.isNew === next.isNew
+    isEqual(prev.menuSection, next.menuSection) && prev.isNew === next.isNew
 );

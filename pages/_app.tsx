@@ -1,12 +1,6 @@
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
-import {
-  ChakraProvider,
-  extendTheme,
-  useToast,
-  withDefaultColorScheme,
-} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { VscError } from "react-icons/vsc";
@@ -15,62 +9,13 @@ import Router from "next/router";
 
 import { getRGBColor } from "/lib/getRGBColor";
 
+import "react-tabs/style/react-tabs.css";
 import "/styles/globals.css";
-import "react-image-crop/dist/ReactCrop.css";
 import "nprogress/nprogress.css";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",
 };
-
-export const chakraTheme = extendTheme(
-  {
-    components: {
-      Form: {
-        variants: {
-          floating: {
-            container: {
-              _focusWithin: {
-                label: {
-                  ...activeLabelStyles,
-                },
-              },
-              label: {
-                ...activeLabelStyles,
-                top: 0,
-                left: 0,
-                zIndex: 1,
-                position: "absolute",
-                backgroundColor: "white",
-                pointerEvents: "none",
-                mx: 3,
-                px: 1,
-                my: 2,
-                transformOrigin: "left top",
-              },
-            },
-          },
-        },
-      },
-      Input: {
-        defaultProps: {
-          focusBorderColor: "gray.500",
-        },
-      },
-      Textarea: {
-        defaultProps: {
-          focusBorderColor: "gray.500",
-        },
-      },
-      Select: {
-        defaultProps: {
-          focusBorderColor: "gray.500",
-        },
-      },
-    },
-  },
-  withDefaultColorScheme({ colorScheme: "blackAlpha" })
-);
 
 Router.events.on("routeChangeStart", () => {
   NProgress.start();
@@ -159,6 +104,8 @@ function App({
 
   const heroPatternVar = `--pattern-hero: url(${heroPattern})`;
 
+  useEffect(() => {});
+
   const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
@@ -168,12 +115,6 @@ function App({
   return (
     <>
       <Head>
-        {pageLoaded && (
-          <link
-            rel="stylesheet"
-            href="https://unpkg.com/placeholder-loading@0.6.0/dist/css/placeholder-loading.min.css"
-          />
-        )}
         <style>
           {`:root{${heroColorVar}
              ${heroA11yHighColorVar}
@@ -206,29 +147,16 @@ function App({
       />
       <div className="bg-hero-pattern bg-repeat opacity-10 fixed top-0 left-0 w-full h-full -z-10" />
       <MyErrorBoundary>
-        <ChakraProvider theme={chakraTheme}>
-          <SessionProvider session={session}>
-            <Component {...pageProps} />
-          </SessionProvider>
-        </ChakraProvider>
+        <SessionProvider session={session}>
+          <Component {...pageProps} />
+        </SessionProvider>
       </MyErrorBoundary>
     </>
   );
 }
 
 function MyErrorBoundary({ children }) {
-  const toast = useToast();
-
   function handleOnCatch(error, errorInfo) {
-    // display a toast notification for the error
-    // I THINK THIS IS NOT WORKING
-    toast({
-      title: error.message,
-      status: "error",
-      duration: 9000,
-      isClosable: true,
-    });
-
     console.error(error, errorInfo);
   }
 
