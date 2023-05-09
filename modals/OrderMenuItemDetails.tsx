@@ -35,11 +35,11 @@ import { StoreContext } from "/components/Store";
 import { IOrder, IOrderExchange, IOrderItem } from "/models/types/Order";
 import Button from "/components/form/Button";
 
-interface AddStoreModalProps extends ComponentProps<typeof Modal> {
+interface OrderMenuItemDetailsModalProps extends ComponentProps<typeof Modal> {
   menuItem: IMenuItem;
 }
 
-const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
+const OrderMenuItemDetailsModal: React.FC<OrderMenuItemDetailsModalProps> = ({
   contentClassName,
   menuItem,
   onOpenChange,

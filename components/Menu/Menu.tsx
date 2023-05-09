@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import { IUser } from "/models/types/User";
 import { replaceAt } from "/lib/immutable";
 import useLocalState from "/hooks/useLocalState";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
 interface MenuProps extends ComponentProps<"section"> {
   sections: IMenuSection[];
@@ -48,13 +49,7 @@ const Menu: React.FC<MenuProps> = ({
   const editMenuSectionMode = router.query.editMenuSection;
   const editMenuSectionId = router.query.editMenuSectionId;
 
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${store.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const goBackToRoot = useGoBackToRoot();
 
   const handleAddSection = () => {
     router.push(`/store/${store.slug}?editMenuSection=ADD`, undefined, {
@@ -103,7 +98,7 @@ const Menu: React.FC<MenuProps> = ({
           mode={editMenuSectionMode}
           menuSection={localSections.find((f) => f._id === editMenuSectionId)}
           open={editMenuSectionMode}
-          onOpenChange={(value) => comeBackToStoreRoot(value)}
+          onOpenChange={(value) => goBackToRoot(value)}
           onSave={async (value) => {
             try {
               const createdOrUpdated = await putMenuSection(store, value);
@@ -121,13 +116,13 @@ const Menu: React.FC<MenuProps> = ({
                   )
                 );
               }
-              comeBackToStoreRoot(false);
+              goBackToRoot(false);
             } catch (err: any) {
               // toast(defaultToastError(err));
             }
           }}
           onCancel={() => {
-            comeBackToStoreRoot(false);
+            goBackToRoot(false);
           }}
           onDelete={async () => {
             const confirmed = confirm(

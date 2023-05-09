@@ -2,6 +2,7 @@ import { ComponentProps, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { createPortal } from "react-dom";
+import useDisableScroll from "/lib/hooks/useDisableScroll";
 
 interface ModalProps extends ComponentProps<"div"> {
   open: boolean;
@@ -39,19 +40,7 @@ const Modal: React.FC<ModalProps> = ({
     }
   }, [open, portalTarget]);
 
-  useEffect(() => {
-    const list = ["overflow-hidden"];
-
-    if (open) {
-      document.body.classList.add(...list);
-    } else {
-      document.body.classList.remove(...list);
-    }
-
-    return () => {
-      document.body.classList.remove(...list);
-    };
-  }, [open]);
+  useDisableScroll(open);
 
   const render = (
     <>

@@ -23,6 +23,7 @@ import defaultToastError from "/config/defaultToastError";
 import EditMenuItemModal from "/forms/EditMenuItemForm";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import isEqual from "lodash.isequal";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -110,13 +111,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [router.query.addMenuItemBySection]
   );
 
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${store.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const goBackToRoot = useGoBackToRoot();
 
   const onFindMenuItem = useCallback(
     (id: string) => {
@@ -264,7 +259,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
                     {
                       "min-h-[428px]": menuSection.editMode === "realistic",
-                      "ml-6 w-[calc(100%-1.5rem)]":
+                      "ml-6 !w-[calc(100%-1.5rem)]":
                         menuSection.editMode === "fast",
                     }
                   )}
@@ -293,7 +288,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           open={
             !!router.query.editMenuItemId || !!router.query.addMenuItemBySection
           }
-          onOpenChange={comeBackToStoreRoot}
+          onOpenChange={goBackToRoot}
           menuItem={editMenuItemObject}
           onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
             if (cancelled) {
@@ -315,7 +310,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               await putMenuItem(clientStore, newMenuItem, editMenuSectionIndex);
               const updatedStore = await getStore(clientStore._id);
               setClientStore(updatedStore);
-              comeBackToStoreRoot(false);
+              goBackToRoot(false);
             } catch (err: any) {
               // toast(defaultToastError(err));
             }

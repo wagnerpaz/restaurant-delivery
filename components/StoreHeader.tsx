@@ -8,6 +8,10 @@ import ImageWithFallback from "./ImageWithFallback";
 import MainMenuDrawer from "./MainMenuDrawer";
 import { StoreContext } from "./Store";
 import UserIcon from "./UserIcon";
+import { useRouter } from "next/router";
+import AddStoreModal from "/modals/AddStoreModal";
+import usePutStore from "/hooks/usePutStore";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
 interface StoreHeaderProps extends ComponentProps<"section"> {}
 
@@ -15,6 +19,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
   const {
     store,
     search,
+    setStore,
     setSearch,
     searchMobileVisible,
     setSearchMobileVisible,
@@ -24,7 +29,14 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
 
   const currLocation = store.locations[0];
 
+  const router = useRouter();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const putStore = usePutStore();
+  const goBackToRoot = useGoBackToRoot();
+
+  const editStore = router.query.editStore;
 
   return (
     <header className="bg-hero text-hero-a11y-high h-[var(--header-height)] sticky top-0 shadow-md z-20 flex flex-row items-center w-full">
@@ -101,13 +113,25 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
         </div>
       </div>
       <MainMenuDrawer
-        store={store}
-        isOpen={drawerOpen}
+        open={drawerOpen}
+        title="Menu"
         onClose={() => setDrawerOpen(false)}
-        onStoreDataClick={() => {
-          setDrawerOpen(false);
-        }}
+        onStoreDataClick={() =>
+          router.push(`/store/${store.slug}?editStore=true`)
+        }
       />
+      {editStore && (
+        <AddStoreModal
+          portalTarget={() => null}
+          noAutoClose={!store}
+          open={!!editStore}
+          onOpenChange={(value) => {
+            if (!value) {
+              goBackToRoot();
+            }
+          }}
+        />
+      )}
     </header>
   );
 };

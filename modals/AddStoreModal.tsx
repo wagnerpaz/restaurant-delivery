@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { ComponentProps, useCallback, useEffect, useState } from "react";
+import { ComponentProps, useCallback, useState, useContext } from "react";
 import { useRouter } from "next/router";
 
 import Button from "/components/form/Button";
@@ -14,22 +14,22 @@ import ImageEditorModal from "./ImageEditorModal";
 import FormControl from "/components/FormControl";
 import EditAddressForm from "/forms/EditAddressForm";
 import ImageWithFallback from "/components/ImageWithFallback";
+import { StoreContext } from "/components/Store";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store?: IStore;
-  onStoreChange: (newStore: IStore, shouldSave?: boolean) => void;
 }
 
 const AddStoreModal: React.FC<AddStoreModalProps> = ({
   contentClassName,
-  store = {} as IStore,
   onOpenChange,
-  onStoreChange,
   ...props
 }) => {
+  const { store, setStore } = useContext(StoreContext);
+
   const router = useRouter();
 
-  const [clientStore, setClientStore] = useState({
+  const [localStore, setLocalStore] = useState({
     ...store,
     slug: router.query.storeSlug,
     locations: store.locations?.length > 0 ? store.locations : [{}],
@@ -37,24 +37,17 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
 
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!clientStore.locations || clientStore.locations.length === 0) {
-      setClientStore({ ...clientStore, locations: [{}] });
-    }
-    onStoreChange(clientStore);
-  }, [clientStore, onStoreChange]);
-
   const handleLocationChange = useCallback(
     (param: ILocation | ((newLocation: ILocation) => ILocation)) => {
       const newLocation =
-        typeof param === "function" ? param(clientStore.locations[0]) : param;
+        typeof param === "function" ? param(localStore.locations[0]) : param;
 
-      setClientStore(
+      setLocalStore(
         (clientStore) =>
           ({ ...clientStore, locations: [newLocation] } as IStore)
       );
     },
-    []
+    [localStore.locations]
   );
 
   return (
@@ -63,43 +56,43 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
       contentClassName={classNames("flex flex-col container", contentClassName)}
       onOpenChange={onOpenChange}
     >
-      <form className="flex flex-col gap-6">
+      <form className="flex flex-col gap-6 text-main-a11y-high">
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <EditableSection
             iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
             onEditClick={() => setEditImageModalOpen(true)}
-            // onDeleteClick={onDeleteClick}
           >
             <ImageWithFallback
               className="border border-solid border-main-a11y-low rounded-lg bg-main-100"
-              src={clientStore.logo}
+              src={localStore.logo}
               width={200}
               height={200}
               cdn
+              alt="Logo da loja"
             />
           </EditableSection>
           <div className="w-full flex-1 flex flex-col gap-6">
             <FormControl className="flex-1 w-full sm:min-w-fit" label="Nome">
               <Input
-                value={clientStore.name}
+                value={localStore.name}
                 autoFocus
                 onChange={(e) =>
-                  setClientStore({
-                    ...clientStore,
+                  setLocalStore({
+                    ...localStore,
                     name: e.target.value,
                   } as IStore)
                 }
               />
             </FormControl>
             <FormControl className="flex-1 min-w-fit" label="URL">
-              <Input value={`/store/${clientStore.slug}`} disabled />
+              <Input value={`/store/${localStore.slug}`} disabled />
             </FormControl>
             <FormControl className="flex-1 min-w-fit" label="Listada">
               <ReactSelect
-                value={`${clientStore.listed}`}
+                value={`${localStore.listed}`}
                 onChange={(e) =>
-                  setClientStore({
-                    ...clientStore,
+                  setLocalStore({
+                    ...localStore,
                     listed: e.target.value === "true",
                   } as IStore)
                 }
@@ -110,11 +103,11 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             </FormControl>
           </div>
         </div>
-        {clientStore?.locations?.[0] && (
+        {localStore?.locations?.[0] && (
           <Fieldset className="pt-0">
             <legend>Localização</legend>
             <EditAddressForm
-              location={clientStore.locations?.[0]}
+              location={localStore.locations?.[0]}
               onLocationChange={handleLocationChange}
             />
           </Fieldset>
@@ -129,7 +122,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
           </Button>
           <Button
             className="w-full sm:w-32 self-end"
-            onClick={() => onStoreChange(clientStore, true)}
+            onClick={() => setStore(localStore)}
           >
             Salvar
           </Button>
@@ -141,14 +134,11 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
         upload={{
           path: "/",
           fileKey: "file",
-          id: clientStore.logo,
+          id: localStore.logo,
         }}
-        // portalTargetEditModal={() =>
-        //   document.querySelector("#edit-menu-item-form") as HTMLElement
-        // }
         onUploadIdChange={(newMainImageId) => {
-          setClientStore({
-            ...clientStore,
+          setLocalStore({
+            ...localStore,
             logo: newMainImageId,
           } as IStore);
         }}

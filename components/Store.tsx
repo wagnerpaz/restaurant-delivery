@@ -33,6 +33,7 @@ import usePutUser from "/hooks/usePutUser";
 import { emptyMenuItem } from "./Menu/MenuItem";
 import StoreHeader from "./StoreHeader";
 import Input from "./form/Input";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
 const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
   ssr: false,
@@ -157,13 +158,7 @@ const Store: FC<StoreProps> = ({ store }) => {
     }
   }, [searchMobileVisible]);
 
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${clientStore.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const goBackToRoot = useGoBackToRoot();
 
   if (!clientStore?.listed && !admin) {
     return null;
@@ -244,50 +239,28 @@ const Store: FC<StoreProps> = ({ store }) => {
             portalTarget={() => document.body}
             menuItem={orderMenuItemDetailObject}
             open={orderMenuItemDetailsOpen}
-            onOpenChange={comeBackToStoreRoot}
-          />
-        )}
-        {addStoreModalOpen && (
-          <AddStoreModal
-            store={clientStore}
-            onStoreChange={async (value, shouldSave) => {
-              if (shouldSave) {
-                try {
-                  const serverStore = await putStore(value);
-                  setClientStore(serverStore);
-                  setAddStoreModalOpen(false);
-                } catch (err: any) {
-                  // toast(defaultToastError(err));
-                }
-              } else {
-                setClientStore(value);
-              }
-            }}
-            portalTarget={() => null}
-            noAutoClose={!clientStore}
-            open={addStoreModalOpen}
-            onOpenChange={(value) => setAddStoreModalOpen(value)}
+            onOpenChange={goBackToRoot}
           />
         )}
         {editUserAddressesOpen && (
           <EditAddressModal
             open={editUserAddressesOpen}
             locations={editUserAddressesObject}
-            onOpenChange={comeBackToStoreRoot}
+            onOpenChange={goBackToRoot}
             onLocationsChange={async (locations) => {
               const serverUser = await putUser({
                 ...clientUser,
                 locations,
               } as IUser);
               setClientUser(serverUser);
-              comeBackToStoreRoot(false);
+              goBackToRoot(false);
             }}
           />
         )}
         {restoreTrashForSectionIndexOpen && (
           <EditMenuItemTrashModal
             open={restoreTrashForSectionIndexOpen}
-            onOpenChange={comeBackToStoreRoot}
+            onOpenChange={goBackToRoot}
             store={clientStore}
           />
         )}
