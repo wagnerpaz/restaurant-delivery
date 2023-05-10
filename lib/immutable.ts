@@ -1,4 +1,7 @@
 export function replaceAt(array: any[], index: number, element: any) {
+  if (index < 0) {
+    return [...array];
+  }
   return [...array.slice(0, index), element, ...array.slice(index + 1)];
 }
 

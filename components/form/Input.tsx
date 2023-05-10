@@ -5,7 +5,7 @@ const Input = ({ className, isDisabled, ...props }) => {
     <input
       className={classNames(
         "ps-4 pe-4 py-2 -mt-[7px] bg-[transparent] rounded-md border-none w-full outline-none",
-        { "bg-main-200 cursor-not-allowed": isDisabled },
+        { "cursor-not-allowed": isDisabled },
         className
       )}
       disabled={isDisabled}

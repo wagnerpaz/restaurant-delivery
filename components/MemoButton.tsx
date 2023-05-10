@@ -1,18 +1,11 @@
-import { memo } from "react";
+import { memo, ComponentProps } from "react";
 
 import Button from "/components/form/Button";
 
-interface LocalButtonProps {
-  label?: string;
-  className: string;
-}
+interface MemoButtonProps extends ComponentProps<typeof Button> {}
 
-const MemoButton: React.FC<LocalButtonProps> = ({
-  className,
-  label,
-  ...props
-}) => {
-  return <Button {...props} className="!min-w-0" />;
+const MemoButton: React.FC<MemoButtonProps> = ({ ...props }) => {
+  return <Button {...props} />;
 };
 
 export default memo(

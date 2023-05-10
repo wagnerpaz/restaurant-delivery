@@ -127,7 +127,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const onDropMenuItem = useCallback(
     async (id: string, atIndex: number) => {
       const { index } = onFindMenuItem(id);
-      reorderMenuItems(store, menuSection.index, [id, `${atIndex}`]);
+      reorderMenuItems(store, menuSection._id, [id, `${atIndex}`]);
       setLocalMenuSection({
         ...menuSection,
         items: moveTo(localMenuSection.items, index, atIndex),
@@ -193,8 +193,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         looseSearch(f.nameDetail || "", search) ||
         looseSearch(f.details?.short || "", search)
     );
-
-  console.log("localMenuSection", localMenuSection);
 
   return (
     <MenuSectionContext.Provider

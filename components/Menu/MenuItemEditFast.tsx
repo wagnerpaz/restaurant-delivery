@@ -17,6 +17,7 @@ import { IStore } from "/models/types/Store";
 import { replaceAt } from "/lib/immutable";
 import MemoButton from "/components/MemoButton";
 import FormControl from "../FormControl";
+import classNames from "classnames";
 
 const TYPE_OPTIONS = {
   product: "Produto",
@@ -56,16 +57,16 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
       store as IStore,
       localMenuItem._id.startsWith("_tmp_")
         ? { ...localMenuItem, _id: undefined }
-        : localMenuItem._id,
+        : localMenuItem,
       menuSection._id
     );
 
     setMenuSection((menuSection) => {
-      const index = menuSection.items.findIndex((f) => f._id === saved._id);
-      const items =
-        index >= 0
-          ? replaceAt(menuSection.items, index, saved)
-          : [...menuSection.items, saved];
+      const index = menuSection.items.findIndex(
+        (f) => f._id === saved._id || f._id === localMenuItem._id
+      );
+      console.log("index", index);
+      const items = replaceAt(menuSection.items, index, saved);
       return { ...menuSection, items };
     });
     setSaving(false);
@@ -91,7 +92,12 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           cdn
         />
       </EditableSection>
-      <FormControl label="Tipo" className="w-full sm:w-36">
+      <FormControl
+        label="Tipo"
+        fieldsetClassName={classNames("w-full sm:w-36", {
+          "bg-main-200": saving,
+        })}
+      >
         <MemoReactSelect
           disabled={saving}
           label="Tipo"
@@ -118,7 +124,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         />
       </FormControl>
       <MemoInput
-        className="flex-1 min-w-0"
+        className={classNames("flex-1 min-w-0")}
+        fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
         label="Nome"
         value={localMenuItem.name}
@@ -130,7 +137,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         }
       />
       <MemoInput
-        className="w-full sm:w-32"
+        className={"w-full sm:w-32"}
+        fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
         label="Detalhe"
         value={localMenuItem.nameDetail}
@@ -142,7 +150,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         }
       />
       <MemoInput
-        className="flex-1 min-w-fit"
+        className={"flex-1 min-w-fit"}
+        fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
         label="Descrição (curta)"
         value={localMenuItem.details?.short}
@@ -155,7 +164,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
       />
       <div className="flex flex-row gap-2">
         <MemoInput
-          className="w-full sm:!w-16"
+          className={"w-full sm:!w-16"}
+          fieldsetClassName={classNames({ "bg-main-200": saving })}
           isDisabled={saving}
           label="Preço"
           type="number"
@@ -168,7 +178,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           }
         />
         <MemoInput
-          className="w-full sm:!w-16"
+          className={"w-full sm:!w-16"}
+          fieldsetClassName={classNames({ "bg-main-200": saving })}
           isDisabled={saving}
           label="Promo"
           type="number"
@@ -183,16 +194,17 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
       </div>
       <div className="flex flex-row gap-2">
         <MemoButton
-          className="!px-3"
+          className="!px-3 !py-0 !h-[42px]"
           type="submit"
           size="sm"
           isDisabled={isLocalEqualToReal || saving}
         >
-          <RiSave3Fill size={20} />
+          {!saving && <RiSave3Fill size={20} />}
+          {saving && <div className="!text-[10px] loading-spinner"></div>}
         </MemoButton>
         <MemoButton
           type="button"
-          className="!px-3 h-auto"
+          className="!px-3 !py-0 !h-[42px]"
           size="sm"
           isDisabled={saving}
           onClick={onDeleteClick}

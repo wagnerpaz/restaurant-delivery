@@ -116,7 +116,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             />
           </Fieldset>
         )}
-        <div className="sticky bottom-0 flex flex-row justify-end gap-2 bg-main-100 p-4 -mx-4 translate-y-4 z-20 border-t border-hero">
+        <div className="sticky bottom-0 flex flex-row items-center justify-end gap-2 bg-main-100 p-4 -mx-4 translate-y-4 z-20 border-t border-hero">
           <Button
             className="w-full sm:w-32"
             variant="outline"

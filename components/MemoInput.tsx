@@ -3,18 +3,25 @@ import { memo } from "react";
 import Input from "/components/form/Input";
 import FormControl from "/components/FormControl";
 
-interface LocalInputProps {
+interface MemoInputProps {
   label?: string;
   className: string;
+  fieldsetClassName: string;
 }
 
-const MemoInput: React.FC<LocalInputProps> = ({
+const MemoInput: React.FC<MemoInputProps> = ({
+  fieldsetClassName,
   className,
   label,
   ...props
 }) => {
+  console.log(className);
   return (
-    <FormControl className={className} label={label || ""}>
+    <FormControl
+      fieldsetClassName={fieldsetClassName}
+      className={className}
+      label={label || ""}
+    >
       <Input {...props} className="!min-w-0" />
     </FormControl>
   );
