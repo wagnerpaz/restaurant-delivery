@@ -16,6 +16,7 @@ import { MenuSectionContext } from "./MenuSection";
 import { IStore } from "/models/types/Store";
 import { replaceAt } from "/lib/immutable";
 import MemoButton from "/components/MemoButton";
+import FormControl from "../FormControl";
 
 const TYPE_OPTIONS = {
   product: "Produto",
@@ -90,31 +91,32 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           cdn
         />
       </EditableSection>
-      <MemoReactSelect
-        className="w-full sm:w-36"
-        disabled={saving}
-        label="Tipo"
-        value={{
-          value: localMenuItem.itemType,
-          label: TYPE_OPTIONS[localMenuItem.itemType],
-        }}
-        options={[
-          {
-            value: Object.keys(TYPE_OPTIONS)[0],
-            label: Object.values(TYPE_OPTIONS)[0],
-          },
-          {
-            value: Object.keys(TYPE_OPTIONS)[1],
-            label: Object.values(TYPE_OPTIONS)[1],
-          },
-        ]}
-        onChange={({ value }) =>
-          setLocalMenuItem((localMenuItem) => ({
-            ...localMenuItem,
-            itemType: value as unknown as ItemTypeType,
-          }))
-        }
-      />
+      <FormControl label="Tipo" className="w-full sm:w-36">
+        <MemoReactSelect
+          disabled={saving}
+          label="Tipo"
+          value={{
+            value: localMenuItem.itemType,
+            label: TYPE_OPTIONS[localMenuItem.itemType],
+          }}
+          options={[
+            {
+              value: Object.keys(TYPE_OPTIONS)[0],
+              label: Object.values(TYPE_OPTIONS)[0],
+            },
+            {
+              value: Object.keys(TYPE_OPTIONS)[1],
+              label: Object.values(TYPE_OPTIONS)[1],
+            },
+          ]}
+          onChange={({ value }) =>
+            setLocalMenuItem((localMenuItem) => ({
+              ...localMenuItem,
+              itemType: value as unknown as ItemTypeType,
+            }))
+          }
+        />
+      </FormControl>
       <MemoInput
         className="flex-1 min-w-0"
         isDisabled={saving}

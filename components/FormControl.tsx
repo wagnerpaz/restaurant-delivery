@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { ReactNode } from "react";
 
 interface FormControlProps {
@@ -13,7 +14,14 @@ const FormControl: React.FC<FormControlProps> = ({
   children,
   label,
 }) => {
-  return <div className={className}>{children}</div>;
+  return (
+    <div className={classNames("relative -mt-2", className)}>
+      <fieldset className="border border-main-a11y-low rounded-md relative bg-main-100">
+        <legend className="ml-2 text-xs pt-0">{label}</legend>
+        {children}
+      </fieldset>
+    </div>
+  );
 };
 
 export default FormControl;

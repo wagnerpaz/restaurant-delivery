@@ -49,7 +49,10 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
         <Button
           className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
           variant="text"
-          onClick={onStoreDataClick}
+          onClick={() => {
+            onStoreDataClick();
+            onClose();
+          }}
         >
           <RiStore3Fill className="mr-4" size={36} />
           Dados da Loja

@@ -89,17 +89,21 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             </FormControl>
             <FormControl className="flex-1 min-w-fit" label="Listada">
               <ReactSelect
-                value={`${localStore.listed}`}
-                onChange={(e) =>
+                value={{
+                  value: localStore.listed,
+                  label: localStore.listed ? "Sim" : "Não",
+                }}
+                onChange={({ value }) =>
                   setLocalStore({
                     ...localStore,
-                    listed: e.target.value === "true",
+                    listed: value === "true",
                   } as IStore)
                 }
-              >
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
-              </ReactSelect>
+                options={[
+                  { value: "true", label: "Sim" },
+                  { value: "false", label: "Não" },
+                ]}
+              ></ReactSelect>
             </FormControl>
           </div>
         </div>

@@ -5,11 +5,10 @@ import useGetBrasilCities from "/hooks/useGetBrasilCities";
 import useGetBrasilStates from "/hooks/useGetBrasilStates";
 
 import Input from "/components/form/Input";
-import Select from "/components/ReactSelect";
+import ReactSelect from "/components/ReactSelect";
 
 import applyCepMask from "/lib/cepMask";
 import isValidBRPostalCode from "/lib/isValidBrPostalCode";
-import { ILocation } from "/models/types/Store";
 
 interface EditAddressFormProps extends ComponentProps<"div"> {}
 
@@ -79,49 +78,36 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
         />
       </FormControl>
       <div className="flex flex-row gap-4">
-        <FormControl className="min-w-fit" label="Estado">
-          <Select
-            value={location.state}
-            onChange={(e) => {
+        <FormControl className="w-24" label="Estado">
+          <ReactSelect
+            value={{ value: location.state, label: location.state }}
+            onChange={({ value }) => {
               onLocationChange({
                 ...location,
-                state: e.target.value,
+                state: value,
               });
             }}
-          >
-            <option></option>
-            {brasilStates.map((state) => (
-              <option
-                className="text-main-a11y-high"
-                key={state.id}
-                value={state.sigla}
-              >
-                {state.sigla}
-              </option>
-            ))}
-          </Select>
+            options={brasilStates.map((state) => ({
+              value: state,
+              label: state.sigla,
+            }))}
+          />
         </FormControl>
 
         <FormControl className="w-full" label="Cidade">
-          <Select
-            value={location.city}
-            onChange={(e) => {
+          <ReactSelect
+            value={{ value: location.city, label: location.city }}
+            onChange={({ value }) => {
               onLocationChange({
                 ...location,
-                city: e.target.value,
+                city: value,
               });
             }}
-          >
-            {brasilCities.map((city) => (
-              <option
-                className="text-main-a11y-high overflow-hidden text-ellipsis"
-                key={city}
-                value={city}
-              >
-                {city}
-              </option>
-            ))}
-          </Select>
+            options={brasilCities.map((city) => ({
+              value: city,
+              label: city,
+            }))}
+          />
         </FormControl>
       </div>
 

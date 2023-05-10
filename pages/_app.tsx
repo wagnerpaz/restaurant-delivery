@@ -43,7 +43,7 @@ function App({
     main300 = "#949494",
     mainA11yHigh = "#0e1111",
     mainA11yMedium = "#4A5959",
-    mainA11yLow = "#e2e8f0",
+    mainA11yLow = "#c9d1db",
     contrastHigh = "#FFFFFF",
     contrastMedium = "#F2F2F2",
     contrastLow = "#E6E6E6",
