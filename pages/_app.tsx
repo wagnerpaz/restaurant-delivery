@@ -10,8 +10,9 @@ import Router from "next/router";
 import { getRGBColor } from "/lib/getRGBColor";
 
 import "react-tabs/style/react-tabs.css";
-import "/styles/globals.css";
 import "nprogress/nprogress.css";
+import "placeholder-loading/dist/css/placeholder-loading.min.css";
+import "/styles/globals.css";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",

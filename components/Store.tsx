@@ -226,8 +226,8 @@ const Store: FC<StoreProps> = ({ store }) => {
             <Image
               className="w-[200px]"
               src="/logo.png"
-              width={500}
-              height={157}
+              width={200}
+              height={63}
               alt="Comanda Vip logo"
             />
           </Link>
