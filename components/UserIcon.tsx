@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useMemo, useRef, useContext } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -7,14 +7,35 @@ import { FaAddressBook, FaSignOutAlt } from "react-icons/fa";
 import Button from "/components/form/Button";
 import useOnClickOutside from "/lib/hooks/useOnClickOutside";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+import { StoreContext } from "./Store";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import usePutUser from "/hooks/usePutUser";
+import { IUser } from "/models/types/User";
+import useLocalState from "/hooks/useLocalState";
 
-const UserIcon = ({ store }) => {
+const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
+  ssr: false,
+});
+
+const UserIcon = () => {
   const { data: session } = useSession();
+  const { store } = useContext(StoreContext);
+
+  const goBackToRoot = useGoBackToRoot();
   const router = useRouter();
+  const putUser = usePutUser();
 
   const container = useRef(null);
 
   const [menuOpened, setMenuOpened] = useState(false);
+  const [clientUser, setClientUser] = useLocalState<IUser>(session?.user);
+
+  const editUserAddressesObject = useMemo(
+    () => store?.locations,
+    [store?.locations]
+  );
+  const editUserAddressesOpen = !!router.query.addressesUserId;
 
   useOnClickOutside(container, () => {
     setMenuOpened(false);
@@ -72,6 +93,21 @@ const UserIcon = ({ store }) => {
               </div>,
               document.body
             )}
+          {editUserAddressesOpen && (
+            <EditAddressModal
+              open={editUserAddressesOpen}
+              locations={editUserAddressesObject}
+              onOpenChange={goBackToRoot}
+              onLocationsChange={async (locations) => {
+                const serverUser = await putUser({
+                  ...clientUser,
+                  locations,
+                } as IUser);
+                setClientUser(serverUser);
+                goBackToRoot();
+              }}
+            />
+          )}
         </>
       )}
     </>

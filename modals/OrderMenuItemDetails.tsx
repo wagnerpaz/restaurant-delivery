@@ -35,11 +35,11 @@ import { StoreContext } from "/components/Store";
 import { IOrder, IOrderExchange, IOrderItem } from "/models/types/Order";
 import Button from "/components/form/Button";
 
-interface AddStoreModalProps extends ComponentProps<typeof Modal> {
+interface OrderMenuItemDetailsModalProps extends ComponentProps<typeof Modal> {
   menuItem: IMenuItem;
 }
 
-const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
+const OrderMenuItemDetailsModal: React.FC<OrderMenuItemDetailsModalProps> = ({
   contentClassName,
   menuItem,
   onOpenChange,
@@ -310,6 +310,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                           >
                             <span>{compositionItem.ingredient?.name}</span>
                             <NumberInput
+                              className="w-28"
                               value={
                                 order.removals?.find(
                                   (orderItem) =>
@@ -367,7 +368,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                             className="flex flex-row items-center justify-between [&:not(:last-child)]:border-b border-main-a11y-low gap-2 py-2"
                             key={item.ingredient.name}
                           >
-                            <div className="flex flex-row items-center gap-2">
+                            <div className="flex flex-row items-center gap-2 flex-1">
                               <ImageWithFallback
                                 className="rounded-md border border-solid border-main-a11y-low bg-main-100 object-cover w-[50px] h-[50px]"
                                 src={item.ingredient.images?.main}
@@ -394,6 +395,7 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
                               </div>
                             </div>
                             <NumberInput
+                              className="w-28"
                               value={
                                 order.additionals?.find(
                                   (f) =>
@@ -526,8 +528,8 @@ const OrderMenuItemDetailsModal: React.FC<AddStoreModalProps> = ({
           )}
         </div>
       </div>
-      <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 justify-between h-18">
-        <NumberInput full />
+      <div className="sticky bottom-0 left-0 right-0 border-t-[1px] border-main-a11y-low p-2 sm:mx-0 bg-main-100 flex flex-row gap-2 items-center justify-between center h-18">
+        <NumberInput className="!h-full w-48" />
         <Button className="flex-1" isDisabled={calculatedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
           Adicionar

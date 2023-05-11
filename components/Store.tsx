@@ -1,14 +1,12 @@
 import {
   FC,
   MutableRefObject,
-  useEffect,
   useMemo,
   useRef,
   useState,
   createContext,
 } from "react";
 import classNames from "classnames";
-import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -19,38 +17,17 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import Menu from "/components/Menu/Menu";
 import { ILocation, IStore } from "/models/types/Store";
 
-import { IMenuItem } from "/models/types/MenuItem";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
-import usePutStore from "/hooks/usePutStore";
-import {
-  findMenuItemSectionIndex,
-  replaceObjectById,
-  retriveAllMenuItems as retrieveAllMenuItems,
-} from "/lib/menuSectionUtils";
-import useGetStore from "/hooks/useGetStore";
-import usePutUser from "/hooks/usePutUser";
-import { emptyMenuItem } from "./Menu/MenuItem";
+import { retriveAllMenuItems as retrieveAllMenuItems } from "/lib/menuSectionUtils";
 import StoreHeader from "./StoreHeader";
-import Input from "./form/Input";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
-const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
-  ssr: false,
-});
 const EditMenuItemTrashModal = dynamic(
   () => import("/modals/EditMenuItemTrashModal"),
   { ssr: false }
 );
-const EditMenuItemModal = dynamic(() => import("/forms/EditMenuItemForm"), {
-  ssr: false,
-});
 const OrderMenuItemDetailsModal = dynamic(
   () => import("/modals/OrderMenuItemDetails"),
-  { ssr: false }
-);
-const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
-const AddMenuSectionModal = dynamic(
-  () => import("/modals/AddMenuSectionModal"),
   { ssr: false }
 );
 
@@ -65,28 +42,18 @@ export const StoreContext = createContext<{
   setStore: (store: IStore) => void;
   search: string;
   setSearch: (search: string) => void;
-  searchMobileVisible: boolean;
-  setSearchMobileVisible: (visible: boolean) => void;
-  isSearchMobileInScreen: boolean;
-  searchMobileElement: HTMLInputElement | null;
   menuItemsRenderCount: MutableRefObject<number> | null;
 }>({
   store: {} as IStore,
   setStore: () => {},
   search: "",
   setSearch: () => {},
-  searchMobileVisible: false,
-  setSearchMobileVisible: () => {},
-  isSearchMobileInScreen: false,
-  searchMobileElement: null,
   menuItemsRenderCount: null,
 });
 
 const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
-
-  console.log("Server Store", store);
 
   // const toast = useToast();
   const router = useRouter();
@@ -95,17 +62,9 @@ const Store: FC<StoreProps> = ({ store }) => {
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const searchMobileRef = useRef<HTMLInputElement>();
-
-  const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
-
-  const [clientUser, setClientUser] = useState<IUser>();
   const [clientStore, setClientStore] = useState(store);
 
   const [search, setSearch] = useState("");
-  const [searchMobileVisible, setSearchMobileVisible] = useState(false);
-
-  const [addStoreModalOpen, setAddStoreModalOpen] = useState(!clientStore);
 
   const orderMenuItemDetailObject = useMemo(
     () =>
@@ -116,54 +75,12 @@ const Store: FC<StoreProps> = ({ store }) => {
   );
   const orderMenuItemDetailsOpen = !!router.query.orderItem;
 
-  const editUserAddressesObject = useMemo(
-    () => clientUser?.locations,
-    [clientUser]
-  );
-  const editUserAddressesOpen = !!router.query.addressesUserId;
-
   const restoreTrashForSectionIndexOpen =
     !!router.query.restoreTrashForSectionIndex;
 
-  const putStore = usePutStore();
-  const putUser = usePutUser();
-
   const [tabIndex, setTabIndex] = useState(0);
 
-  useEffect(() => {
-    if (searchMobileVisible) {
-      searchMobileRef.current?.focus();
-    }
-  }, [searchMobileVisible]);
-
-  useEffect(() => {
-    setClientUser(session?.user as IUser);
-  }, [session?.user]);
-
-  useEffect(() => {
-    const cachedRef = searchMobileRef.current,
-      observer = new IntersectionObserver(
-        ([e]) => setIsSearchMobileInScreen(e.intersectionRatio >= 1),
-        { threshold: [1] }
-      );
-
-    if (cachedRef) {
-      observer.observe(cachedRef);
-
-      // unmount
-      return function () {
-        observer.unobserve(cachedRef);
-      };
-    }
-  }, [searchMobileVisible]);
-
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${clientStore.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const goBackToRoot = useGoBackToRoot();
 
   if (!clientStore?.listed && !admin) {
     return null;
@@ -176,25 +93,11 @@ const Store: FC<StoreProps> = ({ store }) => {
         setStore: setClientStore,
         search,
         setSearch,
-        searchMobileVisible,
-        setSearchMobileVisible,
-        isSearchMobileInScreen,
-        searchMobileElement: searchMobileRef.current as HTMLInputElement,
         menuItemsRenderCount,
       }}
     >
       <div className={classNames("font-lato custom-scrollbar min-h-screen")}>
         <StoreHeader />
-        {searchMobileVisible && (
-          <Input
-            ref={searchMobileRef}
-            id="search-mobile"
-            className="!w-full !min-w-0 !bg-main-100 !text-main-a11y-high !rounded-none"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Pesquisar..."
-          ></Input>
-        )}
         <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
             <main>
@@ -231,8 +134,8 @@ const Store: FC<StoreProps> = ({ store }) => {
             <Image
               className="w-[200px]"
               src="/logo.png"
-              width={500}
-              height={157}
+              width={200}
+              height={63}
               alt="Comanda Vip logo"
             />
           </Link>
@@ -240,55 +143,16 @@ const Store: FC<StoreProps> = ({ store }) => {
 
         {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
           <OrderMenuItemDetailsModal
-            store={clientStore}
             portalTarget={() => document.body}
             menuItem={orderMenuItemDetailObject}
             open={orderMenuItemDetailsOpen}
-            onOpenChange={comeBackToStoreRoot}
-          />
-        )}
-        {addStoreModalOpen && (
-          <AddStoreModal
-            store={clientStore}
-            onStoreChange={async (value, shouldSave) => {
-              if (shouldSave) {
-                try {
-                  const serverStore = await putStore(value);
-                  setClientStore(serverStore);
-                  setAddStoreModalOpen(false);
-                } catch (err: any) {
-                  // toast(defaultToastError(err));
-                }
-              } else {
-                setClientStore(value);
-              }
-            }}
-            portalTarget={() => null}
-            noAutoClose={!clientStore}
-            open={addStoreModalOpen}
-            onOpenChange={(value) => setAddStoreModalOpen(value)}
-          />
-        )}
-        {editUserAddressesOpen && (
-          <EditAddressModal
-            open={editUserAddressesOpen}
-            locations={editUserAddressesObject}
-            onOpenChange={comeBackToStoreRoot}
-            onLocationsChange={async (locations) => {
-              const serverUser = await putUser({
-                ...clientUser,
-                locations,
-              } as IUser);
-              setClientUser(serverUser);
-              comeBackToStoreRoot(false);
-            }}
+            onOpenChange={goBackToRoot}
           />
         )}
         {restoreTrashForSectionIndexOpen && (
           <EditMenuItemTrashModal
             open={restoreTrashForSectionIndexOpen}
-            onOpenChange={comeBackToStoreRoot}
-            store={clientStore}
+            onOpenChange={goBackToRoot}
           />
         )}
       </div>

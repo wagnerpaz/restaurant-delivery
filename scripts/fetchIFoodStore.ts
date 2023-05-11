@@ -7,15 +7,15 @@ import ColorThief from "colorthief";
 import connectToDatabase from "../lib/mongoose";
 import Store from "../models/Store";
 import MenuItem from "../models/MenuItem";
-import toPascalCase from "../lib/toPascalCase";
-import { IMenuItemAdditionalsCategory } from "/models/types/MenuItem";
-import { IMenuSection } from "/models/types/Store";
+import { IMenuItemAdditionalsCategory } from "../models/types/MenuItem";
+import { IMenuSection } from "../models/types/MenuSection";
+import MenuSection from "../models/MenuSection";
 
-// const CV_STORE_SLUG = "reizinho-do-acai";
-// const STORE_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
+const CV_STORE_SLUG = "reizinho-do-acai";
+const MERCHANT_ID = "c2e77a0c-4fb2-4f86-97d6-5bc2a026e385";
 
-const CV_STORE_SLUG = "black-cave";
-const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
+// const CV_STORE_SLUG = "black-cave";
+// const MERCHANT_ID = "75d517ad-f4ed-4f63-b422-29dec7c4cdac";
 
 // const CV_STORE_SLUG = "setor-1";
 // const MERCHANT_ID = "243ef5ae-7f07-4539-bd3c-fa291d744ddb";
@@ -87,6 +87,7 @@ async function run() {
   if (previousStore?._id) {
     console.log("will delete previous store data");
     await MenuItem.deleteMany({ store: previousStore._id });
+    await MenuSection.deleteMany({ store: previousStore._id });
     await Store.deleteOne({ _id: previousStore._id });
   }
 
@@ -221,28 +222,30 @@ async function run() {
   }
 
   const sections: IMenuSection[] = [];
+
+  if (allIngredients.length > 0) {
+    const created = await MenuSection.create({
+      name: "Ingredientes",
+      items: allIngredients,
+    });
+    sections.push(created._id);
+  }
+
   for (const ifoodSection of catalog.menu) {
     const cvSection = {
       name: ifoodSection.name,
       items: await mapIFoodItemsBySection(ifoodSection.itens),
     } as IMenuSection;
-    sections.push(cvSection);
+    const created = await MenuSection.create(cvSection);
+    sections.push(created._id);
   }
-
-  console.log(sections);
 
   await Store.updateOne(
     { _id: createdStore._id },
     {
       ...createdStore.toObject(),
       menu: {
-        sections: [
-          {
-            name: "Ingredientes",
-            items: allIngredients,
-          },
-          ...sections,
-        ],
+        sections: [...sections],
       },
     }
   );

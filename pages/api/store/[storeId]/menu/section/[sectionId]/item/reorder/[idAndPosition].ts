@@ -2,28 +2,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { moveTo } from "/lib/immutable";
 
 import connectToDatabase from "/lib/mongoose";
-import Store from "/models/Store";
+import MenuSection from "/models/MenuSection";
 
 async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
-    const storeId = req.query.storeId as string;
-    const sectionIndex = req.query.sectionIndex as string;
+    const sectionId = req.query.sectionId as string;
     const idAndPosition = req.query.idAndPosition as string;
 
-    const sectionIndexSplit = sectionIndex.split(",");
     const idAndPositionSplit = idAndPosition.split(",");
 
     const id1 = idAndPositionSplit[0];
     const atIndex = idAndPositionSplit[1];
 
     if (req.method === "POST" || req.method === "PUT") {
-      const store = await Store.findById(storeId);
-
-      let section = store.menu;
-      for (const index of sectionIndexSplit) {
-        section = section.sections[index];
-      }
+      const section = await MenuSection.findById(sectionId);
 
       const foundIndex = section.items.findIndex(
         (f) => f?._id?.toString() === id1
@@ -31,7 +24,7 @@ async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {
       if (foundIndex >= 0) {
         section.items = moveTo(section.items, foundIndex, +atIndex);
 
-        store.save();
+        section.save();
       } else {
         res.status(404).end();
       }

@@ -7,13 +7,15 @@ import MenuSection from "./MenuSection";
 import { IMenuSection } from "/models/types/MenuSection";
 import { StoreContext } from "../Store";
 import MenuSectionHeader from "./MenuSectionHeader";
-import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import usePutStoreMenuSectionSections from "/hooks/usePutStoreMenuSectionSections";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import { useSession } from "next-auth/react";
 import { IUser } from "/models/types/User";
 import { replaceAt } from "/lib/immutable";
 import useLocalState from "/hooks/useLocalState";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import defaultToastError from "/config/defaultToastError";
+import useToast from "/hooks/useToast";
 
 interface MenuProps extends ComponentProps<"section"> {
   sections: IMenuSection[];
@@ -41,6 +43,10 @@ const Menu: React.FC<MenuProps> = ({
     [localSections]
   );
 
+  const [expandedMenuSections, setExpandedMenuSections] =
+    useState(defaultIndex);
+
+  const toast = useToast();
   const router = useRouter();
 
   const putMenuSection = usePutStoreMenuSectionSections();
@@ -48,13 +54,7 @@ const Menu: React.FC<MenuProps> = ({
   const editMenuSectionMode = router.query.editMenuSection;
   const editMenuSectionId = router.query.editMenuSectionId;
 
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${store.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const goBackToRoot = useGoBackToRoot();
 
   const handleAddSection = () => {
     router.push(`/store/${store.slug}?editMenuSection=ADD`, undefined, {
@@ -76,11 +76,17 @@ const Menu: React.FC<MenuProps> = ({
 
   return (
     <>
-      <Accordion allowMultipleExpanded preExpanded={defaultIndex}>
+      <Accordion
+        allowMultipleExpanded
+        allowZeroExpanded
+        preExpanded={expandedMenuSections}
+        onChange={(expanded) => setExpandedMenuSections(expanded)}
+      >
         {localSections.map((section) => (
           <MenuSection
             key={`${section._id}`}
             menuSection={section}
+            expanded={expandedMenuSections.includes(section._id)}
             type={type}
             onEditSectionClick={() => handleEditSection(section)}
           />
@@ -92,7 +98,7 @@ const Menu: React.FC<MenuProps> = ({
         </span>
       )} */}
         {admin && (
-          <AccordionItem>
+          <AccordionItem uuid="new">
             <MenuSectionHeader isNew onAddSectionClick={handleAddSection} />
           </AccordionItem>
         )}
@@ -103,7 +109,7 @@ const Menu: React.FC<MenuProps> = ({
           mode={editMenuSectionMode}
           menuSection={localSections.find((f) => f._id === editMenuSectionId)}
           open={editMenuSectionMode}
-          onOpenChange={(value) => comeBackToStoreRoot(value)}
+          onOpenChange={(value) => goBackToRoot(value)}
           onSave={async (value) => {
             try {
               const createdOrUpdated = await putMenuSection(store, value);
@@ -121,13 +127,13 @@ const Menu: React.FC<MenuProps> = ({
                   )
                 );
               }
-              comeBackToStoreRoot(false);
+              goBackToRoot(false);
             } catch (err: any) {
-              // toast(defaultToastError(err));
+              toast(defaultToastError(err));
             }
           }}
           onCancel={() => {
-            comeBackToStoreRoot(false);
+            goBackToRoot(false);
           }}
           onDelete={async () => {
             const confirmed = confirm(

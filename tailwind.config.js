@@ -40,6 +40,10 @@ module.exports = {
       link: "var(--color-link)",
       add: "var(--color-add)",
       remove: "var(--color-remove)",
+      warning: "var(--color-warning)",
+      error: "var(--color-error)",
+      info: "var(--color-info)",
+      success: "var(--color-success)",
     },
     container: {},
     extend: {

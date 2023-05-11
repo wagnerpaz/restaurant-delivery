@@ -10,8 +10,10 @@ import Router from "next/router";
 import { getRGBColor } from "/lib/getRGBColor";
 
 import "react-tabs/style/react-tabs.css";
-import "/styles/globals.css";
 import "nprogress/nprogress.css";
+import "placeholder-loading/dist/css/placeholder-loading.min.css";
+import "/styles/globals.css";
+import { ToastProvider } from "/contexts/ToastContext";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",
@@ -43,7 +45,7 @@ function App({
     main300 = "#949494",
     mainA11yHigh = "#0e1111",
     mainA11yMedium = "#4A5959",
-    mainA11yLow = "#e2e8f0",
+    mainA11yLow = "#c9d1db",
     contrastHigh = "#FFFFFF",
     contrastMedium = "#F2F2F2",
     contrastLow = "#E6E6E6",
@@ -55,6 +57,10 @@ function App({
     link = "#0e1111",
     add = "#11419b",
     remove = "#ce1414",
+    warning = "#DD6B20",
+    error = "#E53E3E",
+    info = "#3182CE",
+    success = "#38A169",
   } = theme?.colors || {};
   const { hero: heroPattern = "/istockphoto-515373062-612x612.webp" } =
     theme?.patterns || {};
@@ -102,11 +108,17 @@ function App({
   const addColorVar = getRGBColor(add, "add");
   const removeColorVar = getRGBColor(remove, "remove");
 
+  const warningColorVar = getRGBColor(warning, "warning");
+  const errorColorVar = getRGBColor(error, "error");
+  const infoColorVar = getRGBColor(info, "info");
+  const successColorVar = getRGBColor(success, "success");
+
   const heroPatternVar = `--pattern-hero: url(${heroPattern})`;
 
   useEffect(() => {});
 
   const [pageLoaded, setPageLoaded] = useState(false);
+  const [appRoot, setAppRoot] = useState<HTMLDivElement>(null);
 
   useEffect(() => {
     setPageLoaded(true);
@@ -137,6 +149,10 @@ function App({
              ${linkColorVar}
              ${addColorVar}
              ${removeColorVar}
+             ${warningColorVar}
+             ${errorColorVar}
+             ${infoColorVar}
+             ${successColorVar}
              ${heroPatternVar}}
           `}
         </style>
@@ -146,9 +162,12 @@ function App({
         className="font-lato bg-main-100 fixed top-0 left-0 w-full h-full -z-10"
       />
       <div className="bg-hero-pattern bg-repeat opacity-10 fixed top-0 left-0 w-full h-full -z-10" />
+      <div ref={setAppRoot}></div>
       <MyErrorBoundary>
         <SessionProvider session={session}>
-          <Component {...pageProps} />
+          <ToastProvider portalTarget={appRoot}>
+            <Component {...pageProps} />
+          </ToastProvider>
         </SessionProvider>
       </MyErrorBoundary>
     </>

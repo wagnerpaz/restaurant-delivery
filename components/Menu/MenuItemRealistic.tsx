@@ -124,7 +124,8 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             height={imageSize}
             alt={`${name} hero image`}
             loading={
-              (menuItemsRenderCount?.current || 0) <= 8 ? "eager" : "lazy"
+              // (menuItemsRenderCount?.current || 0) <= 8 ? "eager" : "lazy"
+              "lazy"
             }
             cdn
           />

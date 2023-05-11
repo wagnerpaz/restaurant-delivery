@@ -1,21 +1,22 @@
-import { ComponentProps } from "react";
+import { ComponentProps, useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { RiStore3Fill } from "react-icons/ri";
 import { signIn, useSession } from "next-auth/react";
 
 import { IUser } from "/models/types/User";
-import MenuSectionsTree from "./MenuSectionsTree";
-import { IStore } from "/models/types/Store";
+import Drawer from "./Drawer";
+import Button from "./form/Button";
+import { StoreContext } from "./Store";
+import classNames from "classnames";
+import { useRouter } from "next/router";
 
 interface MainMenuDrawerProps
   extends Omit<ComponentProps<typeof Drawer>, "children"> {
-  store: IStore;
   onStoreDataClick: () => void;
 }
 
 const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
-  store,
-  isOpen,
+  open,
   onClose,
   onStoreDataClick,
   ...props
@@ -24,45 +25,54 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
+  const { store } = useContext(StoreContext);
+
+  const router = useRouter();
+
   const handleSignIn = () => {
     signIn();
   };
 
   return (
-    // <Drawer isOpen={isOpen} onClose={onClose} isLazy={false}>
-    //   <DrawerOverlay />
-    //   <DrawerContent>
-    //     <DrawerCloseButton size="lg" />
-    //     <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
-
-    //     <DrawerBody className="!p-0">
-    //       {!admin && (
-    //         <Button
-    //           className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
-    //           variant="text"
-    //           onClick={handleSignIn}
-    //         >
-    //           <FaUserCircle className="mr-4" size={36} />
-    //           Entrar
-    //         </Button>
-    //       )}
-    //       {admin && (
-    //         <Button
-    //           className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
-    //           variant="text"
-    //           onClick={onStoreDataClick}
-    //         >
-    //           <RiStore3Fill className="mr-4" size={36} />
-    //           Dados da Loja
-    //         </Button>
-    //       )}
-    //       <MenuSectionsTree store={store} onCloseDrawer={onClose} />
-    //     </DrawerBody>
-
-    //     <DrawerFooter></DrawerFooter>
-    //   </DrawerContent>
-    // </Drawer>
-    null
+    <Drawer title="Menu" open={open} onClose={onClose} {...props}>
+      {!admin && (
+        <Button
+          className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
+          variant="text"
+          onClick={handleSignIn}
+        >
+          <FaUserCircle className="mr-4" size={36} />
+          Entrar
+        </Button>
+      )}
+      {admin && (
+        <Button
+          className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
+          variant="text"
+          onClick={() => {
+            onStoreDataClick();
+            onClose();
+          }}
+        >
+          <RiStore3Fill className="mr-4" size={36} />
+          Dados da Loja
+        </Button>
+      )}
+      {store.menu.sections.map((section) => (
+        <Button
+          key={`${section._id}`}
+          className={classNames(
+            "!rounded-none !justify-start !normal-case border-b-[1px] w-full"
+          )}
+          onClick={() => {
+            router.push("#menu-section-" + section._id);
+            onClose();
+          }}
+        >
+          {section.name}
+        </Button>
+      ))}
+    </Drawer>
   );
 };
 

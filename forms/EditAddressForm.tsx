@@ -5,11 +5,11 @@ import useGetBrasilCities from "/hooks/useGetBrasilCities";
 import useGetBrasilStates from "/hooks/useGetBrasilStates";
 
 import Input from "/components/form/Input";
-import Select from "/components/ReactSelect";
+import ReactSelect from "/components/ReactSelect";
 
 import applyCepMask from "/lib/cepMask";
 import isValidBRPostalCode from "/lib/isValidBrPostalCode";
-import { ILocation } from "/models/types/Store";
+import useToast from "/hooks/useToast";
 
 interface EditAddressFormProps extends ComponentProps<"div"> {}
 
@@ -20,7 +20,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   const [brasilStates, setBrasilStates] = useState([]);
   const [brasilCities, setBrasilCities] = useState([]);
 
-  // const toast = useToast();
+  const toast = useToast();
 
   const getBrasilCep = useGetBrasilCep();
   const getBrasilStates = useGetBrasilStates();
@@ -57,7 +57,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
             postalCode: postalCode,
           });
         } catch (err) {
-          // toast({ status: "warning", title: "CEP não encontrado." });
+          toast({ type: "warning", message: "CEP não encontrado." });
         }
       }
     }
@@ -65,7 +65,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   }, [postalCode, getBrasilCep, onLocationChange]);
 
   return (
-    <div className="flex flex-col gap-6 pt-6 flex-1">
+    <div className="flex flex-col gap-6 pt-6 flex-1 text-main-a11y-high">
       <FormControl className="min-w-fit" label="CEP">
         <Input
           value={location.postalCode}
@@ -79,49 +79,36 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
         />
       </FormControl>
       <div className="flex flex-row gap-4">
-        <FormControl className="min-w-fit" label="Estado">
-          <Select
-            value={location.state}
-            onChange={(e) => {
+        <FormControl className="w-24" label="Estado">
+          <ReactSelect
+            value={{ value: location.state, label: location.state }}
+            onChange={({ value }) => {
               onLocationChange({
                 ...location,
-                state: e.target.value,
+                state: value,
               });
             }}
-          >
-            <option></option>
-            {brasilStates.map((state) => (
-              <option
-                className="text-main-a11y-high"
-                key={state.id}
-                value={state.sigla}
-              >
-                {state.sigla}
-              </option>
-            ))}
-          </Select>
+            options={brasilStates.map((state) => ({
+              value: state,
+              label: state.sigla,
+            }))}
+          />
         </FormControl>
 
         <FormControl className="w-full" label="Cidade">
-          <Select
-            value={location.city}
-            onChange={(e) => {
+          <ReactSelect
+            value={{ value: location.city, label: location.city }}
+            onChange={({ value }) => {
               onLocationChange({
                 ...location,
-                city: e.target.value,
+                city: value,
               });
             }}
-          >
-            {brasilCities.map((city) => (
-              <option
-                className="text-main-a11y-high overflow-hidden text-ellipsis"
-                key={city}
-                value={city}
-              >
-                {city}
-              </option>
-            ))}
-          </Select>
+            options={brasilCities.map((city) => ({
+              value: city,
+              label: city,
+            }))}
+          />
         </FormControl>
       </div>
 

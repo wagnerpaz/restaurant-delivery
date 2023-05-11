@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
+import { v4 as uuidv4 } from "uuid";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -22,6 +23,8 @@ import defaultToastError from "/config/defaultToastError";
 import EditMenuItemModal from "/forms/EditMenuItemForm";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import isEqual from "lodash.isequal";
+import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import useToast from "/hooks/useToast";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -42,6 +45,7 @@ interface MenuSectionProps {
   className?: string;
   menuSection: IMenuSection;
   type: "product" | "ingredient";
+  expanded?: boolean;
   isNew?: boolean;
   onChangeItems: (items: IMenuItem[]) => void;
   onAddMenuItemClick?: () => void;
@@ -68,6 +72,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   className,
   type,
   menuSection,
+  expanded,
   isNew,
   onChangeItems = () => {},
   onAddMenuItemClick,
@@ -109,13 +114,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [router.query.addMenuItemBySection]
   );
 
-  const comeBackToStoreRoot = (newValue: boolean) => {
-    if (!newValue) {
-      router.push(`/store/${store.slug}`, undefined, {
-        shallow: true,
-      });
-    }
-  };
+  const toast = useToast();
+  const goBackToRoot = useGoBackToRoot();
 
   const onFindMenuItem = useCallback(
     (id: string) => {
@@ -131,7 +131,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const onDropMenuItem = useCallback(
     async (id: string, atIndex: number) => {
       const { index } = onFindMenuItem(id);
-      reorderMenuItems(store, menuSection.index, [id, `${atIndex}`]);
+      reorderMenuItems(store, menuSection._id, [id, `${atIndex}`]);
       setLocalMenuSection({
         ...menuSection,
         items: moveTo(localMenuSection.items, index, atIndex),
@@ -147,7 +147,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     ]
   );
 
-  const handleAddMenuItem = () => {
+  const handleAddMenuItemRealistic = () => {
     router.push(
       `/store/${store.slug}?addMenuItemBySection=${menuSection.index}`,
       undefined,
@@ -156,20 +156,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   };
 
   const handleAddMenuItemFast = useCallback(() => {
-    if (localMenuSection.items.find((f) => !f._id)) {
-      // toast({
-      //   title: "Salve todos os novos itens antes de adicionar outro.",
-      //   status: "warning",
-      // });
-    } else {
-      setLocalMenuSection({
-        ...localMenuSection,
-        items: [
-          ...localMenuSection.items,
-          { ...emptyMenuItem, itemType: type },
-        ],
-      });
-    }
+    setLocalMenuSection({
+      ...localMenuSection,
+      items: [
+        ...localMenuSection.items,
+        { ...emptyMenuItem, _id: `_tmp_${uuidv4()}`, itemType: type },
+      ],
+    });
   }, [localMenuSection, setLocalMenuSection, type]);
 
   const putStoreMenuSection = usePutStoreMenuSection();
@@ -193,6 +186,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       exec();
     } catch (err) {
       defaultToastError(err);
+    }
+  };
+
+  const handleAddMenuItem = () => {
+    if (menuSection.editMode === "realistic") {
+      handleAddMenuItemRealistic();
+    } else if (menuSection.editMode === "fast") {
+      handleAddMenuItemFast();
     }
   };
 
@@ -222,74 +223,76 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             name={localMenuSection.name}
             length={foundItems.length}
             totalLength={localMenuSection.items.length}
+            expanded={expanded}
             isNew={isNew}
             editMode={localMenuSection.editMode}
-            onAddMenuItemClick={onAddMenuItemClick}
+            onAddMenuItemClick={handleAddMenuItem}
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
             onTrashClick={onTrashClick}
             onFastEditClick={handleFastEditClick}
           />
-          <AccordionItemPanel
-            id={`${menuSection._id}`}
-            className={classNames(
-              "sm:container sm:m-auto !px-2 sm:!px-8",
-              {
-                "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
-                  menuSection.editMode === "realistic" || !admin,
-                "flex flex-col gap-2": menuSection.editMode === "fast" && admin,
-              },
-              { "my-2 sm:my-6": true },
-              className
-            )}
-            {...props}
-          >
-            <AdminDraggableGroup id={`${menuSection._id}`} className="contents">
-              {foundItems.map((menuItem, menuItemIndex) => (
-                <AdminDraggable
-                  dragIndicator={menuSection.editMode === "fast" && admin}
-                  containerClassName="h-full"
-                  key={menuItem._id}
-                  id={menuItem._id}
-                  originalIndex={menuItemIndex}
-                  onFind={onFindMenuItem}
-                  onDrop={onDropMenuItem}
-                >
-                  <MenuItem
-                    editMode={menuSection.editMode}
-                    menuItem={menuItem}
-                    useEffects
-                  />
-                </AdminDraggable>
-              ))}
-              {admin && (
-                <div
-                  className={classNames(
-                    "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
-                    {
-                      "min-h-[428px]": menuSection.editMode === "realistic",
-                      "ml-6 w-[calc(100%-1.5rem)]":
-                        menuSection.editMode === "fast",
-                    }
-                  )}
-                  onClick={() => {
-                    if (menuSection.editMode === "realistic") {
-                      handleAddMenuItem();
-                    } else if (menuSection.editMode === "fast") {
-                      handleAddMenuItemFast();
-                    }
-                  }}
-                >
-                  <HiPlus
-                    className={classNames("", {
-                      "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
-                      "w-10 h-10 p-1 ": menuSection.editMode === "fast",
-                    })}
-                  />
-                </div>
+          {localMenuSection.items.length > 0 && (
+            <AccordionItemPanel
+              id={`${menuSection._id}`}
+              className={classNames(
+                "sm:container sm:m-auto !px-2 sm:!px-8",
+                {
+                  "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
+                    menuSection.editMode === "realistic" || !admin,
+                  "flex flex-col gap-2":
+                    menuSection.editMode === "fast" && admin,
+                },
+                { "my-2 sm:my-6": true },
+                { hidden: !expanded },
+                className
               )}
-            </AdminDraggableGroup>
-          </AccordionItemPanel>
+              {...props}
+            >
+              <AdminDraggableGroup
+                id={`${menuSection._id}`}
+                className="contents"
+              >
+                {foundItems.map((menuItem, menuItemIndex) => (
+                  <AdminDraggable
+                    dragIndicator={menuSection.editMode === "fast" && admin}
+                    containerClassName="h-full"
+                    key={menuItem._id}
+                    id={menuItem._id}
+                    originalIndex={menuItemIndex}
+                    onFind={onFindMenuItem}
+                    onDrop={onDropMenuItem}
+                  >
+                    <MenuItem
+                      editMode={menuSection.editMode}
+                      menuItem={menuItem}
+                      useEffects
+                    />
+                  </AdminDraggable>
+                ))}
+                {admin && (
+                  <div
+                    className={classNames(
+                      "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
+                      {
+                        "min-h-[428px]": menuSection.editMode === "realistic",
+                        "ml-6 !w-[calc(100%-1.5rem)]":
+                          menuSection.editMode === "fast",
+                      }
+                    )}
+                    onClick={handleAddMenuItem}
+                  >
+                    <HiPlus
+                      className={classNames("", {
+                        "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
+                        "w-10 h-10 p-1 ": menuSection.editMode === "fast",
+                      })}
+                    />
+                  </div>
+                )}
+              </AdminDraggableGroup>
+            </AccordionItemPanel>
+          )}
         </AccordionItem>
       )}
       {editMenuItemObject && (
@@ -297,7 +300,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           open={
             !!router.query.editMenuItemId || !!router.query.addMenuItemBySection
           }
-          onOpenChange={comeBackToStoreRoot}
+          onOpenChange={goBackToRoot}
           menuItem={editMenuItemObject}
           onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
             if (cancelled) {
@@ -319,9 +322,9 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               await putMenuItem(clientStore, newMenuItem, editMenuSectionIndex);
               const updatedStore = await getStore(clientStore._id);
               setClientStore(updatedStore);
-              comeBackToStoreRoot(false);
+              goBackToRoot(false);
             } catch (err: any) {
-              // toast(defaultToastError(err));
+              toast(defaultToastError(err));
             }
           }}
         />
@@ -333,5 +336,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 export default memo(
   MenuSection,
   (prev, next) =>
-    isEqual(prev.menuSection, next.menuSection) && prev.isNew === next.isNew
+    isEqual(prev.menuSection, next.menuSection) &&
+    prev.isNew === next.isNew &&
+    prev.expanded === next.expanded
 );

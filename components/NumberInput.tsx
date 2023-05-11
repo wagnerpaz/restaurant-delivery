@@ -17,14 +17,13 @@ const NumberInput = ({
     <div
       className={classNames(
         "grid grid-cols-[max-content_1fr_max-content] gap-0",
-        { "py-1": !full, "flex-1": full },
+        { "": !full, "flex-1": full },
         className
       )}
     >
       <Button
-        className={classNames("!rounded-r-none !px-2", {
+        className={classNames("!rounded-r-none !px-2 !h-full", {
           "!h-[30px]": !full,
-          "h-full": full,
         })}
         size="sm"
         isDisabled={+value - 1 < min}
@@ -36,15 +35,16 @@ const NumberInput = ({
         value={+value}
         disabled
         style={{ opacity: 1 }}
-        className={classNames("!rounded-none !px-2 text-center min-w-0", {
-          "!min-w-10 !w-10 !h-[30px]": !full,
-          "h-full": full,
-        })}
+        className={classNames(
+          "!rounded-none !px-2 text-center !mt-0 !border-t !border-b !border-main-a11y-low !border-solid min-w-0 !h-full !w-full",
+          {
+            "!min-w-10 !w-10 !h-[30px]": !full,
+          }
+        )}
       />
       <Button
-        className={classNames("!rounded-l-none !w-fit !px-2", {
+        className={classNames("!rounded-l-none !w-fit !px-2 !h-full", {
           "!h-[30px]": !full,
-          "h-full": full,
         })}
         size="sm"
         isDisabled={+value + 1 > max}

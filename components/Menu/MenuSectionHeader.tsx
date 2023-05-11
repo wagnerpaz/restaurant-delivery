@@ -1,11 +1,12 @@
 import { ComponentProps, useContext } from "react";
 import classNames from "classnames";
-import { FaThList } from "react-icons/fa";
+import { FaChevronDown, FaThList } from "react-icons/fa";
 import { RiEditFill } from "react-icons/ri";
 import { IoIosAddCircle } from "react-icons/io";
 import { useSession } from "next-auth/react";
 import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
+import { HiPlus } from "react-icons/hi";
 
 import { IUser } from "/models/types/User";
 import {
@@ -17,6 +18,7 @@ interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
   length?: number;
   totalLength?: number;
+  expanded?: boolean;
   isNew?: boolean;
   editMode?: "realistic" | "fast";
   onAddMenuItemClick?: () => void;
@@ -32,6 +34,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   name,
   length,
   totalLength,
+  expanded,
   isNew,
   editMode = "realistic",
   onAddMenuItemClick = () => {},
@@ -109,33 +112,48 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
             ) : null}
           </div>
 
-          {admin && !isNew && (
-            <div className="flex flex-row gap-3 items-center text-sm">
-              {editMode === "realistic" ? (
-                <BsMicrosoft
-                  className="cursor-pointer mt-1"
-                  size={20}
-                  onClick={(e) => stopPropagation(e, onFastEditClick)}
-                  title="Edição realista (cartões)"
+          {!isNew && (
+            <>
+              <div className="flex flex-row gap-3 items-center text-sm">
+                {admin && (
+                  <>
+                    <HiPlus
+                      className="cursor-pointer mt-1"
+                      size={26}
+                      title="Adicionar novo item"
+                      onClick={(e) => stopPropagation(e, onAddMenuItemClick)}
+                    />
+                    {editMode === "realistic" ? (
+                      <BsMicrosoft
+                        className="cursor-pointer mt-1"
+                        size={20}
+                        onClick={(e) => stopPropagation(e, onFastEditClick)}
+                        title="Edição realista (cartões)"
+                      />
+                    ) : (
+                      <FaThList
+                        className="cursor-pointer mt-1"
+                        size={20}
+                        onClick={(e) => stopPropagation(e, onFastEditClick)}
+                        title="Edição rápida (lista)"
+                      />
+                    )}
+                    <BsFillCloudArrowUpFill
+                      className="cursor-pointer mt-1"
+                      size={26}
+                      onClick={(e) => stopPropagation(e, onTrashClick)}
+                      title="Núvem"
+                    />
+                  </>
+                )}
+                <FaChevronDown
+                  className={classNames("transition-all duration-500", {
+                    "rotate-180": expanded,
+                  })}
                 />
-              ) : (
-                <FaThList
-                  className="cursor-pointer mt-1"
-                  size={20}
-                  onClick={(e) => stopPropagation(e, onFastEditClick)}
-                  title="Edição rápida (lista)"
-                />
-              )}
-              <BsFillCloudArrowUpFill
-                className="cursor-pointer mt-1"
-                size={26}
-                onClick={(e) => stopPropagation(e, onTrashClick)}
-                title="Núvem"
-              />
-              {/* <AccordionIcon /> */}
-            </div>
+              </div>
+            </>
           )}
-          {/* {!admin && <AccordionIcon />} */}
         </div>
       </AccordionItemButton>
     </AccordionItemHeading>
