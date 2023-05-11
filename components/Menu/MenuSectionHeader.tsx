@@ -7,12 +7,16 @@ import { useSession } from "next-auth/react";
 import { BsFillCloudArrowUpFill, BsMicrosoft } from "react-icons/bs";
 import { MdMoveDown } from "react-icons/md";
 import { HiPlus } from "react-icons/hi";
-
-import { IUser } from "/models/types/User";
 import {
   AccordionItemButton,
   AccordionItemHeading,
 } from "react-accessible-accordion";
+
+import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
+import { IUser } from "/models/types/User";
+import { MenuSectionContext } from "./MenuSection";
+import { StoreContext } from "../Store";
+import defaultToastError from "/config/defaultToastError";
 
 interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   name?: string;
@@ -48,12 +52,33 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
+  const { store } = useContext(StoreContext);
+  const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+
+  const putStoreMenuSection = usePutStoreMenuSection();
+
   const stopPropagation = (
     e: MouseEvent,
     callback: (e: MouseEvent) => void
   ) => {
     e.stopPropagation();
     callback(e);
+  };
+
+  const handleFastEditClick = () => {
+    async function exec() {
+      const serverMenuSection = await putStoreMenuSection(store, {
+        ...menuSection,
+        editMode: menuSection.editMode === "fast" ? "realistic" : "fast",
+      });
+      console.log("will set menu section", serverMenuSection);
+      setMenuSection({ ...serverMenuSection });
+    }
+    try {
+      exec();
+    } catch (err) {
+      defaultToastError(err);
+    }
   };
 
   return (
@@ -127,14 +152,14 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
                       <BsMicrosoft
                         className="cursor-pointer mt-1"
                         size={20}
-                        onClick={(e) => stopPropagation(e, onFastEditClick)}
+                        onClick={(e) => stopPropagation(e, handleFastEditClick)}
                         title="Edição realista (cartões)"
                       />
                     ) : (
                       <FaThList
                         className="cursor-pointer mt-1"
                         size={20}
-                        onClick={(e) => stopPropagation(e, onFastEditClick)}
+                        onClick={(e) => stopPropagation(e, handleFastEditClick)}
                         title="Edição rápida (lista)"
                       />
                     )}

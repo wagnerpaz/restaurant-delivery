@@ -7,16 +7,17 @@ import MenuSection from "/models/MenuSection";
 
 async function section(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const storeId = req.query.storeId as string;
     const sectionId = req.query.sectionId as string;
     const requestSection = req.body as IMenuSection;
 
     await connectToDatabase();
 
     if (req.method === "PUT") {
-      const updated = await MenuSection.findById(sectionId);
-      Object.assign(updated, requestSection);
-      await updated.save();
+      const updated = await MenuSection.findOne({ _id: sectionId })
+        .populate("items")
+        .exec();
+      Object.assign(updated, { ...requestSection, items: updated.items });
+      updated.save();
       res.status(200).json(updated.toObject());
     } else {
       res.status(405).json({ message: "Method not allowed" });

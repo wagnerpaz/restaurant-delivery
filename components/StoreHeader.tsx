@@ -112,7 +112,6 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
               onClick={() => {
                 if (searchMobileVisible) {
                   if (!isSearchMobileInScreen) {
-                    console.log("oii");
                     searchMobileRef.current?.focus();
                   } else {
                     setSearchMobileVisible(false);

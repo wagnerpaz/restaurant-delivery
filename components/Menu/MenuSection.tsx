@@ -18,7 +18,6 @@ import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
-import usePutStoreMenuSection from "/hooks/usePutStoreMenuSection";
 import defaultToastError from "/config/defaultToastError";
 import EditMenuItemModal from "/forms/EditMenuItemForm";
 import usePutMenuItem from "/hooks/usePutMenuItem";
@@ -117,6 +116,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const toast = useToast();
   const goBackToRoot = useGoBackToRoot();
 
+  console.log("render", localMenuSection);
+
   const onFindMenuItem = useCallback(
     (id: string) => {
       const index = localMenuSection.items.findIndex((f) => f._id === id);
@@ -165,29 +166,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     });
   }, [localMenuSection, setLocalMenuSection, type]);
 
-  const putStoreMenuSection = usePutStoreMenuSection();
   const putMenuItem = usePutMenuItem();
-
-  const handleFastEditClick = () => {
-    async function exec() {
-      setLocalMenuSection(
-        await putStoreMenuSection(
-          store,
-          {
-            ...localMenuSection,
-            editMode: "fast",
-          },
-          localMenuSection.index
-        )
-      );
-    }
-
-    try {
-      exec();
-    } catch (err) {
-      defaultToastError(err);
-    }
-  };
 
   const handleAddMenuItem = () => {
     if (menuSection.editMode === "realistic") {
@@ -230,7 +209,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
             onTrashClick={onTrashClick}
-            onFastEditClick={handleFastEditClick}
           />
           {localMenuSection.items.length > 0 && (
             <AccordionItemPanel
@@ -239,9 +217,9 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 "sm:container sm:m-auto !px-2 sm:!px-8",
                 {
                   "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
-                    menuSection.editMode === "realistic" || !admin,
+                    localMenuSection.editMode === "realistic" || !admin,
                   "flex flex-col gap-2":
-                    menuSection.editMode === "fast" && admin,
+                    localMenuSection.editMode === "fast" && admin,
                 },
                 { "my-2 sm:my-6": true },
                 { hidden: !expanded },
@@ -255,7 +233,9 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               >
                 {foundItems.map((menuItem, menuItemIndex) => (
                   <AdminDraggable
-                    dragIndicator={menuSection.editMode === "fast" && admin}
+                    dragIndicator={
+                      localMenuSection.editMode === "fast" && admin
+                    }
                     containerClassName="h-full"
                     key={menuItem._id}
                     id={menuItem._id}
@@ -264,7 +244,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     onDrop={onDropMenuItem}
                   >
                     <MenuItem
-                      editMode={menuSection.editMode}
+                      editMode={localMenuSection.editMode}
                       menuItem={menuItem}
                       useEffects
                     />
@@ -275,17 +255,19 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     className={classNames(
                       "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
                       {
-                        "min-h-[428px]": menuSection.editMode === "realistic",
+                        "min-h-[428px]":
+                          localMenuSection.editMode === "realistic",
                         "ml-6 !w-[calc(100%-1.5rem)]":
-                          menuSection.editMode === "fast",
+                          localMenuSection.editMode === "fast",
                       }
                     )}
                     onClick={handleAddMenuItem}
                   >
                     <HiPlus
                       className={classNames("", {
-                        "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
-                        "w-10 h-10 p-1 ": menuSection.editMode === "fast",
+                        "w-20 h-20 p-5 ":
+                          localMenuSection.editMode === "realistic",
+                        "w-10 h-10 p-1 ": localMenuSection.editMode === "fast",
                       })}
                     />
                   </div>

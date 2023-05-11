@@ -15,7 +15,6 @@ const MemoInput: React.FC<MemoInputProps> = ({
   label,
   ...props
 }) => {
-  console.log(className);
   return (
     <FormControl
       fieldsetClassName={fieldsetClassName}
