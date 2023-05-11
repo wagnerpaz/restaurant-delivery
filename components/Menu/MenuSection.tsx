@@ -45,6 +45,7 @@ interface MenuSectionProps {
   className?: string;
   menuSection: IMenuSection;
   type: "product" | "ingredient";
+  expanded?: boolean;
   isNew?: boolean;
   onChangeItems: (items: IMenuItem[]) => void;
   onAddMenuItemClick?: () => void;
@@ -71,6 +72,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   className,
   type,
   menuSection,
+  expanded,
   isNew,
   onChangeItems = () => {},
   onAddMenuItemClick,
@@ -145,7 +147,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     ]
   );
 
-  const handleAddMenuItem = () => {
+  const handleAddMenuItemRealistic = () => {
     router.push(
       `/store/${store.slug}?addMenuItemBySection=${menuSection.index}`,
       undefined,
@@ -187,6 +189,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     }
   };
 
+  const handleAddMenuItem = () => {
+    if (menuSection.editMode === "realistic") {
+      handleAddMenuItemRealistic();
+    } else if (menuSection.editMode === "fast") {
+      handleAddMenuItemFast();
+    }
+  };
+
   const foundItems = localMenuSection.items
     .filter((f) => f.itemType === type)
     .filter(
@@ -213,74 +223,76 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             name={localMenuSection.name}
             length={foundItems.length}
             totalLength={localMenuSection.items.length}
+            expanded={expanded}
             isNew={isNew}
             editMode={localMenuSection.editMode}
-            onAddMenuItemClick={onAddMenuItemClick}
+            onAddMenuItemClick={handleAddMenuItem}
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
             onTrashClick={onTrashClick}
             onFastEditClick={handleFastEditClick}
           />
-          <AccordionItemPanel
-            id={`${menuSection._id}`}
-            className={classNames(
-              "sm:container sm:m-auto !px-2 sm:!px-8",
-              {
-                "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
-                  menuSection.editMode === "realistic" || !admin,
-                "flex flex-col gap-2": menuSection.editMode === "fast" && admin,
-              },
-              { "my-2 sm:my-6": true },
-              className
-            )}
-            {...props}
-          >
-            <AdminDraggableGroup id={`${menuSection._id}`} className="contents">
-              {foundItems.map((menuItem, menuItemIndex) => (
-                <AdminDraggable
-                  dragIndicator={menuSection.editMode === "fast" && admin}
-                  containerClassName="h-full"
-                  key={menuItem._id}
-                  id={menuItem._id}
-                  originalIndex={menuItemIndex}
-                  onFind={onFindMenuItem}
-                  onDrop={onDropMenuItem}
-                >
-                  <MenuItem
-                    editMode={menuSection.editMode}
-                    menuItem={menuItem}
-                    useEffects
-                  />
-                </AdminDraggable>
-              ))}
-              {admin && (
-                <div
-                  className={classNames(
-                    "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
-                    {
-                      "min-h-[428px]": menuSection.editMode === "realistic",
-                      "ml-6 !w-[calc(100%-1.5rem)]":
-                        menuSection.editMode === "fast",
-                    }
-                  )}
-                  onClick={() => {
-                    if (menuSection.editMode === "realistic") {
-                      handleAddMenuItem();
-                    } else if (menuSection.editMode === "fast") {
-                      handleAddMenuItemFast();
-                    }
-                  }}
-                >
-                  <HiPlus
-                    className={classNames("", {
-                      "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
-                      "w-10 h-10 p-1 ": menuSection.editMode === "fast",
-                    })}
-                  />
-                </div>
+          {localMenuSection.items.length > 0 && (
+            <AccordionItemPanel
+              id={`${menuSection._id}`}
+              className={classNames(
+                "sm:container sm:m-auto !px-2 sm:!px-8",
+                {
+                  "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
+                    menuSection.editMode === "realistic" || !admin,
+                  "flex flex-col gap-2":
+                    menuSection.editMode === "fast" && admin,
+                },
+                { "my-2 sm:my-6": true },
+                { hidden: !expanded },
+                className
               )}
-            </AdminDraggableGroup>
-          </AccordionItemPanel>
+              {...props}
+            >
+              <AdminDraggableGroup
+                id={`${menuSection._id}`}
+                className="contents"
+              >
+                {foundItems.map((menuItem, menuItemIndex) => (
+                  <AdminDraggable
+                    dragIndicator={menuSection.editMode === "fast" && admin}
+                    containerClassName="h-full"
+                    key={menuItem._id}
+                    id={menuItem._id}
+                    originalIndex={menuItemIndex}
+                    onFind={onFindMenuItem}
+                    onDrop={onDropMenuItem}
+                  >
+                    <MenuItem
+                      editMode={menuSection.editMode}
+                      menuItem={menuItem}
+                      useEffects
+                    />
+                  </AdminDraggable>
+                ))}
+                {admin && (
+                  <div
+                    className={classNames(
+                      "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
+                      {
+                        "min-h-[428px]": menuSection.editMode === "realistic",
+                        "ml-6 !w-[calc(100%-1.5rem)]":
+                          menuSection.editMode === "fast",
+                      }
+                    )}
+                    onClick={handleAddMenuItem}
+                  >
+                    <HiPlus
+                      className={classNames("", {
+                        "w-20 h-20 p-5 ": menuSection.editMode === "realistic",
+                        "w-10 h-10 p-1 ": menuSection.editMode === "fast",
+                      })}
+                    />
+                  </div>
+                )}
+              </AdminDraggableGroup>
+            </AccordionItemPanel>
+          )}
         </AccordionItem>
       )}
       {editMenuItemObject && (
@@ -324,5 +336,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 export default memo(
   MenuSection,
   (prev, next) =>
-    isEqual(prev.menuSection, next.menuSection) && prev.isNew === next.isNew
+    isEqual(prev.menuSection, next.menuSection) &&
+    prev.isNew === next.isNew &&
+    prev.expanded === next.expanded
 );

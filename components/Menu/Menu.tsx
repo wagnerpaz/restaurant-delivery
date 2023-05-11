@@ -7,7 +7,6 @@ import MenuSection from "./MenuSection";
 import { IMenuSection } from "/models/types/MenuSection";
 import { StoreContext } from "../Store";
 import MenuSectionHeader from "./MenuSectionHeader";
-import useDeleteStoreMenuSection from "/hooks/useDeleteStoreMenuSection";
 import usePutStoreMenuSectionSections from "/hooks/usePutStoreMenuSectionSections";
 import AddMenuSectionModal from "/modals/AddMenuSectionModal";
 import { useSession } from "next-auth/react";
@@ -44,6 +43,9 @@ const Menu: React.FC<MenuProps> = ({
     [localSections]
   );
 
+  const [expandedMenuSections, setExpandedMenuSections] =
+    useState(defaultIndex);
+
   const toast = useToast();
   const router = useRouter();
 
@@ -74,11 +76,16 @@ const Menu: React.FC<MenuProps> = ({
 
   return (
     <>
-      <Accordion allowMultipleExpanded preExpanded={defaultIndex}>
+      <Accordion
+        allowMultipleExpanded
+        allowZeroExpanded
+        onChange={(expanded) => setExpandedMenuSections(expanded)}
+      >
         {localSections.map((section) => (
           <MenuSection
             key={`${section._id}`}
             menuSection={section}
+            expanded={expandedMenuSections.includes(section._id)}
             type={type}
             onEditSectionClick={() => handleEditSection(section)}
           />
@@ -90,7 +97,7 @@ const Menu: React.FC<MenuProps> = ({
         </span>
       )} */}
         {admin && (
-          <AccordionItem>
+          <AccordionItem uuid="new">
             <MenuSectionHeader isNew onAddSectionClick={handleAddSection} />
           </AccordionItem>
         )}
