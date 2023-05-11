@@ -17,7 +17,7 @@ const Button = ({
           "px-2 py-3 rounded-md": size === "sm",
           "bg-hero text-hero-a11y-high uppercase font-bold":
             variant === "contained",
-          "border border-hero": variant === "outline",
+          "border border-hero text-main-a11y-high": variant === "outline",
           "!px-0": variant === "text",
           "opacity-50 cursor-not-allowed": isDisabled,
         },

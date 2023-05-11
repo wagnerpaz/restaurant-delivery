@@ -169,7 +169,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           isDisabled={saving}
           label="Preço"
           type="number"
-          value={localMenuItem.price || 0}
+          value={`${localMenuItem.price || 0}`}
           onChange={(e) =>
             setLocalMenuItem((localMenuItem) => ({
               ...localMenuItem,
@@ -183,7 +183,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           isDisabled={saving}
           label="Promo"
           type="number"
-          value={localMenuItem.pricePromotional || 0}
+          value={`${localMenuItem.pricePromotional || 0}`}
           onChange={(e) =>
             setLocalMenuItem((localMenuItem) => ({
               ...localMenuItem,

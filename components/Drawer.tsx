@@ -19,7 +19,10 @@ const Drawer: React.FC<DrawerProps> = ({
 
   return (
     <div
-      className={classNames("text-main-a11y-high transition-all", className)}
+      className={classNames(
+        "text-main-a11y-high transition-all ease-in-out",
+        className
+      )}
       {...props}
     >
       <div

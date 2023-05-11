@@ -15,6 +15,8 @@ import { IUser } from "/models/types/User";
 import { replaceAt } from "/lib/immutable";
 import useLocalState from "/hooks/useLocalState";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import defaultToastError from "/config/defaultToastError";
+import useToast from "/hooks/useToast";
 
 interface MenuProps extends ComponentProps<"section"> {
   sections: IMenuSection[];
@@ -42,6 +44,7 @@ const Menu: React.FC<MenuProps> = ({
     [localSections]
   );
 
+  const toast = useToast();
   const router = useRouter();
 
   const putMenuSection = usePutStoreMenuSectionSections();
@@ -118,7 +121,7 @@ const Menu: React.FC<MenuProps> = ({
               }
               goBackToRoot(false);
             } catch (err: any) {
-              // toast(defaultToastError(err));
+              toast(defaultToastError(err));
             }
           }}
           onCancel={() => {

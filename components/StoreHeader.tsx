@@ -1,6 +1,7 @@
 import { ComponentProps, useContext, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { HiMenu } from "react-icons/hi";
+import dynamic from "next/dynamic";
 
 import Button from "/components/form/Button";
 import DebouncedInput from "./DebouncedInput";
@@ -9,9 +10,10 @@ import MainMenuDrawer from "./MainMenuDrawer";
 import { StoreContext } from "./Store";
 import UserIcon from "./UserIcon";
 import { useRouter } from "next/router";
-import AddStoreModal from "/modals/AddStoreModal";
 import usePutStore from "/hooks/usePutStore";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
+
+const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
 
 interface StoreHeaderProps extends ComponentProps<"section"> {}
 

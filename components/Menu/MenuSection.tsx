@@ -24,6 +24,7 @@ import EditMenuItemModal from "/forms/EditMenuItemForm";
 import usePutMenuItem from "/hooks/usePutMenuItem";
 import isEqual from "lodash.isequal";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import useToast from "/hooks/useToast";
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
@@ -111,6 +112,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [router.query.addMenuItemBySection]
   );
 
+  const toast = useToast();
   const goBackToRoot = useGoBackToRoot();
 
   const onFindMenuItem = useCallback(
@@ -310,7 +312,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               setClientStore(updatedStore);
               goBackToRoot(false);
             } catch (err: any) {
-              // toast(defaultToastError(err));
+              toast(defaultToastError(err));
             }
           }}
         />

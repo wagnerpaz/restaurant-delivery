@@ -8,7 +8,6 @@ import {
   createContext,
 } from "react";
 import classNames from "classnames";
-import cloneDeep from "lodash.clonedeep";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -19,39 +18,18 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import Menu from "/components/Menu/Menu";
 import { ILocation, IStore } from "/models/types/Store";
 
-import { IMenuItem } from "/models/types/MenuItem";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 import { IUser } from "/models/types/User";
-import usePutStore from "/hooks/usePutStore";
-import {
-  findMenuItemSectionIndex,
-  replaceObjectById,
-  retriveAllMenuItems as retrieveAllMenuItems,
-} from "/lib/menuSectionUtils";
-import useGetStore from "/hooks/useGetStore";
-import usePutUser from "/hooks/usePutUser";
-import { emptyMenuItem } from "./Menu/MenuItem";
+import { retriveAllMenuItems as retrieveAllMenuItems } from "/lib/menuSectionUtils";
 import StoreHeader from "./StoreHeader";
 import Input from "./form/Input";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
-const EditAddressModal = dynamic(() => import("/modals/EditAddressModal"), {
-  ssr: false,
-});
 const EditMenuItemTrashModal = dynamic(
   () => import("/modals/EditMenuItemTrashModal"),
   { ssr: false }
 );
-const EditMenuItemModal = dynamic(() => import("/forms/EditMenuItemForm"), {
-  ssr: false,
-});
 const OrderMenuItemDetailsModal = dynamic(
   () => import("/modals/OrderMenuItemDetails"),
-  { ssr: false }
-);
-const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
-const AddMenuSectionModal = dynamic(
-  () => import("/modals/AddMenuSectionModal"),
   { ssr: false }
 );
 
@@ -87,8 +65,6 @@ const Store: FC<StoreProps> = ({ store }) => {
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
-  console.log("Server Store", store);
-
   // const toast = useToast();
   const router = useRouter();
 
@@ -100,13 +76,10 @@ const Store: FC<StoreProps> = ({ store }) => {
 
   const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
 
-  const [clientUser, setClientUser] = useState<IUser>();
   const [clientStore, setClientStore] = useState(store);
 
   const [search, setSearch] = useState("");
   const [searchMobileVisible, setSearchMobileVisible] = useState(false);
-
-  const [addStoreModalOpen, setAddStoreModalOpen] = useState(!clientStore);
 
   const orderMenuItemDetailObject = useMemo(
     () =>
@@ -117,17 +90,8 @@ const Store: FC<StoreProps> = ({ store }) => {
   );
   const orderMenuItemDetailsOpen = !!router.query.orderItem;
 
-  const editUserAddressesObject = useMemo(
-    () => clientUser?.locations,
-    [clientUser]
-  );
-  const editUserAddressesOpen = !!router.query.addressesUserId;
-
   const restoreTrashForSectionIndexOpen =
     !!router.query.restoreTrashForSectionIndex;
-
-  const putStore = usePutStore();
-  const putUser = usePutUser();
 
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -136,10 +100,6 @@ const Store: FC<StoreProps> = ({ store }) => {
       searchMobileRef.current?.focus();
     }
   }, [searchMobileVisible]);
-
-  useEffect(() => {
-    setClientUser(session?.user as IUser);
-  }, [session?.user]);
 
   useEffect(() => {
     const cachedRef = searchMobileRef.current,
@@ -235,33 +195,16 @@ const Store: FC<StoreProps> = ({ store }) => {
 
         {orderMenuItemDetailsOpen && orderMenuItemDetailObject && (
           <OrderMenuItemDetailsModal
-            store={clientStore}
             portalTarget={() => document.body}
             menuItem={orderMenuItemDetailObject}
             open={orderMenuItemDetailsOpen}
             onOpenChange={goBackToRoot}
           />
         )}
-        {editUserAddressesOpen && (
-          <EditAddressModal
-            open={editUserAddressesOpen}
-            locations={editUserAddressesObject}
-            onOpenChange={goBackToRoot}
-            onLocationsChange={async (locations) => {
-              const serverUser = await putUser({
-                ...clientUser,
-                locations,
-              } as IUser);
-              setClientUser(serverUser);
-              goBackToRoot(false);
-            }}
-          />
-        )}
         {restoreTrashForSectionIndexOpen && (
           <EditMenuItemTrashModal
             open={restoreTrashForSectionIndexOpen}
             onOpenChange={goBackToRoot}
-            store={clientStore}
           />
         )}
       </div>

@@ -9,6 +9,7 @@ import ReactSelect from "/components/ReactSelect";
 
 import applyCepMask from "/lib/cepMask";
 import isValidBRPostalCode from "/lib/isValidBrPostalCode";
+import useToast from "/hooks/useToast";
 
 interface EditAddressFormProps extends ComponentProps<"div"> {}
 
@@ -19,7 +20,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   const [brasilStates, setBrasilStates] = useState([]);
   const [brasilCities, setBrasilCities] = useState([]);
 
-  // const toast = useToast();
+  const toast = useToast();
 
   const getBrasilCep = useGetBrasilCep();
   const getBrasilStates = useGetBrasilStates();
@@ -56,7 +57,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
             postalCode: postalCode,
           });
         } catch (err) {
-          // toast({ status: "warning", title: "CEP não encontrado." });
+          toast({ type: "warning", message: "CEP não encontrado." });
         }
       }
     }
@@ -64,7 +65,7 @@ const EditAddressForm: React.FC<EditAddressFormProps> = ({
   }, [postalCode, getBrasilCep, onLocationChange]);
 
   return (
-    <div className="flex flex-col gap-6 pt-6 flex-1">
+    <div className="flex flex-col gap-6 pt-6 flex-1 text-main-a11y-high">
       <FormControl className="min-w-fit" label="CEP">
         <Input
           value={location.postalCode}
