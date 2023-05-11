@@ -1,7 +1,6 @@
 import {
   FC,
   MutableRefObject,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -21,7 +20,6 @@ import { ILocation, IStore } from "/models/types/Store";
 import { IUser } from "/models/types/User";
 import { retriveAllMenuItems as retrieveAllMenuItems } from "/lib/menuSectionUtils";
 import StoreHeader from "./StoreHeader";
-import Input from "./form/Input";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
 const EditMenuItemTrashModal = dynamic(
@@ -44,20 +42,12 @@ export const StoreContext = createContext<{
   setStore: (store: IStore) => void;
   search: string;
   setSearch: (search: string) => void;
-  searchMobileVisible: boolean;
-  setSearchMobileVisible: (visible: boolean) => void;
-  isSearchMobileInScreen: boolean;
-  searchMobileElement: HTMLInputElement | null;
   menuItemsRenderCount: MutableRefObject<number> | null;
 }>({
   store: {} as IStore,
   setStore: () => {},
   search: "",
   setSearch: () => {},
-  searchMobileVisible: false,
-  setSearchMobileVisible: () => {},
-  isSearchMobileInScreen: false,
-  searchMobileElement: null,
   menuItemsRenderCount: null,
 });
 
@@ -72,14 +62,9 @@ const Store: FC<StoreProps> = ({ store }) => {
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const searchMobileRef = useRef<HTMLInputElement>();
-
-  const [isSearchMobileInScreen, setIsSearchMobileInScreen] = useState(false);
-
   const [clientStore, setClientStore] = useState(store);
 
   const [search, setSearch] = useState("");
-  const [searchMobileVisible, setSearchMobileVisible] = useState(false);
 
   const orderMenuItemDetailObject = useMemo(
     () =>
@@ -95,29 +80,6 @@ const Store: FC<StoreProps> = ({ store }) => {
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  useEffect(() => {
-    if (searchMobileVisible) {
-      searchMobileRef.current?.focus();
-    }
-  }, [searchMobileVisible]);
-
-  useEffect(() => {
-    const cachedRef = searchMobileRef.current,
-      observer = new IntersectionObserver(
-        ([e]) => setIsSearchMobileInScreen(e.intersectionRatio >= 1),
-        { threshold: [1] }
-      );
-
-    if (cachedRef) {
-      observer.observe(cachedRef);
-
-      // unmount
-      return function () {
-        observer.unobserve(cachedRef);
-      };
-    }
-  }, [searchMobileVisible]);
-
   const goBackToRoot = useGoBackToRoot();
 
   if (!clientStore?.listed && !admin) {
@@ -131,25 +93,11 @@ const Store: FC<StoreProps> = ({ store }) => {
         setStore: setClientStore,
         search,
         setSearch,
-        searchMobileVisible,
-        setSearchMobileVisible,
-        isSearchMobileInScreen,
-        searchMobileElement: searchMobileRef.current as HTMLInputElement,
         menuItemsRenderCount,
       }}
     >
       <div className={classNames("font-lato custom-scrollbar min-h-screen")}>
         <StoreHeader />
-        {searchMobileVisible && (
-          <Input
-            ref={searchMobileRef}
-            id="search-mobile"
-            className="!w-full !min-w-0 !bg-main-100 !text-main-a11y-high !rounded-none"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Pesquisar..."
-          ></Input>
-        )}
         <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
             <main>

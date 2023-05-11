@@ -79,6 +79,7 @@ const Menu: React.FC<MenuProps> = ({
       <Accordion
         allowMultipleExpanded
         allowZeroExpanded
+        preExpanded={expandedMenuSections}
         onChange={(expanded) => setExpandedMenuSections(expanded)}
       >
         {localSections.map((section) => (
