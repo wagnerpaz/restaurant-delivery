@@ -13,9 +13,9 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
   portalTarget,
   children,
 }) => {
-  const [toasts, setToasts] = useState<{ id: string; message: ReactNode }[]>(
-    []
-  );
+  const [toasts, setToasts] = useState<
+    { id: string; message: ReactNode; description: ReactNode }[]
+  >([]);
   const open = (content: ToastProps) =>
     setToasts((currentToasts) => [
       ...currentToasts,

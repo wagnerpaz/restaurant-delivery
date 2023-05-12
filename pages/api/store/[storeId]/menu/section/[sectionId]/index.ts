@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import connectToDatabase from "/lib/mongoose";
-import Store from "/models/Store";
 import { IMenuSection } from "/models/types/MenuSection";
 import MenuSection from "/models/MenuSection";
 

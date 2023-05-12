@@ -61,6 +61,14 @@ const MenuItem: React.FC<MenuItemProps> = ({
   }, [menuItem._id, router, store.slug]);
 
   const handleDeleteMenuItem = useCallback(async () => {
+    if (menuItem._id.startsWith("_tmp_")) {
+      setMenuSection({
+        ...menuSection,
+        items: menuSection.items.filter((f) => f._id !== menuItem._id),
+      });
+      return;
+    }
+
     let confirmed = true;
     if (menuItem._id) {
       confirmed = confirm(`Deseja excluir o item "${menuItem.name}"?`);
@@ -76,11 +84,16 @@ const MenuItem: React.FC<MenuItemProps> = ({
           ...menuSection,
           items: menuSection.items.filter((f) => f._id !== menuItem._id),
         });
+        toast({
+          message: "Item removido com sucesso:",
+          description: `Nome: ${menuItem.name}`,
+          type: "success",
+        });
       } catch (err: any) {
         toast(defaultToastError(err));
       }
     }
-  }, [deleteMenuItem, menuItem, menuSection, setMenuSection, store]);
+  }, [deleteMenuItem, menuItem, menuSection, setMenuSection, store, toast]);
 
   return editMode === "realistic" || !admin ? (
     <MenuItemRealistic

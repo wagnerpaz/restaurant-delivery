@@ -116,8 +116,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const toast = useToast();
   const goBackToRoot = useGoBackToRoot();
 
-  console.log("render", localMenuSection);
-
   const onFindMenuItem = useCallback(
     (id: string) => {
       const index = localMenuSection.items.findIndex((f) => f._id === id);
@@ -132,19 +130,23 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const onDropMenuItem = useCallback(
     async (id: string, atIndex: number) => {
       const { index } = onFindMenuItem(id);
-      reorderMenuItems(store, menuSection._id, [id, `${atIndex}`]);
-      setLocalMenuSection({
-        ...menuSection,
-        items: moveTo(localMenuSection.items, index, atIndex),
-      });
+      try {
+        reorderMenuItems(store, localMenuSection._id, [id, `${atIndex}`]);
+        setLocalMenuSection({
+          ...localMenuSection,
+          items: moveTo(localMenuSection.items, index, atIndex),
+        });
+      } catch (err) {
+        toast(defaultToastError(err));
+      }
     },
     [
       onFindMenuItem,
       reorderMenuItems,
       store,
-      menuSection,
+      localMenuSection,
       setLocalMenuSection,
-      localMenuSection.items,
+      toast,
     ]
   );
 
@@ -236,6 +238,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     dragIndicator={
                       localMenuSection.editMode === "fast" && admin
                     }
+                    disabled={menuItem._id.startsWith("_tmp_")}
                     containerClassName="h-full"
                     key={menuItem._id}
                     id={menuItem._id}
