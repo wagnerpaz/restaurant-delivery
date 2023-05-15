@@ -18,6 +18,8 @@ import { replaceAt } from "/lib/immutable";
 import MemoButton from "/components/MemoButton";
 import FormControl from "../FormControl";
 import classNames from "classnames";
+import useToast from "/hooks/useToast";
+import defaultToastError from "/config/defaultToastError";
 
 const TYPE_OPTIONS = {
   product: "Produto",
@@ -39,6 +41,8 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   const { store } = useContext(StoreContext);
   const { menuSection, setMenuSection } = useContext(MenuSectionContext);
 
+  const toast = useToast();
+
   const [localMenuItem, setLocalMenuItem] = useLocalState(menuItem);
   const [saving, setSaving] = useState(false);
 
@@ -50,26 +54,34 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
   );
 
   const handleSubmit = async (e) => {
-    console.log("will submit");
     e.preventDefault();
     setSaving(true);
-    const saved = await putMenuItem(
-      store as IStore,
-      localMenuItem._id.startsWith("_tmp_")
-        ? { ...localMenuItem, _id: undefined }
-        : localMenuItem,
-      menuSection._id
-    );
-
-    setMenuSection((menuSection) => {
-      const index = menuSection.items.findIndex(
-        (f) => f._id === saved._id || f._id === localMenuItem._id
+    try {
+      const saved = await putMenuItem(
+        store as IStore,
+        localMenuItem._id.startsWith("_tmp_")
+          ? { ...localMenuItem, _id: undefined }
+          : localMenuItem,
+        menuSection._id
       );
-      console.log("index", index);
-      const items = replaceAt(menuSection.items, index, saved);
-      return { ...menuSection, items };
-    });
-    setSaving(false);
+
+      setMenuSection((menuSection) => {
+        const index = menuSection.items.findIndex(
+          (f) => f._id === saved._id || f._id === localMenuItem._id
+        );
+        const items = replaceAt(menuSection.items, index, saved);
+        return { ...menuSection, items };
+      });
+      toast({
+        message: "Item editado com sucesso:",
+        description: `Nome: ${saved.name}`,
+        type: "success",
+      });
+    } catch (err) {
+      toast(defaultToastError(err));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

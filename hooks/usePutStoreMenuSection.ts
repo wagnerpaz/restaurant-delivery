@@ -3,14 +3,10 @@ import { IStore } from "/models/types/Store";
 import { IMenuSection } from "/models/types/MenuSection";
 
 const usePostStoreMenuSection = () => {
-  const call = async (
-    store: IStore,
-    newMenuSection: IMenuSection,
-    sectionIndex?: number[]
-  ) => {
+  const call = async (store: IStore, newMenuSection: IMenuSection) => {
     if (newMenuSection._id) {
       const response = await axiosInstance.put(
-        `/api/store/${store._id}/menu/section/${sectionIndex}`,
+        `/api/store/${store._id}/menu/section/${newMenuSection._id}`,
         newMenuSection
       );
       return response.data;

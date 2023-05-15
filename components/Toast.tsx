@@ -7,12 +7,14 @@ import { AiFillExclamationCircle } from "react-icons/ai";
 
 export interface ToastProps {
   message: ReactNode;
+  description: ReactNode;
   type?: "warning" | "error" | "info" | "success";
   onClose?: () => void;
 }
 
 const Toast: React.FC<ToastProps> = ({
   message,
+  description,
   type = "info",
   onClose = () => {},
 }) => {
@@ -21,7 +23,7 @@ const Toast: React.FC<ToastProps> = ({
   return (
     <div
       className={classNames(
-        "fixed bottom-5 right-5 p-4 bg-gray-800 text-[#FFF] font-bold rounded-md z-50 flex flex-row items-center gap-2",
+        "fixed bottom-5 right-5 p-4 bg-gray-800 text-[#FFF] rounded-md z-50 flex flex-col justify-center gap-2",
         {
           "bg-warning": type === "warning",
           "bg-error": type === "error",
@@ -30,11 +32,14 @@ const Toast: React.FC<ToastProps> = ({
         }
       )}
     >
-      {type === "warning" && <TiWarning size={24} />}
-      {type === "error" && <BsFillXCircleFill size={24} />}
-      {type === "info" && <AiFillExclamationCircle size={24} />}
-      {type === "success" && <BsFillCheckCircleFill size={24} />}
-      {message}
+      <div className="flex flex-row items-center gap-2">
+        {type === "warning" && <TiWarning size={24} />}
+        {type === "error" && <BsFillXCircleFill size={24} />}
+        {type === "info" && <AiFillExclamationCircle size={24} />}
+        {type === "success" && <BsFillCheckCircleFill size={24} />}
+        <div className="font-bold">{message}</div>
+      </div>
+      <div className="ml-8 text-sm">{description}</div>
     </div>
   );
 };

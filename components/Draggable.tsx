@@ -7,6 +7,7 @@ export interface DraggableProps {
   id: string;
   originalIndex: number;
   dragIndicator?: boolean;
+  disabled?: boolean;
   onFind: (id: string) => { index: number };
   onDrop: (droppedId: string, originalIndex: number) => void;
   children: ReactNode;
@@ -26,6 +27,7 @@ const Draggable: React.FC<DraggableProps> = ({
   id,
   originalIndex,
   dragIndicator,
+  disabled,
   onFind = () => {
     return { index: -1 };
   },
@@ -84,8 +86,20 @@ const Draggable: React.FC<DraggableProps> = ({
     >
       {dragIndicator && (
         <>
-          <div ref={(node) => drag(node)}>
-            <MdDragIndicator className="cursor-move -mx-1" size={24} />
+          <div className="relative">
+            <div ref={(node) => drag(node)}>
+              <MdDragIndicator
+                className={classNames("cursor-move -mx-1", {
+                  "opacity-30": disabled,
+                })}
+                size={24}
+              />
+            </div>
+            <div
+              className={classNames({
+                "absolute inset-0 cursor-not-allowed": disabled,
+              })}
+            />
           </div>
           <div className={classNames("flex-1", className)}>{children}</div>
         </>
