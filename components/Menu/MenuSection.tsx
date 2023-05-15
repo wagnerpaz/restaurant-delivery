@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
 import { v4 as uuidv4 } from "uuid";
+import isEqual from "lodash.isequal";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -19,9 +20,8 @@ import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
 import looseSearch from "/lib/looseSearch";
 import defaultToastError from "/config/defaultToastError";
-import EditMenuItemModal from "/forms/EditMenuItemForm";
+import EditMenuItemModal from "/modals/EditMenuItemModal";
 import usePutMenuItem from "/hooks/usePutMenuItem";
-import isEqual from "lodash.isequal";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import useToast from "/hooks/useToast";
 
@@ -178,14 +178,21 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     }
   };
 
-  const foundItems = localMenuSection.items
-    .filter((f) => f.itemType === type)
-    .filter(
-      (f) =>
-        looseSearch(f.name, search) ||
-        looseSearch(f.nameDetail || "", search) ||
-        looseSearch(f.details?.short || "", search)
-    );
+  const menuItemsByType = useMemo(
+    () => localMenuSection.items.filter((f) => f.itemType === type),
+    [localMenuSection.items, type]
+  );
+
+  const foundItems = useMemo(
+    () =>
+      menuItemsByType.filter(
+        (f) =>
+          looseSearch(f.name, search) ||
+          looseSearch(f.nameDetail || "", search) ||
+          looseSearch(f.details?.short || "", search)
+      ),
+    [menuItemsByType, search]
+  );
 
   return (
     <MenuSectionContext.Provider
@@ -203,7 +210,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           <MenuSectionHeader
             name={localMenuSection.name}
             length={foundItems.length}
-            totalLength={localMenuSection.items.length}
+            totalLength={menuItemsByType.length}
             expanded={expanded}
             isNew={isNew}
             editMode={localMenuSection.editMode}

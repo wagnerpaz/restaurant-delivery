@@ -3,10 +3,12 @@ import { moveTo } from "/lib/immutable";
 
 import connectToDatabase from "/lib/mongoose";
 import MenuSection from "/models/MenuSection";
+import Store from "/models/Store";
 
 async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {
   try {
     await connectToDatabase();
+    const storeId = req.query.storeId as string;
     const sectionId = req.query.sectionId as string;
     const idAndPosition = req.query.idAndPosition as string;
 
@@ -29,6 +31,8 @@ async function reorderMenuItems(req: NextApiRequest, res: NextApiResponse) {
         res.status(404).end();
       }
 
+      const { slug } = await Store.findById(storeId, { slug: 1 });
+      await res.revalidate(`/store/${slug}`);
       res.status(200).json(section);
     } else {
       res.status(405).json({ message: "Method not allowed" });

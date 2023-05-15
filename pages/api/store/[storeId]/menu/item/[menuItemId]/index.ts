@@ -4,8 +4,10 @@ import { getServerSession } from "next-auth";
 import connectToDatabase from "/lib/mongoose";
 import MenuItem from "/models/MenuItem";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
+import Store from "/models/Store";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {
+  const storeId = req.query.storeId;
   const menuItemId = req.query.menuItemId;
 
   try {
@@ -23,6 +25,8 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
       await MenuItem.deleteOne({
         _id: menuItemId,
       }).exec();
+      const { slug } = await Store.findById(storeId, { slug: 1 });
+      await res.revalidate(`/store/${slug}`);
       res.status(200).end();
     } else {
       res.status(405).json({ message: "Method not allowed" });

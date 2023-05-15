@@ -15,8 +15,7 @@ const useReorderMenuItems = () => {
           `/api/store/${store._id}/menu/section/${sectionId}/item/reorder/${idAndPosition}`
         );
         toast({
-          message: "Item movido com sucesso:",
-          description: `Para posição ${idAndPosition[1]}`,
+          message: "Item reordenado com sucesso!",
           type: "success",
         });
         return response;

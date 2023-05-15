@@ -39,7 +39,7 @@ const Toast: React.FC<ToastProps> = ({
         {type === "success" && <BsFillCheckCircleFill size={24} />}
         <div className="font-bold">{message}</div>
       </div>
-      <div className="ml-8 text-sm">{description}</div>
+      {description && <div className="ml-8 text-sm">{description}</div>}
     </div>
   );
 };
