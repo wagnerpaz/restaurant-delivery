@@ -11,11 +11,13 @@ import MenuItemRealistic from "../components/Menu/MenuItemRealistic";
 import ImageEditorModal from "/modals/ImageEditorModal";
 import Modal from "/components/Modal";
 import EditMenuItemCompositionForm from "/forms/EditMenuItemCompositionForm";
-import EditMenuItemSidesForm, { emptySidesItem } from "./EditMenuItemSidesForm";
+import EditMenuItemSidesForm, {
+  emptySidesItem,
+} from "../forms/EditMenuItemSidesForm";
 import FormControl from "/components/FormControl";
 import EditMenuItemAdditionalsForm, {
   emptyAdditionalsCategory,
-} from "./EditMenuItemAdditionalsForm";
+} from "../forms/EditMenuItemAdditionalsForm";
 import Input from "/components/form/Input";
 import ReactSelect from "/components/ReactSelect";
 import Textarea from "/components/form/Textarea";
