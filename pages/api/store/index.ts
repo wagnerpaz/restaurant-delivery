@@ -11,7 +11,9 @@ async function createStore(req: NextApiRequest, res: NextApiResponse) {
     const bodyStore = req.body as IStore;
 
     if (req.method === "POST") {
-      const foundStore = await Store.findOne({ slug: bodyStore.slug }).exec();
+      const foundStore = await Store.findOne({ slug: bodyStore.slug })
+        .populate("menu.sections")
+        .exec();
       if (foundStore) {
         foundStore.name = bodyStore.name;
         foundStore.logo = bodyStore.logo;

@@ -27,5 +27,19 @@
   "menu.item.remove.confirm": "Deseja remover o item \"{{menuItem}}\"?",
   "menu.item.remove.sucess.message": "Item removido com sucesso:",
   "menu.item.remove.sucess.description": "Nome: {{menuItem}}",
-  "upload.image.file": "Arquivo de Imagem"
+  "upload.image.file": "Arquivo de Imagem",
+  "store.logo.alt": "Logo da loja",
+  "store.name": "Nome",
+  "store.url": "URL",
+  "store.listed": "Listada",
+  "yes": "Sim",
+  "no": "Não",
+  "store.location": "Localização",
+  "address.postalCode": "CEP",
+  "address.state": "Estado",
+  "address.city": "Cidade",
+  "address.line1": "Endereço",
+  "address.neighborhood": "Bairro",
+  "address.number": "Número",
+  "address.line2": "Complemento"
 }

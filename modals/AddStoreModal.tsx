@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { ComponentProps, useCallback, useState, useContext } from "react";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 
 import Button from "/components/form/Button";
 import Input from "/components/form/Input";
@@ -27,42 +28,32 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
   onOpenChange,
   ...props
 }) => {
+  const { t } = useTranslation();
   const { store, setStore } = useContext(StoreContext);
 
   const router = useRouter();
 
-  const [localStore, setLocalStore] = useLocalState({
-    ...store,
-    slug: router.query.storeSlug,
-    locations: store.locations?.length > 0 ? store.locations : [{}],
-  } as IStore);
+  const [localStore, setLocalStore] = useLocalState(store);
 
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
 
   const putStore = usePutStore();
 
-  const handleSave = useCallback(
-    async (e) => {
-      e.preventDefault();
-      const serverStore = await putStore(localStore);
-      setStore(serverStore);
-      onOpenChange(false);
-    },
-    [localStore, onOpenChange, putStore, setStore]
-  );
+  const handleSave = async (e: MouseEvent) => {
+    e.preventDefault();
+    const serverStore = await putStore(localStore);
+    setStore(serverStore);
+    onOpenChange(false);
+  };
 
   const handleLocationChange = useCallback(
-    (param: ILocation | ((newLocation: ILocation) => ILocation)) => {
-      const newLocation =
-        typeof param === "function" ? param(localStore.locations[0]) : param;
-
+    (newLocation: ILocation) => {
       setLocalStore(
         (clientStore) =>
           ({ ...clientStore, locations: [newLocation] } as IStore)
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localStore.locations]
+    [setLocalStore]
   );
 
   return (
@@ -86,11 +77,14 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               width={200}
               height={200}
               cdn
-              alt="Logo da loja"
+              alt={t("store.logo.alt")}
             />
           </EditableSection>
           <div className="w-full flex-1 flex flex-col gap-6">
-            <FormControl className="flex-1 w-full sm:min-w-fit" label="Nome">
+            <FormControl
+              className="flex-1 w-full sm:min-w-fit"
+              label={t("store.name")}
+            >
               <Input
                 value={localStore.name}
                 autoFocus
@@ -102,14 +96,14 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                 }
               />
             </FormControl>
-            <FormControl className="flex-1 min-w-fit" label="URL">
+            <FormControl className="flex-1 min-w-fit" label={t("store.url")}>
               <Input value={`/store/${localStore.slug}`} disabled />
             </FormControl>
-            <FormControl className="flex-1 min-w-fit" label="Listada">
+            <FormControl className="flex-1 min-w-fit" label={t("store.listed")}>
               <ReactSelect
                 value={{
                   value: localStore.listed,
-                  label: localStore.listed ? "Sim" : "Não",
+                  label: localStore.listed ? t("yes") : t("no"),
                 }}
                 onChange={({ value }) =>
                   setLocalStore({
@@ -118,8 +112,8 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
                   } as IStore)
                 }
                 options={[
-                  { value: "true", label: "Sim" },
-                  { value: "false", label: "Não" },
+                  { value: "true", label: t("yes") },
+                  { value: "false", label: t("no") },
                 ]}
               ></ReactSelect>
             </FormControl>
@@ -127,7 +121,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
         </div>
         {localStore?.locations?.[0] && (
           <Fieldset className="pt-0">
-            <legend>Localização</legend>
+            <legend>{t("store.location")}</legend>
             <EditAddressForm
               location={localStore.locations?.[0]}
               onLocationChange={handleLocationChange}
@@ -141,10 +135,10 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
             type="button"
             onClick={() => onOpenChange(false)}
           >
-            Cancelar
+            {t("button.cancel")}
           </Button>
           <Button className="w-full sm:w-32 self-end" type="submit">
-            Salvar
+            {t("button.save")}
           </Button>
         </div>
       </form>

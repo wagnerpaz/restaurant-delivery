@@ -66,12 +66,14 @@ const Store: FC<StoreProps> = ({ store }) => {
 
   const [search, setSearch] = useState("");
 
+  const allMenuItems = useMemo(
+    () => clientStore.menu.sections.map((m) => m.items).flat(),
+    [clientStore.menu.sections]
+  );
+
   const orderMenuItemDetailObject = useMemo(
-    () =>
-      retrieveAllMenuItems(clientStore?.menu?.sections || []).find(
-        (f) => f._id === router.query.orderItem
-      ),
-    [clientStore?.menu?.sections, router.query.orderItem]
+    () => allMenuItems.find((f) => f._id === router.query.orderItem),
+    [allMenuItems, router.query.orderItem]
   );
   const orderMenuItemDetailsOpen = !!router.query.orderItem;
 

@@ -1,5 +1,5 @@
 import { IMenuItem } from "/models/types/MenuItem";
-import { IMenuSection } from "/models/types/Store";
+import { IMenuSection } from "/models/types/MenuSection";
 
 export function retriveAllMenuItems(sections: IMenuSection[]) {
   const menuItems: IMenuItem[] = [];
