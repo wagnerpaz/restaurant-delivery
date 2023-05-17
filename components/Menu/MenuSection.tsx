@@ -104,14 +104,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [admin]
   );
 
-  const editMenuItemObject = useMemo(
-    () =>
-      router.query.addMenuItemBySection && {
+  const editMenuItemObject = useMemo(() => {
+    if (router.query.editMenuItemId) {
+      return menuSection.items.find(
+        (f) => f._id === router.query.editMenuItemId
+      );
+    } else if (router.query.addMenuItemBySection) {
+      return {
         ...emptyMenuItem,
         itemType: "product",
-      },
-    [router.query.addMenuItemBySection]
-  );
+      };
+    }
+  }, [
+    menuSection.items,
+    router.query.addMenuItemBySection,
+    router.query.editMenuItemId,
+  ]);
 
   const toast = useToast();
   const goBackToRoot = useGoBackToRoot();
@@ -152,7 +160,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const handleAddMenuItemRealistic = () => {
     router.push(
-      `/store/${store.slug}?addMenuItemBySection=${menuSection.index}`,
+      `/store/${store.slug}?addMenuItemBySection=${menuSection._id}`,
       undefined,
       { shallow: true }
     );
@@ -294,31 +302,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           }
           onOpenChange={goBackToRoot}
           menuItem={editMenuItemObject}
-          onMenuItemChange={async (newMenuItem?: IMenuItem, cancelled?) => {
-            if (cancelled) {
-              return;
-            }
-
-            let editMenuSectionIndex;
-            if (newMenuItem?._id) {
-              editMenuSectionIndex = findMenuItemSectionIndex(
-                clientStore.menu.sections,
-                newMenuItem
-              );
-            } else {
-              editMenuSectionIndex =
-                `${router.query.addMenuItemBySection}`?.split(",");
-            }
-
-            try {
-              await putMenuItem(clientStore, newMenuItem, editMenuSectionIndex);
-              const updatedStore = await getStore(clientStore._id);
-              setClientStore(updatedStore);
-              goBackToRoot(false);
-            } catch (err: any) {
-              toast(defaultToastError(err));
-            }
-          }}
         />
       )}
     </MenuSectionContext.Provider>

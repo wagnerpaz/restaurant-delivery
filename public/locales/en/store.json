@@ -12,7 +12,13 @@
   "menu.item.type": "Type",
   "menu.item.name": "Name",
   "menu.item.nameDetail": "Detail",
+  "menu.item.details": "Details",
   "menu.item.detail.short": "Description (short)",
+  "menu.item.detail.long": "Description (long)",
   "menu.item.price": "Price",
-  "menu.item.pricePromotional": "Sale"
+  "menu.item.pricePromotional": "Sale",
+  "menu.item.price.real": "Real",
+  "menu.item.price.sale": "Sale",
+  "menu.item.price.suggested.ingredients": "Suggested (Ing.)",
+  "menu.item.price.suggested.combo": "Suggested (Combo)"
 }

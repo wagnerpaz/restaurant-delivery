@@ -3,6 +3,7 @@ import classNames from "classnames";
 import isEqual from "lodash.isequal";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import { useTranslation } from "next-i18next";
 
 import { IMenuItem } from "/models/types/MenuItem";
 import Fieldset from "/components/Fieldset";
@@ -23,6 +24,10 @@ import ReactSelect from "/components/ReactSelect";
 import Textarea from "/components/form/Textarea";
 import Button from "/components/form/Button";
 import { StoreContext } from "/components/Store";
+import usePutMenuItem from "/hooks/usePutMenuItem";
+import { MenuSectionContext } from "/components/Menu/MenuSection";
+import defaultToastError from "/config/defaultToastError";
+import { replaceAt } from "/lib/immutable";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
@@ -37,15 +42,17 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
   menuItem,
   open,
   onOpenChange,
-  onMenuItemChange = () => {},
-  onStoreChange = () => {},
   ...props
 }) => {
   const { store } = useContext(StoreContext);
+  const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+  const { t } = useTranslation();
 
   const [edit, setEdit] = useState(menuItem);
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
+
+  const putMenuItem = usePutMenuItem();
 
   useEffect(() => {
     const compositionIndexed = menuItem.composition?.map((c, index) => ({
@@ -109,6 +116,35 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     }
   };
 
+  const handleSave = async () => {
+    //remove empty ingredients
+    edit.composition = edit.composition?.filter((f) => f.ingredient?.name);
+    //remove additionals
+    edit.additionals = edit.additionals?.filter(
+      (f) => (f.items?.filter((f2) => f2.ingredient?.name).length || 0) > 0
+    );
+    //remove empty sides
+    edit.sides = edit.sides?.filter((f) => f.menuItem?._id);
+
+    try {
+      const serverMenuItem = await putMenuItem(store, edit, menuSection._id);
+      const index = menuSection.items.findIndex(
+        (f) => f._id === serverMenuItem._id
+      );
+      console.log(index);
+      setMenuSection({
+        ...menuSection,
+        items:
+          index >= 0
+            ? replaceAt(menuSection.items, index, serverMenuItem)
+            : [...menuSection.items, serverMenuItem],
+      });
+      onOpenChange(false);
+    } catch (err) {
+      defaultToastError(err);
+    }
+  };
+
   return (
     <Modal
       className="!z-40"
@@ -125,7 +161,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       <form
         id="edit-menu-item-form"
         className={classNames("flex flex-col gap-4", className)}
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
       >
         <div className="flex flex-col lg:flex-row gap-4">
           <MenuItemRealistic
@@ -138,7 +177,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           />
           <div className="w-full lg:flex-1 flex flex-col gap-5">
             <div className="flex flex-row gap-2 mt-4">
-              <FormControl className="flex-1 min-w-fit" label="Nome">
+              <FormControl
+                className="flex-1 min-w-fit"
+                label={t("menu.item.name")}
+              >
                 <Input
                   value={edit.name}
                   onChange={(e) =>
@@ -149,7 +191,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="flex-1 min-w-fit" label="Detalhe">
+              <FormControl
+                className="flex-1 min-w-fit"
+                label={t("menu.item.nameDetail")}
+              >
                 <Input
                   value={edit.nameDetail}
                   onChange={(e) =>
@@ -160,7 +205,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="flex-1 min-w-fit" label="Tipo">
+              <FormControl
+                className="flex-1 min-w-fit"
+                label={t("menu.item.type")}
+              >
                 <ReactSelect
                   className="flex-1"
                   value={edit.itemType}
@@ -176,8 +224,14 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 </ReactSelect>
               </FormControl>
             </div>
-            <Fieldset className="flex flex-row gap-2" title="Preço">
-              <FormControl className="min-w-0 flex-1" label="Real">
+            <Fieldset
+              className="flex flex-row gap-2"
+              title={t("menu.item.price")}
+            >
+              <FormControl
+                className="min-w-0 flex-1"
+                label={t("menu.item.price.real")}
+              >
                 <Input
                   type="number"
                   value={`${edit.price}`}
@@ -189,7 +243,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="min-w-0 flex-1" label="Promocional">
+              <FormControl
+                className="min-w-0 flex-1"
+                label={t("menu.item.price.sale")}
+              >
                 <Input
                   type="number"
                   value={`${edit.pricePromotional}`}
@@ -201,7 +258,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="min-w-0 flex-1" label="Sugerido (Ingr.)">
+              <FormControl
+                className="min-w-0 flex-1"
+                label={t("menu.item.price.suggested.ingredients")}
+              >
                 <Input
                   type="number"
                   value={edit.sides?.reduce(
@@ -216,7 +276,10 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   disabled
                 />
               </FormControl>
-              <FormControl className="min-w-0 flex-1" label="Sugerido (Cmb.)">
+              <FormControl
+                className="min-w-0 flex-1"
+                label={t("menu.item.price.suggested.combo")}
+              >
                 <Input
                   type="number"
                   value={edit.sides?.reduce(
@@ -232,9 +295,16 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                 />
               </FormControl>
             </Fieldset>
-            <Fieldset className="flex flex-col gap-5 mt-2" title="Detalhes">
-              <FormControl className="flex-1 min-w-fit" label="Descrição curta">
-                <Input
+            <Fieldset
+              className="flex flex-col gap-5 mt-2"
+              title={t("menu.item.details")}
+            >
+              <FormControl
+                className="flex-1 min-w-fit"
+                label={t("menu.item.detail.short")}
+              >
+                <Textarea
+                  rows={3}
                   value={edit.details?.short}
                   onChange={(e) =>
                     setEdit({
@@ -244,10 +314,13 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
                   }
                 />
               </FormControl>
-              <FormControl className="flex-1 min-w-fit" label="Descrição longa">
+              <FormControl
+                className="flex-1 min-w-fit"
+                label={t("menu.item.detail.long")}
+              >
                 <Textarea
                   value={edit.details?.long}
-                  rows={10}
+                  rows={6}
                   onChange={(e) =>
                     setEdit({
                       ...edit,
@@ -260,114 +333,102 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
           </div>
         </div>
 
-        <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
-          <TabList>
-            <Tab>Ingredientes Principais</Tab>
-            <Tab>Customizar</Tab>
-            <Tab>Combo</Tab>
-          </TabList>
-          <TabPanel className="!px-0">
-            {tabIndex === 0 && (
-              <Fieldset className="flex flex-col gap-2">
-                <div className="flex-1 flex flex-row items-center justify-between gap-4  mb-4">
-                  <div className="flex-1 flex flex-row items-center gap-2">
-                    <BsFillInfoCircleFill
-                      className="text-main-a11y-medium"
-                      size={24}
-                    />
-                    <span className="text-xs">
-                      Ingredientes servem para informar ao cliente o que contém
-                      no prato. São também usados na busca e na opção de retirar
-                      ingredientes do prato (ex. Não quero ervilha)
-                    </span>
+        {/* <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+            <TabList>
+              <Tab>Ingredientes Principais</Tab>
+              <Tab>Customizar</Tab>
+              <Tab>Combo</Tab>
+            </TabList>
+            <TabPanel className="!px-0">
+              {tabIndex === 0 && (
+                <Fieldset className="flex flex-col gap-2">
+                  <div className="flex-1 flex flex-row items-center justify-between gap-4  mb-4">
+                    <div className="flex-1 flex flex-row items-center gap-2">
+                      <BsFillInfoCircleFill
+                        className="text-main-a11y-medium"
+                        size={24}
+                      />
+                      <span className="text-xs">
+                        Ingredientes servem para informar ao cliente o que contém
+                        no prato. São também usados na busca e na opção de retirar
+                        ingredientes do prato (ex. Não quero ervilha)
+                      </span>
+                    </div>
+                    <FormControl
+                      className="min-w-[180px]"
+                      label="Exibir Ingredientes"
+                    >
+                      <ReactSelect>
+                        <option>Sim</option>
+                        <option>Não</option>
+                      </ReactSelect>
+                    </FormControl>
                   </div>
-                  <FormControl
-                    className="min-w-[180px]"
-                    label="Exibir Ingredientes"
-                  >
-                    <ReactSelect>
-                      <option>Sim</option>
-                      <option>Não</option>
-                    </ReactSelect>
-                  </FormControl>
-                </div>
-                <EditMenuItemCompositionForm
-                  store={store}
-                  composition={edit.composition}
-                  onCompositionChange={(composition) =>
-                    setEdit({ ...edit, composition })
-                  }
-                />
-              </Fieldset>
-            )}
-          </TabPanel>
-          <TabPanel className="!px-0">
-            {tabIndex === 1 && (
-              <Fieldset className="flex flex-col gap-2 pt-6">
-                <EditMenuItemAdditionalsForm
-                  store={store}
-                  menuItem={edit}
-                  additionals={edit.additionals}
-                  onMenuItemChange={(newMenuItem) =>
-                    setEdit({ ...newMenuItem })
-                  }
-                  onAdditionalsChange={(additionals) =>
-                    setEdit({ ...edit, additionals })
-                  }
-                />
-              </Fieldset>
-            )}
-          </TabPanel>
-          <TabPanel className="!px-0">
-            {tabIndex === 3 && (
-              <Fieldset className="flex flex-col gap-2">
-                <div className="flex flex-row items-center mb-4">
-                  <div className="flex-1 flex flex-row items-center gap-2">
-                    <BsFillInfoCircleFill
-                      className="text-main-a11y-medium"
-                      size={24}
-                    />
-                    <span className="text-xs">
-                      Combos servem para vender um conjunto de itens em um único
-                      pacote.
-                    </span>
+                  <EditMenuItemCompositionForm
+                    store={store}
+                    composition={edit.composition}
+                    onCompositionChange={(composition) =>
+                      setEdit({ ...edit, composition })
+                    }
+                  />
+                </Fieldset>
+              )}
+            </TabPanel>
+            <TabPanel className="!px-0">
+              {tabIndex === 1 && (
+                <Fieldset className="flex flex-col gap-2 pt-6">
+                  <EditMenuItemAdditionalsForm
+                    store={store}
+                    menuItem={edit}
+                    additionals={edit.additionals}
+                    onMenuItemChange={(newMenuItem) =>
+                      setEdit({ ...newMenuItem })
+                    }
+                    onAdditionalsChange={(additionals) =>
+                      setEdit({ ...edit, additionals })
+                    }
+                  />
+                </Fieldset>
+              )}
+            </TabPanel>
+            <TabPanel className="!px-0">
+              {tabIndex === 3 && (
+                <Fieldset className="flex flex-col gap-2">
+                  <div className="flex flex-row items-center mb-4">
+                    <div className="flex-1 flex flex-row items-center gap-2">
+                      <BsFillInfoCircleFill
+                        className="text-main-a11y-medium"
+                        size={24}
+                      />
+                      <span className="text-xs">
+                        Combos servem para vender um conjunto de itens em um único
+                        pacote.
+                      </span>
+                    </div>
+                    <Button variant="outline" onClick={handleFillSides}>
+                      Gerenciar Combo
+                    </Button>
                   </div>
-                  <Button variant="outline" onClick={handleFillSides}>
-                    Gerenciar Combo
-                  </Button>
-                </div>
-                <EditMenuItemSidesForm
-                  store={store}
-                  sides={edit.sides}
-                  onSidesChange={(sides) => setEdit({ ...edit, sides })}
-                />
-              </Fieldset>
-            )}
-          </TabPanel>
-        </Tabs>
+                  <EditMenuItemSidesForm
+                    store={store}
+                    sides={edit.sides}
+                    onSidesChange={(sides) => setEdit({ ...edit, sides })}
+                  />
+                </Fieldset>
+              )}
+            </TabPanel>
+          </Tabs> */}
         <div className="sticky bottom-0 flex flex-row justify-end gap-2 bg-main-100 z-20 py-3 px-4 -mx-4 translate-y-4 border-t border-hero">
-          <Button className="w-32" variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
           <Button
             className="w-32"
-            onClick={() => {
-              //remove empty ingredients
-              edit.composition = edit.composition?.filter(
-                (f) => f.ingredient?.name
-              );
-              //remove additionals
-              edit.additionals = edit.additionals?.filter(
-                (f) =>
-                  (f.items?.filter((f2) => f2.ingredient?.name).length || 0) > 0
-              );
-              //remove empty sides
-              edit.sides = edit.sides?.filter((f) => f.menuItem?._id);
-
-              onMenuItemChange(edit);
-            }}
+            variant="outline"
+            type="button"
+            onClick={handleCancel}
           >
-            Salvar
+            {t("button.cancel")}
+          </Button>
+          <Button className="w-32" type="submit">
+            {t("button.save")}
           </Button>
         </div>
         <ImageEditorModal
