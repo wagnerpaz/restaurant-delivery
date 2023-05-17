@@ -1,0 +1,18 @@
+{
+  "button.save": "Save",
+  "button.cancel": "Cancel",
+  "button.delete": "Delete",
+  "input.name": "Name",
+  "main.menu.drawer.title": "Menu",
+  "store.data": "Store Info",
+  "signIn": "Sign In",
+  "search.placeholder": "Search...",
+  "menu.item.addToCart": "Add to cart",
+  "menu.item.add": "Add",
+  "menu.item.type": "Type",
+  "menu.item.name": "Name",
+  "menu.item.nameDetail": "Detail",
+  "menu.item.detail.short": "Description (short)",
+  "menu.item.price": "Price",
+  "menu.item.pricePromotional": "Sale"
+}

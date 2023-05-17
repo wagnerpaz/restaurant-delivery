@@ -1,0 +1,18 @@
+{
+  "button.save": "Salvar",
+  "button.cancel": "Cancelar",
+  "button.delete": "Excluir",
+  "input.name": "Nome",
+  "main.menu.drawer.title": "Menu",
+  "store.data": "Dados da Loja",
+  "signIn": "Entrar",
+  "search.placeholder": "Pesquisar...",
+  "menu.item.addToCart": "Adicionar ao carrinho",
+  "menu.item.add": "Adicionar",
+  "menu.item.type": "Tipo",
+  "menu.item.name": "Nome",
+  "menu.item.nameDetail": "Detalhe",
+  "menu.item.detail.short": "Descrição (curta)",
+  "menu.item.price": "Preço",
+  "menu.item.pricePromotional": "Promo."
+}

@@ -6,6 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { VscError } from "react-icons/vsc";
 import NProgress from "nprogress";
 import Router from "next/router";
+import { appWithTranslation } from "next-i18next";
 
 import { getRGBColor } from "/lib/getRGBColor";
 
@@ -194,4 +195,4 @@ function MyErrorBoundary({ children }) {
   );
 }
 
-export default App;
+export default appWithTranslation(App);

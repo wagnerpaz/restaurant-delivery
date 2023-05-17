@@ -14,6 +14,7 @@ import {
   useContext,
 } from "react";
 import { FaShoppingCart } from "react-icons/fa";
+import { useTranslation } from "next-i18next";
 
 import Modal from "/components/Modal";
 import MoneyDisplay from "/components/MoneyDisplay";
@@ -46,6 +47,7 @@ const OrderMenuItemDetailsModal: React.FC<OrderMenuItemDetailsModalProps> = ({
   ...props
 }) => {
   const { store } = useContext(StoreContext);
+  const { t } = useTranslation();
 
   const getMenuItemAdditionals = useGetMenuItemsAdditionals();
   const [additionals, setAdditionals] = useState(null);
@@ -532,7 +534,7 @@ const OrderMenuItemDetailsModal: React.FC<OrderMenuItemDetailsModalProps> = ({
         <NumberInput className="!h-full w-48" />
         <Button className="flex-1" isDisabled={calculatedPrice <= 0}>
           <FaShoppingCart className="mr-2" />
-          Adicionar
+          {t("menu.item.add")}
         </Button>
       </div>
     </Modal>

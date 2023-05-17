@@ -15,6 +15,8 @@ import FormControl from "/components/FormControl";
 import EditAddressForm from "/forms/EditAddressForm";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { StoreContext } from "/components/Store";
+import usePutStore from "/hooks/usePutStore";
+import useLocalState from "/hooks/useLocalState";
 
 interface AddStoreModalProps extends ComponentProps<typeof Modal> {
   store?: IStore;
@@ -29,13 +31,25 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
 
   const router = useRouter();
 
-  const [localStore, setLocalStore] = useState({
+  const [localStore, setLocalStore] = useLocalState({
     ...store,
     slug: router.query.storeSlug,
     locations: store.locations?.length > 0 ? store.locations : [{}],
   } as IStore);
 
   const [editImageModalOpen, setEditImageModalOpen] = useState(false);
+
+  const putStore = usePutStore();
+
+  const handleSave = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const serverStore = await putStore(localStore);
+      setStore(serverStore);
+      onOpenChange(false);
+    },
+    [localStore, onOpenChange, putStore, setStore]
+  );
 
   const handleLocationChange = useCallback(
     (param: ILocation | ((newLocation: ILocation) => ILocation)) => {
@@ -47,6 +61,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
           ({ ...clientStore, locations: [newLocation] } as IStore)
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localStore.locations]
   );
 
@@ -56,7 +71,10 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
       contentClassName={classNames("flex flex-col container", contentClassName)}
       onOpenChange={onOpenChange}
     >
-      <form className="flex flex-col gap-6 text-main-a11y-high">
+      <form
+        className="flex flex-col gap-6 text-main-a11y-high"
+        onSubmit={handleSave}
+      >
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <EditableSection
             iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
@@ -120,14 +138,12 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
           <Button
             className="w-full sm:w-32"
             variant="outline"
+            type="button"
             onClick={() => onOpenChange(false)}
           >
             Cancelar
           </Button>
-          <Button
-            className="w-full sm:w-32 self-end"
-            onClick={() => setStore(localStore)}
-          >
+          <Button className="w-full sm:w-32 self-end" type="submit">
             Salvar
           </Button>
         </div>

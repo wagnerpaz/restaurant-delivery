@@ -12,6 +12,7 @@ import UserIcon from "./UserIcon";
 import { useRouter } from "next/router";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import Input from "./form/Input";
+import { useTranslation } from "next-i18next";
 
 const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
 
@@ -19,6 +20,7 @@ interface StoreHeaderProps extends ComponentProps<"section"> {}
 
 const StoreHeader: React.FC<StoreHeaderProps> = () => {
   const { store, search, setSearch } = useContext(StoreContext);
+  const { t } = useTranslation();
 
   const searchMobileRef = useRef<HTMLInputElement>();
 
@@ -98,7 +100,7 @@ const StoreHeader: React.FC<StoreHeaderProps> = () => {
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
-              placeholder="Pesquisar..."
+              placeholder={t("search.placeholder")}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   setSearch("");

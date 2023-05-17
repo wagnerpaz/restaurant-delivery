@@ -1,6 +1,5 @@
 import { ParsedUrlQuery } from "querystring";
 
-import sectionsPopulate from "./lib/sectionsPopulate";
 import connectToDatabase from "/lib/mongoose";
 import serializeJson from "/lib/serializeJson";
 import { TPipeGetServerSideProps } from "/lib/ssrHelpers";
@@ -8,7 +7,6 @@ import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { IStore } from "/models/types/Store";
 import MenuSection from "/models/MenuSection";
-import section from "/pages/api/store/[storeId]/menu/section";
 
 const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   console.log("-------------");

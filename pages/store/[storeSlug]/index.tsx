@@ -8,6 +8,7 @@ import Store from "/components/Store";
 import { ScreenSizeProvider } from "/contexts/BrowserScreenSizeContext";
 import StoreModel from "/models/Store";
 import connectToDatabase from "/lib/mongoose";
+import localeSSP from "/server-side-props/localeSSP";
 
 interface StorePageProps {
   store: IStore;
@@ -33,7 +34,10 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
   );
 };
 
-export const getStaticProps: GetServerSideProps = ssrHelpers.pipe(storeSSP());
+export const getStaticProps: GetServerSideProps = ssrHelpers.pipe(
+  localeSSP(),
+  storeSSP()
+);
 export async function getStaticPaths() {
   await connectToDatabase();
   const slugs = await StoreModel.find({}, { slug: 1 });

@@ -1,6 +1,8 @@
 import { ComponentProps, useContext, useMemo, memo } from "react";
 import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
+import isEqual from "lodash.isequal";
+import { useTranslation } from "next-i18next";
 
 import {
   IMenuItem,
@@ -19,7 +21,6 @@ import { GRID_CONFIG } from "./MenuSection";
 import remToPix from "/lib/remToPix";
 import { StoreContext } from "../Store";
 import ScreenSizeContext from "/contexts/BrowserScreenSizeContext";
-import isEqual from "lodash.isequal";
 
 interface MenuItemProps extends ComponentProps<"div"> {
   idPrefix?: string;
@@ -54,6 +55,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   onMainImageChange = () => {},
   ...props
 }) => {
+  const { t } = useTranslation();
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
@@ -136,7 +138,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
           <Button
             className="sm:!hidden inline float-right !rounded-xl w-fit mx-0 !px-4 !py-2 !bg-hero !text-hero-a11y-high ml-1 mb-1"
             size="sm"
-            aria-label="Adicionar ao carrinho"
+            aria-label={t("menu.item.addToCart")}
             onClick={onClick}
           >
             <FaShoppingCart className="text-xl" />
@@ -201,7 +203,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
           onClick={onClick}
         >
           <FaShoppingCart className="text-xl" />
-          <span className="inline-block">Adicionar</span>
+          <span className="inline-block">{t("menu.item.add")}</span>
         </Button>
       </div>
     </div>

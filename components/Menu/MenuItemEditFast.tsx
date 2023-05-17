@@ -3,6 +3,7 @@ import ImageWithFallback from "/components/ImageWithFallback";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
 import isEqual from "lodash.isequal";
+import { useTranslation } from "next-i18next";
 
 import MemoInput from "../MemoInput";
 import EditableSection from "/components/EditableSection";
@@ -40,6 +41,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
 }) => {
   const { store } = useContext(StoreContext);
   const { menuSection, setMenuSection } = useContext(MenuSectionContext);
+  const { t } = useTranslation();
 
   const toast = useToast();
 
@@ -105,14 +107,13 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         />
       </EditableSection>
       <FormControl
-        label="Tipo"
+        label={t("menu.item.type")}
         fieldsetClassName={classNames("w-full sm:w-36", {
           "bg-main-200": saving,
         })}
       >
         <MemoReactSelect
           disabled={saving}
-          label="Tipo"
           value={{
             value: localMenuItem.itemType,
             label: TYPE_OPTIONS[localMenuItem.itemType],
@@ -139,7 +140,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         className={classNames("flex-1 min-w-0")}
         fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
-        label="Nome"
+        label={t("menu.item.name")}
         value={localMenuItem.name}
         onChange={(e) =>
           setLocalMenuItem((localMenuItem) => ({
@@ -152,7 +153,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         className={"w-full sm:w-32"}
         fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
-        label="Detalhe"
+        label={t("menu.item.nameDetail")}
         value={localMenuItem.nameDetail}
         onChange={(e) =>
           setLocalMenuItem((localMenuItem) => ({
@@ -165,7 +166,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
         className={"flex-1 min-w-fit"}
         fieldsetClassName={classNames({ "bg-main-200": saving })}
         isDisabled={saving}
-        label="Descrição (curta)"
+        label={t("menu.item.detail.short")}
         value={localMenuItem.details?.short}
         onChange={(e) => {
           setLocalMenuItem((localMenuItem) => ({
@@ -179,7 +180,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           className={"w-full sm:!w-16"}
           fieldsetClassName={classNames({ "bg-main-200": saving })}
           isDisabled={saving}
-          label="Preço"
+          label={t("menu.item.price")}
           type="number"
           value={`${localMenuItem.price || 0}`}
           onChange={(e) =>
@@ -193,7 +194,7 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           className={"w-full sm:!w-16"}
           fieldsetClassName={classNames({ "bg-main-200": saving })}
           isDisabled={saving}
-          label="Promo"
+          label={t("menu.item.pricePromotional")}
           type="number"
           value={`${localMenuItem.pricePromotional || 0}`}
           onChange={(e) =>

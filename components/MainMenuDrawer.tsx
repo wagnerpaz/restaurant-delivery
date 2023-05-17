@@ -2,6 +2,7 @@ import { ComponentProps, useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { RiStore3Fill } from "react-icons/ri";
 import { signIn, useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 
 import { IUser } from "/models/types/User";
 import Drawer from "./Drawer";
@@ -21,6 +22,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   onStoreDataClick,
   ...props
 }) => {
+  const { t } = useTranslation();
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
@@ -34,7 +36,12 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
   };
 
   return (
-    <Drawer title="Menu" open={open} onClose={onClose} {...props}>
+    <Drawer
+      title={t("main.menu.drawer.title")}
+      open={open}
+      onClose={onClose}
+      {...props}
+    >
       {!admin && (
         <Button
           className="!w-full !justify-start mx-2 !py-4 !h-auto flex flex-row !items-center"
@@ -42,7 +49,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
           onClick={handleSignIn}
         >
           <FaUserCircle className="mr-4" size={36} />
-          Entrar
+          {t("signIn")}
         </Button>
       )}
       {admin && (
@@ -55,7 +62,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
           }}
         >
           <RiStore3Fill className="mr-4" size={36} />
-          Dados da Loja
+          {t("store.data")}
         </Button>
       )}
       {store.menu.sections.map((section) => (

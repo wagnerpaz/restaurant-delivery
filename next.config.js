@@ -1,9 +1,10 @@
-/** @type {import('next').NextConfig} */
+const { i18n } = require("./next-i18next.config");
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = withBundleAnalyzer({
   reactStrictMode: true,
   typescript: {
@@ -23,6 +24,7 @@ const nextConfig = withBundleAnalyzer({
   experimental: {
     optimizeCss: true, // enabling this will enable SSR for Tailwind
   },
+  i18n,
 });
 
 module.exports = nextConfig;

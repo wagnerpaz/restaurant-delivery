@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { ComponentProps, useState } from "react";
+import { useTranslation } from "next-i18next";
 
 import Modal from "/components/Modal";
 import FormControl from "/components/FormControl";
@@ -33,6 +34,8 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
     mode === "ADD" ? emptyMenuSection.name : menuSection.name
   );
 
+  const { t } = useTranslation();
+
   return (
     <Modal
       {...props}
@@ -53,7 +56,7 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
             <Input value={parentName} disabled />
           </FormControl>
         )}
-        <FormControl label="Nome">
+        <FormControl label={t("input.name")}>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -68,10 +71,10 @@ const AddMenuSecitionModal: React.FC<AddMenuSectionModalProps> = ({
           )}
           <div className="flex-1" />
           <Button className="w-28" variant="outline" onClick={onCancel}>
-            Cancelar
+            {t("button.cancel")}
           </Button>
           <Button type="submit" className="w-28">
-            Salvar
+            {t("button.save")}
           </Button>
         </div>
       </form>
