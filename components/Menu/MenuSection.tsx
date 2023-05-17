@@ -106,7 +106,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const editMenuItemObject = useMemo(() => {
     if (router.query.editMenuItemId) {
-      return menuSection.items.find(
+      return localMenuSection.items.find(
         (f) => f._id === router.query.editMenuItemId
       );
     } else if (router.query.addMenuItemBySection) {
@@ -116,7 +116,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       };
     }
   }, [
-    menuSection.items,
+    localMenuSection.items,
     router.query.addMenuItemBySection,
     router.query.editMenuItemId,
   ]);
@@ -175,8 +175,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       ],
     });
   }, [localMenuSection, setLocalMenuSection, type]);
-
-  const putMenuItem = usePutMenuItem();
 
   const handleAddMenuItem = () => {
     if (menuSection.editMode === "realistic") {

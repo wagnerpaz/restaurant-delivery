@@ -7,6 +7,7 @@ import ReactCrop, {
   makeAspectCrop,
   convertToPixelCrop,
 } from "react-image-crop";
+import { useTranslation } from "next-i18next";
 
 import Modal from "/components/Modal";
 import { imgPreview } from "/lib/image-crop/imgPreview";
@@ -40,6 +41,7 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
   portalTargetEditModal,
   ...props
 }) => {
+  const { t } = useTranslation();
   const [crop, setCrop] = useState<Crop>();
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
   const [cachedImage, setCachedImage] = useState<string>();
@@ -117,7 +119,10 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
           )}
         </div>
         <div className="flex gap-4">
-          <FormControl className="flex-1 min-w-fit" label="Arquivo de Imagem">
+          <FormControl
+            className="flex-1 min-w-fit"
+            label={t("upload.image.file")}
+          >
             <Input
               className="flex-1"
               type="file"
@@ -151,12 +156,17 @@ const ImageEditorModal: React.FC<DbImageEditorProps> = ({
               }}
             />
           </FormControl>
-          <Button className="block" onClick={() => onOpenChange(false)}>
+          <Button
+            className="block"
+            type="button"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
 
           <Button
             className="block"
+            type="button"
             onClick={() => {
               if (!cachedImage) {
                 onOpenChange(false);

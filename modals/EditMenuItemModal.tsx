@@ -28,12 +28,11 @@ import usePutMenuItem from "/hooks/usePutMenuItem";
 import { MenuSectionContext } from "/components/Menu/MenuSection";
 import defaultToastError from "/config/defaultToastError";
 import { replaceAt } from "/lib/immutable";
+import { TYPE_OPTIONS, TYPE_VALUES } from "/components/Menu/MenuItem";
 
 interface EditMenuItemModalProps extends ComponentProps<typeof Modal> {
   store: IStore;
   menuItem: IMenuItem;
-  onMenuItemChange: (newValue?: IMenuItem, cancelled?: boolean) => void;
-  onStoreChange: (newValue: IStore, shouldSave?: boolean) => void;
 }
 
 const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
@@ -101,7 +100,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
     const toCheck = clearTransient({ ...edit });
 
     if (!isEqual(menuItem, toCheck)) {
-      const confirmed = confirm("Você tem alterações não salvas. Deseja sair?");
+      const confirmed = confirm(t("menu.item.edit.save.changes.confirm"));
       if (confirmed) {
         cancel();
       }
@@ -211,17 +210,18 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
               >
                 <ReactSelect
                   className="flex-1"
-                  value={edit.itemType}
-                  onChange={(e) => {
+                  value={{
+                    value: edit.itemType,
+                    label: TYPE_VALUES(t)[edit.itemType],
+                  }}
+                  options={TYPE_OPTIONS(t)}
+                  onChange={({ value }) => {
                     setEdit({
                       ...edit,
-                      itemType: e.target.value,
+                      itemType: value,
                     });
                   }}
-                >
-                  <option value="product">Produto</option>
-                  <option value="ingredient">Ingrediente</option>
-                </ReactSelect>
+                />
               </FormControl>
             </div>
             <Fieldset
@@ -431,6 +431,8 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             {t("button.save")}
           </Button>
         </div>
+      </form>
+      {editImageModalOpen && (
         <ImageEditorModal
           open={editImageModalOpen}
           onOpenChange={(newValue) => setEditImageModalOpen(newValue)}
@@ -452,7 +454,7 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
             } as IMenuItem);
           }}
         />
-      </form>
+      )}
     </Modal>
   );
 };

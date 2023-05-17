@@ -10,6 +10,8 @@
   "menu.item.addToCart": "Add to cart",
   "menu.item.add": "Add",
   "menu.item.type": "Type",
+  "menu.item.type.product": "Product",
+  "menu.item.type.ingredient": "Ingredient",
   "menu.item.name": "Name",
   "menu.item.nameDetail": "Detail",
   "menu.item.details": "Details",
@@ -20,5 +22,10 @@
   "menu.item.price.real": "Real",
   "menu.item.price.sale": "Sale",
   "menu.item.price.suggested.ingredients": "Suggested (Ing.)",
-  "menu.item.price.suggested.combo": "Suggested (Combo)"
+  "menu.item.price.suggested.combo": "Suggested (Combo)",
+  "menu.item.edit.save.changes.confirm": "You have unsaved changes. Do you want to leave?",
+  "menu.item.remove.confirm": "Do you want to delete \"{{menuItem}}\"?",
+  "menu.item.remove.sucess.message": "Item successfully removed:",
+  "menu.item.remove.sucess.description": "Name: {{menuItem}}",
+  "upload.image.file": "Image file"
 }

@@ -21,11 +21,7 @@ import FormControl from "../FormControl";
 import classNames from "classnames";
 import useToast from "/hooks/useToast";
 import defaultToastError from "/config/defaultToastError";
-
-const TYPE_OPTIONS = {
-  product: "Produto",
-  ingredient: "Ingrediente",
-};
+import { TYPE_OPTIONS, TYPE_VALUES } from "./MenuItem";
 
 interface MenuItemEditFastProps extends ComponentProps<"form"> {
   menuItem: IMenuItem;
@@ -116,18 +112,9 @@ const MenuItemEditFast: React.FC<MenuItemEditFastProps> = ({
           disabled={saving}
           value={{
             value: localMenuItem.itemType,
-            label: TYPE_OPTIONS[localMenuItem.itemType],
+            label: TYPE_VALUES(t)[localMenuItem.itemType],
           }}
-          options={[
-            {
-              value: Object.keys(TYPE_OPTIONS)[0],
-              label: Object.values(TYPE_OPTIONS)[0],
-            },
-            {
-              value: Object.keys(TYPE_OPTIONS)[1],
-              label: Object.values(TYPE_OPTIONS)[1],
-            },
-          ]}
+          options={TYPE_OPTIONS(t)}
           onChange={({ value }) =>
             setLocalMenuItem((localMenuItem) => ({
               ...localMenuItem,

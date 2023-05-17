@@ -10,6 +10,8 @@
   "menu.item.addToCart": "Adicionar ao carrinho",
   "menu.item.add": "Adicionar",
   "menu.item.type": "Tipo",
+  "menu.item.type.product": "Produto",
+  "menu.item.type.ingredient": "Ingrediente",
   "menu.item.name": "Nome",
   "menu.item.nameDetail": "Detalhe",
   "menu.item.details": "Detalhes",
@@ -20,5 +22,10 @@
   "menu.item.price.real": "Real",
   "menu.item.price.sale": "Promo.",
   "menu.item.price.suggested.ingredients": "Sugerido (Ingr.)",
-  "menu.item.price.suggested.combo": "Sugerido (Combo)"
+  "menu.item.price.suggested.combo": "Sugerido (Combo)",
+  "menu.item.edit.save.changes.confirm": "Você tem alterações não salvas. Deseja sair?",
+  "menu.item.remove.confirm": "Deseja remover o item \"{{menuItem}}\"?",
+  "menu.item.remove.sucess.message": "Item removido com sucesso:",
+  "menu.item.remove.sucess.description": "Nome: {{menuItem}}",
+  "upload.image.file": "Arquivo de Imagem"
 }

@@ -1,5 +1,6 @@
 import { useState, useContext, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 
 import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
 import MenuItemRealistic from "/components/Menu/MenuItemRealistic";
@@ -31,11 +32,29 @@ export const emptyMenuItem: IMenuItem = {
   customizeType: "template",
 };
 
+export const TYPE_VALUES = (t) => ({
+  product: t("menu.item.type.product"),
+  ingredient: t("menu.item.type.ingredient"),
+});
+
+export const TYPE_OPTIONS = (t) => [
+  {
+    value: Object.keys(TYPE_VALUES(t))[0],
+    label: Object.values(TYPE_VALUES(t))[0],
+  },
+  {
+    value: Object.keys(TYPE_VALUES(t))[1],
+    label: Object.values(TYPE_VALUES(t))[1],
+  },
+];
+
 const MenuItem: React.FC<MenuItemProps> = ({
   editMode,
   menuItem,
   useEffects,
 }) => {
+  const { t } = useTranslation();
+
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
@@ -71,7 +90,9 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
     let confirmed = true;
     if (menuItem._id) {
-      confirmed = confirm(`Deseja excluir o item "${menuItem.name}"?`);
+      confirmed = confirm(
+        t("menu.item.remove.confirm", { menuItem: menuItem.name })
+      );
     }
 
     if (confirmed) {
@@ -85,8 +106,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
           items: menuSection.items.filter((f) => f._id !== menuItem._id),
         });
         toast({
-          message: "Item removido com sucesso:",
-          description: `Nome: ${menuItem.name}`,
+          message: t("menu.item.remove.sucess.message"),
+          description: t("menu.item.remove.sucess.description", {
+            menuItem: menuItem.name,
+          }),
           type: "success",
         });
       } catch (err: any) {
