@@ -6,7 +6,8 @@ export interface IMenuSection {
   parentSection: IMenuSection;
   name: string;
   index: number[];
-  editMode: "realistic" | "fast";
+  editModeProduct: "realistic" | "fast";
+  editModeIngredient: "realistic" | "fast";
   retracted?: boolean;
   items: IMenuItem[];
 }

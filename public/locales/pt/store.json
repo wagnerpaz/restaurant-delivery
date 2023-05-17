@@ -41,5 +41,7 @@
   "address.line1": "Endereço",
   "address.neighborhood": "Bairro",
   "address.number": "Número",
-  "address.line2": "Complemento"
+  "address.line2": "Complemento",
+  "menu.products": "Produtos",
+  "menu.ingredients": "Ingredientes"
 }

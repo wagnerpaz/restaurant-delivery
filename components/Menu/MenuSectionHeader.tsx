@@ -25,6 +25,7 @@ interface MenuSectionHeaderProps extends ComponentProps<"button"> {
   expanded?: boolean;
   isNew?: boolean;
   editMode?: "realistic" | "fast";
+  type?: "product" | "ingredient";
   onAddMenuItemClick?: () => void;
   onAddSectionClick?: () => void;
   onEditSectionClick?: () => void;
@@ -40,6 +41,7 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
   totalLength,
   expanded,
   isNew,
+  type = "product",
   editMode = "realistic",
   onAddMenuItemClick = () => {},
   onAddSectionClick = () => {},
@@ -69,9 +71,18 @@ const MenuSectionHeader: React.FC<MenuSectionHeaderProps> = ({
     async function exec() {
       const serverMenuSection = await putStoreMenuSection(store, {
         ...menuSection,
-        editMode: menuSection.editMode === "fast" ? "realistic" : "fast",
+        ...(type === "ingredient"
+          ? {
+              editModeIngredient:
+                menuSection.editModeIngredient === "fast"
+                  ? "realistic"
+                  : "fast",
+            }
+          : {
+              editModeProduct:
+                menuSection.editModeProduct === "fast" ? "realistic" : "fast",
+            }),
       });
-      console.log("will set menu section", serverMenuSection);
       setMenuSection({ ...serverMenuSection });
     }
     try {

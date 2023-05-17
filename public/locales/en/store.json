@@ -41,5 +41,7 @@
   "address.line1": "Address 1",
   "address.neighborhood": "Neighborhood",
   "address.number": "Number",
-  "address.line2": "Address 2"
+  "address.line2": "Address 2",
+  "menu.products": "Products",
+  "menu.ingredients": "Ingredients"
 }

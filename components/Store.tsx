@@ -13,12 +13,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import { useTranslation } from "next-i18next";
 
 import Menu from "/components/Menu/Menu";
 import { ILocation, IStore } from "/models/types/Store";
-
 import { IUser } from "/models/types/User";
-import { retriveAllMenuItems as retrieveAllMenuItems } from "/lib/menuSectionUtils";
 import StoreHeader from "./StoreHeader";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 
@@ -52,6 +51,8 @@ export const StoreContext = createContext<{
 });
 
 const Store: FC<StoreProps> = ({ store }) => {
+  const { t } = useTranslation();
+
   const menuItemsRenderCount = useRef(0);
   menuItemsRenderCount.current = 0;
 
@@ -121,13 +122,13 @@ const Store: FC<StoreProps> = ({ store }) => {
               className="react-tabs__tab tab"
               selectedClassName="tab-selected"
             >
-              Produtos
+              {t("menu.products")}
             </Tab>
             <Tab
               className="react-tabs__tab tab"
               selectedClassName="tab-selected"
             >
-              Ingredientes
+              {t("menu.ingredients")}
             </Tab>
           </TabList>
         </Tabs>

@@ -6,11 +6,17 @@ const schema = new mongoose.Schema<IMenuSection>({
   store: { type: mongoose.Types.ObjectId, ref: "Store" },
   parentSection: { type: mongoose.Types.ObjectId, ref: "MenuSection" },
   name: String,
-  editMode: {
+  editModeProduct: {
     type: String,
     required: true,
     enum: ["realistic", "fast"],
     default: "realistic",
+  },
+  editModeIngredient: {
+    type: String,
+    required: true,
+    enum: ["realistic", "fast"],
+    default: "fast",
   },
   retracted: Boolean,
   items: [{ type: mongoose.Types.ObjectId, ref: "MenuItem" }],

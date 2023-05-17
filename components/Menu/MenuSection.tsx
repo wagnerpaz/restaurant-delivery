@@ -200,6 +200,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     [menuItemsByType, search]
   );
 
+  const editModeByType =
+    type === "ingredient"
+      ? localMenuSection.editModeIngredient
+      : localMenuSection.editModeProduct;
+
   return (
     <MenuSectionContext.Provider
       value={{
@@ -219,7 +224,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             totalLength={menuItemsByType.length}
             expanded={expanded}
             isNew={isNew}
-            editMode={localMenuSection.editMode}
+            type={type}
+            editMode={editModeByType}
             onAddMenuItemClick={handleAddMenuItem}
             onAddSectionClick={onAddSectionClick}
             onEditSectionClick={onEditSectionClick}
@@ -232,9 +238,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 "sm:container sm:m-auto !px-2 sm:!px-8",
                 {
                   "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6":
-                    localMenuSection.editMode === "realistic" || !admin,
-                  "flex flex-col gap-2":
-                    localMenuSection.editMode === "fast" && admin,
+                    editModeByType === "realistic" || !admin,
+                  "flex flex-col gap-2": editModeByType === "fast" && admin,
                 },
                 { "my-2 sm:my-6": true },
                 { hidden: !expanded },
@@ -248,9 +253,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               >
                 {foundItems.map((menuItem, menuItemIndex) => (
                   <AdminDraggable
-                    dragIndicator={
-                      localMenuSection.editMode === "fast" && admin
-                    }
+                    dragIndicator={editModeByType === "fast" && admin}
                     disabled={menuItem._id.startsWith("_tmp_")}
                     containerClassName="h-full"
                     key={menuItem._id}
@@ -260,7 +263,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     onDrop={onDropMenuItem}
                   >
                     <MenuItem
-                      editMode={localMenuSection.editMode}
+                      editMode={editModeByType}
                       menuItem={menuItem}
                       useEffects
                     />
@@ -271,19 +274,17 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     className={classNames(
                       "flex items-center justify-center w-full h-full bg-contrast-high shadow-md rounded-md border border-main-a11y-low cursor-pointer",
                       {
-                        "min-h-[428px]":
-                          localMenuSection.editMode === "realistic",
+                        "min-h-[428px]": editModeByType === "realistic",
                         "ml-6 !w-[calc(100%-1.5rem)]":
-                          localMenuSection.editMode === "fast",
+                          editModeByType === "fast",
                       }
                     )}
                     onClick={handleAddMenuItem}
                   >
                     <HiPlus
                       className={classNames("", {
-                        "w-20 h-20 p-5 ":
-                          localMenuSection.editMode === "realistic",
-                        "w-10 h-10 p-1 ": localMenuSection.editMode === "fast",
+                        "w-20 h-20 p-5 ": editModeByType === "realistic",
+                        "w-10 h-10 p-1 ": editModeByType === "fast",
                       })}
                     />
                   </div>
