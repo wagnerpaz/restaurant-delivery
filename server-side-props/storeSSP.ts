@@ -30,7 +30,6 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
 
   const store: IStore | null = await Store.findOne({
     slug: storeSlug,
-    active: true,
   })
     .populate({ path: "menu.sections", populate: { path: "items" } })
     .exec();

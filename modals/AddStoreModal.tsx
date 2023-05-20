@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 
 import Button from "/components/form/Button";
+import Textarea from "/components/form/Textarea";
 import Input from "/components/form/Input";
 import ReactSelect from "/components/ReactSelect";
 
@@ -66,7 +67,7 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
         className="flex flex-col gap-6 text-main-a11y-high"
         onSubmit={handleSave}
       >
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch">
           <EditableSection
             iconsContainerClassName="bottom-2 sm:bottom-8 !top-auto bg-contrast-high p-2 rounded-full"
             onEditClick={() => setEditImageModalOpen(true)}
@@ -118,6 +119,20 @@ const AddStoreModal: React.FC<AddStoreModalProps> = ({
               ></ReactSelect>
             </FormControl>
           </div>
+          <FormControl
+            className="flex-1 h-full"
+            fieldsetClassName="flex-1"
+            label={t("store.description")}
+          >
+            <Textarea
+              className="h-full resize-none"
+              rows={6}
+              value={localStore.description}
+              onChange={(e) =>
+                setLocalStore({ ...localStore, description: e.target.value })
+              }
+            />
+          </FormControl>
         </div>
         {localStore?.locations?.[0] && (
           <Fieldset className="pt-0">

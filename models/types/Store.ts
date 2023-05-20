@@ -6,6 +6,7 @@ export interface IStore extends Document {
   logo?: string;
   slug: string;
   listed: boolean;
+  description?: string;
   locations: ILocation[];
   menu: {
     sections: IMenuSection[];

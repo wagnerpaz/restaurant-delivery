@@ -11,6 +11,7 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
   },
   slug: { type: String, required: true, unique: true },
   listed: { type: Boolean, required: true, default: false },
+  description: { type: String, required: false },
   locations: [
     {
       address: String,

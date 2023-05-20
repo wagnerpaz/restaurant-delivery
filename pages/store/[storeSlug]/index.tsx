@@ -26,6 +26,7 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
           href={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN_NAME}/${store?.logo}`}
         />
         <title>{store?.name}</title>
+        <meta name="description" content={store.description} />
       </Head>
       <ScreenSizeProvider>
         <Store store={store} selectedLocation={selectedLocation} />

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-const Textarea = ({ className, ...props }) => {
+const Textarea = ({ className = "", ...props }) => {
   return (
     <textarea
       className={classNames(

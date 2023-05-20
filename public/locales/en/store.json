@@ -32,6 +32,7 @@
   "store.name": "Name",
   "store.url": "URL",
   "store.listed": "Listed",
+  "store.description": "Description",
   "yes": "Yes",
   "no": "No",
   "store.location": "Location",
