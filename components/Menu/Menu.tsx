@@ -2,6 +2,7 @@ import { ComponentProps, useMemo, memo, useContext, useState } from "react";
 import { Accordion, AccordionItem } from "react-accessible-accordion";
 import isEqual from "lodash.isequal";
 import { useRouter } from "next/router";
+import InfiniteScroll from "react-infinite-scroller";
 
 import MenuSection from "./MenuSection";
 import { IMenuSection } from "/models/types/MenuSection";
@@ -73,15 +74,48 @@ const Menu: React.FC<MenuProps> = ({
     );
   };
 
+  const loader = <div key="loader">Loading ...</div>;
+  const [infiniteIndex, setInfiniteIndex] = useState(1);
+  const [infiniteSections, setInfiniteSections] = useState(
+    localSections?.[0] ? [localSections[0]] : []
+  );
+
+  const hasMoreItems = () => infiniteIndex < localSections.length - 1;
+
+  const fetchItems = () => {
+    if (!hasMoreItems()) {
+      return;
+    }
+    setInfiniteIndex((infiniteIndex) => {
+      const newInfiniteIndex = infiniteIndex + 1;
+      setInfiniteSections([
+        ...infiniteSections,
+        localSections[newInfiniteIndex],
+      ]);
+      return newInfiniteIndex;
+    });
+  };
+
+  console.log(
+    localSections.length,
+    infiniteIndex,
+    hasMoreItems(),
+    infiniteSections
+  );
+
   return (
-    <>
+    <InfiniteScroll
+      loadMore={fetchItems}
+      hasMore={hasMoreItems}
+      loader={loader}
+    >
       <Accordion
         allowMultipleExpanded
         allowZeroExpanded
         preExpanded={expandedMenuSections}
         onChange={(expanded) => setExpandedMenuSections(expanded)}
       >
-        {localSections.map((section) => (
+        {infiniteSections.map((section) => (
           <MenuSection
             key={`${section._id}`}
             menuSection={section}
@@ -141,7 +175,7 @@ const Menu: React.FC<MenuProps> = ({
           }}
         />
       )}
-    </>
+    </InfiniteScroll>
   );
 };
 
