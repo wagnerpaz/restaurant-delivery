@@ -16,6 +16,7 @@ import useLocalState from "/hooks/useLocalState";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import defaultToastError from "/config/defaultToastError";
 import useToast from "/hooks/useToast";
+import { MdNoFood } from "react-icons/md";
 
 interface MenuProps extends ComponentProps<"section"> {
   sections: IMenuSection[];
@@ -72,8 +73,6 @@ const Menu: React.FC<MenuProps> = ({
     );
   };
 
-  if (menuItemsRenderCount) menuItemsRenderCount.current = 0;
-
   return (
     <>
       <Accordion
@@ -91,12 +90,12 @@ const Menu: React.FC<MenuProps> = ({
             onEditSectionClick={() => handleEditSection(section)}
           />
         ))}
-        {/* {menuItemsRenderCount?.current === 0 && !admin && (
-        <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
-          <MdNoFood size={42} />
-          Ops... nenhum produto encontrado!
-        </span>
-      )} */}
+        {menuItemsRenderCount?.current === 0 && !admin && (
+          <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
+            <MdNoFood size={42} />
+            Ops... nenhum produto encontrado!
+          </span>
+        )}
         {admin && (
           <AccordionItem uuid="new">
             <MenuSectionHeader isNew onAddSectionClick={handleAddSection} />

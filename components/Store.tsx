@@ -20,6 +20,8 @@ import { ILocation, IStore } from "/models/types/Store";
 import { IUser } from "/models/types/User";
 import StoreHeader from "./StoreHeader";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
+import looseSearch from "/lib/looseSearch";
+import { IMenuItem } from "/models/types/MenuItem";
 
 const EditMenuItemTrashModal = dynamic(
   () => import("/modals/EditMenuItemTrashModal"),
@@ -41,13 +43,13 @@ export const StoreContext = createContext<{
   setStore: (store: IStore) => void;
   search: string;
   setSearch: (search: string) => void;
-  menuItemsRenderCount: MutableRefObject<number> | null;
+  allFoundItems: IMenuItem[];
 }>({
   store: {} as IStore,
   setStore: () => {},
   search: "",
   setSearch: () => {},
-  menuItemsRenderCount: null,
+  allFoundItems: [],
 });
 
 const Store: FC<StoreProps> = ({ store }) => {
@@ -70,6 +72,17 @@ const Store: FC<StoreProps> = ({ store }) => {
   const allMenuItems = useMemo(
     () => clientStore.menu.sections.map((m) => m.items).flat(),
     [clientStore.menu.sections]
+  );
+
+  const allFoundItems = useMemo(
+    () =>
+      allMenuItems.filter(
+        (f) =>
+          looseSearch(f.name, search) ||
+          looseSearch(f.nameDetail || "", search) ||
+          looseSearch(f.details?.short || "", search)
+      ),
+    [allMenuItems, search]
   );
 
   const orderMenuItemDetailObject = useMemo(
@@ -96,7 +109,7 @@ const Store: FC<StoreProps> = ({ store }) => {
         setStore: setClientStore,
         search,
         setSearch,
-        menuItemsRenderCount,
+        allFoundItems,
       }}
     >
       <div className={classNames("font-lato custom-scrollbar min-h-screen")}>

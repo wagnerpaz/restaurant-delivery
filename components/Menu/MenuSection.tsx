@@ -81,7 +81,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   onFastEditClick,
   ...props
 }) => {
-  const { store, search } = useContext(StoreContext);
+  const { store, allFoundItems } = useContext(StoreContext);
   const router = useRouter();
 
   const { data: session, status } = useSession();
@@ -191,13 +191,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const foundItems = useMemo(
     () =>
-      menuItemsByType.filter(
-        (f) =>
-          looseSearch(f.name, search) ||
-          looseSearch(f.nameDetail || "", search) ||
-          looseSearch(f.details?.short || "", search)
-      ),
-    [menuItemsByType, search]
+      allFoundItems.filter((f) => menuItemsByType.find((d) => d._id === f._id)),
+    [allFoundItems, menuItemsByType]
   );
 
   const editModeByType =

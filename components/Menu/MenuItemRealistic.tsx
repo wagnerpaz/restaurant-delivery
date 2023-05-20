@@ -60,7 +60,7 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const { search, menuItemsRenderCount } = useContext(StoreContext);
+  const { search, allFoundItems } = useContext(StoreContext);
   const { screenSizeWidth } = useContext(ScreenSizeContext);
 
   const id = menuItem._id;
@@ -126,8 +126,10 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             height={imageSize}
             alt={`${name} hero image`}
             loading={
-              // (menuItemsRenderCount?.current || 0) <= 8 ? "eager" : "lazy"
-              "lazy"
+              (allFoundItems?.findIndex((f) => f._id === id) || 0) < 8
+                ? "eager"
+                : "lazy"
+              // "lazy"
             }
             cdn
           />
