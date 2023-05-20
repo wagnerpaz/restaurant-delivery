@@ -31,7 +31,7 @@ const Menu: React.FC<MenuProps> = ({
   onChangeSection = () => {},
   ...props
 }) => {
-  const { store, menuItemsRenderCount } = useContext(StoreContext);
+  const { store, allFoundItems } = useContext(StoreContext);
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -90,7 +90,7 @@ const Menu: React.FC<MenuProps> = ({
             onEditSectionClick={() => handleEditSection(section)}
           />
         ))}
-        {menuItemsRenderCount?.current === 0 && !admin && (
+        {allFoundItems.length === 0 && !admin && (
           <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
             <MdNoFood size={42} />
             Ops... nenhum produto encontrado!
