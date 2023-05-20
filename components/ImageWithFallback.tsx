@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import Image from "next/image";
 import { ComponentProps, useEffect, useState, SyntheticEvent } from "react";
 import { MdOutlineNoPhotography } from "react-icons/md";
@@ -11,6 +12,7 @@ interface ImageWithFallbackProps
 
 const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   fallback = "/no-image-icon-4.png",
+  className,
   alt,
   src,
   cdn,
@@ -25,11 +27,15 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   }, [src]);
 
   return error || !src ? (
-    <div className="flex items-center justify-center" style={{ width, height }}>
+    <div
+      className={classNames("flex items-center justify-center", className)}
+      style={{ width, height }}
+    >
       <MdOutlineNoPhotography className="text-main-a11y-low" size="50px" />
     </div>
   ) : (
     <Image
+      className={className}
       width={width}
       height={height}
       alt={alt}
