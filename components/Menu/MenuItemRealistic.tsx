@@ -89,6 +89,8 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
     [screenSizeType, width]
   );
 
+  const aboveTheFold = allFoundItems?.findIndex((f) => f._id === id) || 0 < 8;
+
   return (
     <div
       id={idPrefix + id}
@@ -126,11 +128,10 @@ const MenuItemRealistic: React.FC<MenuItemProps> = ({
             height={imageSize}
             alt={`${name} hero image`}
             loading={
-              (allFoundItems?.findIndex((f) => f._id === id) || 0) < 8
-                ? "eager"
-                : "lazy"
+              aboveTheFold ? "eager" : "lazy"
               // "lazy"
             }
+            priority={!!aboveTheFold}
             cdn
           />
         </EditableSection>

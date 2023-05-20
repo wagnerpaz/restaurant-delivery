@@ -80,10 +80,13 @@ const Menu: React.FC<MenuProps> = ({
     localSections?.[0] ? [localSections[0]] : []
   );
 
-  const hasMoreItems = () => infiniteIndex < localSections.length - 1;
+  const hasMoreItems = useMemo(
+    () => infiniteIndex < localSections.length - 1,
+    [infiniteIndex, localSections]
+  );
 
   const fetchItems = () => {
-    if (!hasMoreItems()) {
+    if (!hasMoreItems) {
       return;
     }
     setInfiniteIndex((infiniteIndex) => {
@@ -95,13 +98,6 @@ const Menu: React.FC<MenuProps> = ({
       return newInfiniteIndex;
     });
   };
-
-  console.log(
-    localSections.length,
-    infiniteIndex,
-    hasMoreItems(),
-    infiniteSections
-  );
 
   return (
     <InfiniteScroll
