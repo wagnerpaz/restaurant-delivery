@@ -11,8 +11,8 @@ import dynamic from "next/dynamic";
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
 import { IMenuItem } from "/models/types/MenuItem";
-import DraggableGroup, { DraggableGroupProps } from "../DraggableGroup";
-import Draggable, { DraggableProps } from "../Draggable";
+import { DraggableGroupProps } from "../DraggableGroup";
+import { DraggableProps } from "../Draggable";
 import { moveTo } from "/lib/immutable";
 import MenuItem, { emptyMenuItem } from "./MenuItem";
 import { IMenuSection } from "/models/types/MenuSection";
@@ -23,6 +23,8 @@ import defaultToastError from "/config/defaultToastError";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import useToast from "/hooks/useToast";
 
+const DraggableGroup = dynamic(() => import("../DraggableGroup"));
+const Draggable = dynamic(() => import("../Draggable"));
 const EditMenuItemModal = dynamic(() => import("/modals/EditMenuItemModal"));
 
 export const GRID_CONFIG = {
