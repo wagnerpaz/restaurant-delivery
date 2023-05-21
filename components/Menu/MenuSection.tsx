@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
 import { v4 as uuidv4 } from "uuid";
-import isEqual from "nano-equal";
+import isEqual from "fast-deep-equal";
 import dynamic from "next/dynamic";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";

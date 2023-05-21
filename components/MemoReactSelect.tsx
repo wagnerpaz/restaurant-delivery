@@ -1,5 +1,5 @@
 import { memo } from "react";
-import isEqual from "nano-equal";
+import isEqual from "fast-deep-equal";
 
 import ReactSelect from "./ReactSelect";
 

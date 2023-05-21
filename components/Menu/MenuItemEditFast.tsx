@@ -2,7 +2,7 @@ import { ComponentProps, memo, useMemo, useState, useContext } from "react";
 import ImageWithFallback from "/components/ImageWithFallback";
 import { IoMdClose } from "react-icons/io";
 import { RiSave3Fill } from "react-icons/ri";
-import isEqual from "nano-equal";
+import isEqual from "fast-deep-equal";
 import { useTranslation } from "next-i18next";
 
 import MemoInput from "../MemoInput";

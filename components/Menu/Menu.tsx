@@ -1,6 +1,6 @@
 import { ComponentProps, useMemo, memo, useContext, useState } from "react";
 import { Accordion, AccordionItem } from "react-accessible-accordion";
-import isEqual from "nano-equal";
+import isEqual from "fast-deep-equal";
 import { useRouter } from "next/router";
 import InfiniteScroll from "react-infinite-scroller";
 
