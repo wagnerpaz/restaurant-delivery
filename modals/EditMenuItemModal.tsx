@@ -1,6 +1,6 @@
 import { ComponentProps, useEffect, useContext, useState } from "react";
 import classNames from "classnames";
-import isEqual from "lodash.isequal";
+import isEqual from "nano-equal";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useTranslation } from "next-i18next";

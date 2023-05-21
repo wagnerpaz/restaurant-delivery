@@ -1,7 +1,7 @@
 import { memo } from "react";
+import isEqual from "nano-equal";
 
 import ReactSelect from "./ReactSelect";
-import isEqual from "lodash.isequal";
 
 interface LocalSimpleSelectProps {
   label?: string;

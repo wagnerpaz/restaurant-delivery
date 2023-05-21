@@ -1,7 +1,7 @@
 import { ComponentProps, useContext, useMemo, memo } from "react";
 import classNames from "classnames";
 import { FaShoppingCart } from "react-icons/fa";
-import isEqual from "lodash.isequal";
+import isEqual from "nano-equal";
 import { useTranslation } from "next-i18next";
 
 import {

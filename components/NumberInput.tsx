@@ -28,6 +28,7 @@ const NumberInput = ({
         size="sm"
         isDisabled={+value - 1 < min}
         onClick={() => onChange(+value - step)}
+        aria-label="decrease"
       >
         <AiOutlineMinus />
       </Button>
@@ -41,6 +42,7 @@ const NumberInput = ({
             "!min-w-10 !w-10 !h-[30px]": !full,
           }
         )}
+        aria-label="number input"
       />
       <Button
         className={classNames("!rounded-l-none !w-fit !px-2 !h-full", {
@@ -49,6 +51,7 @@ const NumberInput = ({
         size="sm"
         isDisabled={+value + 1 > max}
         onClick={() => onChange(+value + step)}
+        aria-label="increase"
       >
         <AiOutlinePlus />
       </Button>
