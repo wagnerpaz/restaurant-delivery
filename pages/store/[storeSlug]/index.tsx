@@ -28,7 +28,14 @@ const StorePage: NextPage<StorePageProps> = ({ store, selectedLocation }) => {
         <title>{store?.name}</title>
         <meta name="description" content={store.description} />
       </Head>
-      <ScreenSizeProvider>
+      <ScreenSizeProvider
+        screenSizeWidth={
+          typeof window !== "undefined" ? window.innerWidth : undefined
+        }
+        screenSizeHeight={
+          typeof window !== "undefined" ? window.innerHeight : undefined
+        }
+      >
         <Store store={store} selectedLocation={selectedLocation} />
       </ScreenSizeProvider>
     </>

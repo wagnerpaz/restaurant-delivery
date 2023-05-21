@@ -2,11 +2,13 @@ import resolveConfig from "tailwindcss/resolveConfig";
 
 import tailwindConfig from "/tailwind.config.js";
 
+export type ScreenWidthRange = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+
 const fullConfig = resolveConfig(tailwindConfig);
 
 export default function getTailwindScreenSize(
   width: number
-): ["xs" | "sm" | "md" | "lg" | "xl" | "2xl", number] {
+): [ScreenWidthRange, number] {
   const windowWidth = width;
   const smValue = +(fullConfig.theme?.screens.sm).split("px")[0];
   const mdValue = +fullConfig.theme?.screens.md.split("px")[0];
