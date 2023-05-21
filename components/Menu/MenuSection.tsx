@@ -6,6 +6,7 @@ import { HiPlus } from "react-icons/hi";
 import { AccordionItem, AccordionItemPanel } from "react-accessible-accordion";
 import { v4 as uuidv4 } from "uuid";
 import isEqual from "lodash.isequal";
+import dynamic from "next/dynamic";
 
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
@@ -18,12 +19,11 @@ import { IMenuSection } from "/models/types/MenuSection";
 import useLocalState from "/hooks/useLocalState";
 import { StoreContext } from "../Store";
 import useReorderMenuItems from "/hooks/useReorderMenuItems";
-import looseSearch from "/lib/looseSearch";
 import defaultToastError from "/config/defaultToastError";
-import EditMenuItemModal from "/modals/EditMenuItemModal";
-import usePutMenuItem from "/hooks/usePutMenuItem";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import useToast from "/hooks/useToast";
+
+const EditMenuItemModal = dynamic(() => import("/modals/EditMenuItemModal"));
 
 export const GRID_CONFIG = {
   xs: { cols: 1, gap: 1 },
