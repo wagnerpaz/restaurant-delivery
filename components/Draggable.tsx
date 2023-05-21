@@ -1,7 +1,9 @@
 import classNames from "classnames";
+import { useSession } from "next-auth/react";
 import { CSSProperties, ReactNode } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { MdDragIndicator } from "react-icons/md";
+import { IUser } from "/models/types/User";
 
 export interface DraggableProps {
   id: string;
@@ -38,8 +40,13 @@ const Draggable: React.FC<DraggableProps> = ({
   style,
   ...props
 }) => {
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const admin = (session?.user as IUser)?.role === "admin";
+
   const [{ isDragging }, drag, preview] = useDrag(
     () => ({
+      canDrag: admin,
       type: ACCEPT,
       item: { id, originalIndex },
       collect: (monitor) => ({
@@ -53,7 +60,7 @@ const Draggable: React.FC<DraggableProps> = ({
         }
       },
     }),
-    [id, originalIndex, onDrop]
+    [admin, id, originalIndex, onDrop]
   );
 
   const [, drop] = useDrop(

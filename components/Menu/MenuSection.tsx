@@ -11,8 +11,8 @@ import dynamic from "next/dynamic";
 import MenuSectionHeader from "/components/Menu/MenuSectionHeader";
 import { IUser } from "/models/types/User";
 import { IMenuItem } from "/models/types/MenuItem";
-import { DraggableGroupProps } from "../DraggableGroup";
-import { DraggableProps } from "../Draggable";
+import DraggableGroup from "../DraggableGroup";
+import Draggable from "../Draggable";
 import { moveTo } from "/lib/immutable";
 import MenuItem, { emptyMenuItem } from "./MenuItem";
 import { IMenuSection } from "/models/types/MenuSection";
@@ -23,8 +23,6 @@ import defaultToastError from "/config/defaultToastError";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import useToast from "/hooks/useToast";
 
-const DraggableGroup = dynamic(() => import("../DraggableGroup"));
-const Draggable = dynamic(() => import("../Draggable"));
 const EditMenuItemModal = dynamic(() => import("/modals/EditMenuItemModal"));
 
 export const GRID_CONFIG = {
@@ -93,18 +91,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [localMenuSection, setLocalMenuSection] = useLocalState(menuSection);
 
   const reorderMenuItems = useReorderMenuItems();
-
-  const AdminDraggableGroup: React.FC<DraggableGroupProps> = useMemo(() => {
-    return admin
-      ? DraggableGroup
-      : ({ children }: DraggableGroupProps) => <>{children}</>;
-  }, [admin]);
-
-  const AdminDraggable: React.FC<DraggableProps> = useMemo(
-    () =>
-      admin ? Draggable : ({ children }: DraggableProps) => <>{children}</>,
-    [admin]
-  );
 
   const editMenuItemObject = useMemo(() => {
     if (router.query.editMenuItemId) {
@@ -193,7 +179,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const foundItems = useMemo(
     () =>
-      allFoundItems.filter((f) => menuItemsByType.find((d) => d._id === f._id)),
+      menuItemsByType.filter((f) => allFoundItems.find((d) => f._id === f._id)),
     [allFoundItems, menuItemsByType]
   );
 
@@ -201,6 +187,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     type === "ingredient"
       ? localMenuSection.editModeIngredient
       : localMenuSection.editModeProduct;
+
+  console.log(localMenuSection);
 
   return (
     <MenuSectionContext.Provider
@@ -230,7 +218,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           />
           {localMenuSection.items.length > 0 && (
             <AccordionItemPanel
-              id={`${menuSection._id}`}
+              id={`${menuSection._id}-${type}`}
               className={classNames(
                 "sm:container sm:m-auto !px-2 sm:!px-8",
                 {
@@ -244,12 +232,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               )}
               {...props}
             >
-              <AdminDraggableGroup
-                id={`${menuSection._id}`}
+              <DraggableGroup
+                id={`accordion__panel-${menuSection._id}-${type}`}
                 className="contents"
               >
                 {foundItems.map((menuItem, menuItemIndex) => (
-                  <AdminDraggable
+                  <Draggable
                     dragIndicator={editModeByType === "fast" && admin}
                     disabled={menuItem._id.startsWith("_tmp_")}
                     containerClassName="h-full"
@@ -264,7 +252,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       menuItem={menuItem}
                       useEffects
                     />
-                  </AdminDraggable>
+                  </Draggable>
                 ))}
                 {admin && (
                   <div
@@ -286,7 +274,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     />
                   </div>
                 )}
-              </AdminDraggableGroup>
+              </DraggableGroup>
             </AccordionItemPanel>
           )}
         </AccordionItem>

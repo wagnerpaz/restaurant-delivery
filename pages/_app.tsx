@@ -15,6 +15,8 @@ import "nprogress/nprogress.css";
 import "placeholder-loading/dist/css/placeholder-loading.min.css";
 import "/styles/globals.css";
 import { ToastProvider } from "/contexts/ToastContext";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const activeLabelStyles = {
   transform: "scale(0.85) translateY(-32px)",
@@ -167,7 +169,9 @@ function App({
       <MyErrorBoundary>
         <SessionProvider session={session}>
           <ToastProvider portalTarget={appRoot}>
-            <Component {...pageProps} />
+            <DndProvider backend={HTML5Backend}>
+              <Component {...pageProps} />
+            </DndProvider>
           </ToastProvider>
         </SessionProvider>
       </MyErrorBoundary>

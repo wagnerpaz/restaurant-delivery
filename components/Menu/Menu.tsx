@@ -75,28 +75,19 @@ const Menu: React.FC<MenuProps> = ({
   };
 
   const loader = <div key="loader">Loading ...</div>;
-  const [infiniteIndex, setInfiniteIndex] = useState(0);
-  const [infiniteSections, setInfiniteSections] = useState(
-    localSections?.[0] ? [localSections[0]] : []
-  );
+  const [infiniteVisibleIndex, setInfiniteVisibleIndex] = useState(0);
 
   const hasMoreItems = useMemo(
-    () => infiniteIndex < localSections.length - 1,
-    [infiniteIndex, localSections]
+    () => infiniteVisibleIndex < localSections.length,
+    [infiniteVisibleIndex, localSections]
   );
 
   const fetchItems = () => {
-    if (!hasMoreItems) {
-      return;
+    if (hasMoreItems) {
+      setInfiniteVisibleIndex(
+        (infiniteVisibleIndex) => infiniteVisibleIndex + 1
+      );
     }
-    setInfiniteIndex((infiniteIndex) => {
-      const newInfiniteIndex = infiniteIndex + 1;
-      setInfiniteSections((infiniteSections) => [
-        ...infiniteSections,
-        localSections[newInfiniteIndex],
-      ]);
-      return newInfiniteIndex;
-    });
   };
 
   return (
@@ -111,15 +102,17 @@ const Menu: React.FC<MenuProps> = ({
         preExpanded={expandedMenuSections}
         onChange={(expanded) => setExpandedMenuSections(expanded)}
       >
-        {infiniteSections.map((section) => (
-          <MenuSection
-            key={`${section._id}`}
-            menuSection={section}
-            expanded={expandedMenuSections.includes(section._id)}
-            type={type}
-            onEditSectionClick={() => handleEditSection(section)}
-          />
-        ))}
+        {localSections
+          .filter((f, index) => index <= infiniteVisibleIndex)
+          .map((section) => (
+            <MenuSection
+              key={`${section._id}-${type}`}
+              menuSection={section}
+              expanded={expandedMenuSections.includes(section._id)}
+              type={type}
+              onEditSectionClick={() => handleEditSection(section)}
+            />
+          ))}
         {allFoundItems.length === 0 && !admin && (
           <span className="text-xl w-full h-[calc(100vh-var(--footer-height)-var(--header-height))] flex flex-col items-center justify-center gap-4">
             <MdNoFood size={42} />

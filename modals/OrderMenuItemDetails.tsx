@@ -157,6 +157,7 @@ const OrderMenuItemDetailsModal: React.FC<OrderMenuItemDetailsModalProps> = ({
         alt={`${menuItem.name} hero image`}
         cdn
         loading="eager"
+        priority
       />
       <div className="sticky top-0 bg-main-100 px-4 py-2 z-20 shadow-md mb-3 flex flex-col sm:flex-row sm:items-center">
         <div className="flex flex-row gap-2 items-center justify-between">
