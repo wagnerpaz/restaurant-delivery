@@ -1,8 +1,8 @@
-import { useState, useContext, useCallback } from "react";
+import { useContext, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
+import dynamic from "next/dynamic";
 
-import MenuItemEditFast from "/components/Menu/MenuItemEditFast";
 import MenuItemRealistic from "/components/Menu/MenuItemRealistic";
 import { IMenuItem } from "/models/types/MenuItem";
 import { IUser } from "/models/types/User";
@@ -13,6 +13,10 @@ import defaultToastError from "/config/defaultToastError";
 import { MenuSectionContext } from "./MenuSection";
 import useLocalState from "/hooks/useLocalState";
 import useToast from "/hooks/useToast";
+
+const MenuItemEditFast = dynamic(
+  () => import("/components/Menu/MenuItemEditFast")
+);
 
 interface MenuItemProps {
   editMode: "realistic" | "fast";

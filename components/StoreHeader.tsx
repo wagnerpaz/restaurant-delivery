@@ -8,12 +8,12 @@ import DebouncedInput from "./DebouncedInput";
 import ImageWithFallback from "./ImageWithFallback";
 import MainMenuDrawer from "./MainMenuDrawer";
 import { StoreContext } from "./Store";
-import UserIcon from "./UserIcon";
 import { useRouter } from "next/router";
 import useGoBackToRoot from "/hooks/useGoBackToRoot";
 import Input from "./form/Input";
 import { useTranslation } from "next-i18next";
 
+const UserIcon = dynamic(() => import("./UserIcon"));
 const AddStoreModal = dynamic(() => import("/modals/AddStoreModal"));
 
 interface StoreHeaderProps extends ComponentProps<"section"> {}
