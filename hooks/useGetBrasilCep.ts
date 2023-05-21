@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "redaxios";
 import debounce from "lodash.debounce";
 import { useCallback } from "react";
 

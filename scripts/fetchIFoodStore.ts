@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import axios from "axios";
+import axios from "redaxios";
 import FormData from "form-data";
 import request from "request";
 import ColorThief from "colorthief";
