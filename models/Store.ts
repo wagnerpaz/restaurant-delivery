@@ -25,7 +25,10 @@ const storeSchema: Schema = new mongoose.Schema<IStore>({
     },
   ],
   menu: {
-    sections: [{ type: mongoose.Types.ObjectId, ref: "MenuSection" }],
+    sections: {
+      products: [{ type: mongoose.Types.ObjectId, ref: "MenuSection" }],
+      ingredients: [{ type: mongoose.Types.ObjectId, ref: "MenuSection" }],
+    },
   },
   theme: {
     colors: {

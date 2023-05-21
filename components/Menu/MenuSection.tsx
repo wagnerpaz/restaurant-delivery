@@ -165,9 +165,9 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   }, [localMenuSection, setLocalMenuSection, type]);
 
   const handleAddMenuItem = () => {
-    if (menuSection.editMode === "realistic") {
+    if (editModeByType === "realistic") {
       handleAddMenuItemRealistic();
-    } else if (menuSection.editMode === "fast") {
+    } else if (editModeByType === "fast") {
       handleAddMenuItemFast();
     }
   };
@@ -179,7 +179,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const foundItems = useMemo(
     () =>
-      menuItemsByType.filter((f) => allFoundItems.find((d) => f._id === f._id)),
+      menuItemsByType.filter((f) => allFoundItems.find((d) => f._id === d._id)),
     [allFoundItems, menuItemsByType]
   );
 

@@ -65,7 +65,7 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
           {t("store.data")}
         </Button>
       )}
-      {store.menu.sections.map((section) => (
+      {store.menu.sections.products.map((section) => (
         <Button
           key={`${section._id}`}
           className={classNames(

@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import axios from "redaxios";
+import axios from "axios";
 import FormData from "form-data";
 import request from "request";
 import ColorThief from "colorthief";
@@ -221,15 +221,8 @@ async function run() {
     return result;
   }
 
-  const sections: IMenuSection[] = [];
-
-  if (allIngredients.length > 0) {
-    const created = await MenuSection.create({
-      name: "Ingredientes",
-      items: allIngredients,
-    });
-    sections.push(created._id);
-  }
+  const productSections: IMenuSection[] = [];
+  const ingredientSections: IMenuSection[] = [];
 
   for (const ifoodSection of catalog.menu) {
     const cvSection = {
@@ -237,7 +230,15 @@ async function run() {
       items: await mapIFoodItemsBySection(ifoodSection.itens),
     } as IMenuSection;
     const created = await MenuSection.create(cvSection);
-    sections.push(created._id);
+    productSections.push(created._id);
+  }
+
+  if (allIngredients.length > 0) {
+    const created = await MenuSection.create({
+      name: "Ingredientes",
+      items: allIngredients,
+    });
+    ingredientSections.push(created._id);
   }
 
   await Store.updateOne(
@@ -245,7 +246,10 @@ async function run() {
     {
       ...createdStore.toObject(),
       menu: {
-        sections: [...sections],
+        sections: {
+          products: [...productSections],
+          ingredients: [...ingredientSections],
+        },
       },
     }
   );

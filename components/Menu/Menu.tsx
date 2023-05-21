@@ -38,7 +38,9 @@ const Menu: React.FC<MenuProps> = ({
   const loading = status === "loading";
   const admin = (session?.user as IUser)?.role === "admin";
 
-  const [localSections, setLocalSections] = useLocalState(store.menu.sections);
+  const [localSections, setLocalSections] = useLocalState(
+    store.menu.sections[type + "s"]
+  );
 
   const defaultIndex = useMemo(
     () => localSections.map((section) => section._id),

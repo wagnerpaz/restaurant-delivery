@@ -9,7 +9,10 @@ export interface IStore extends Document {
   description?: string;
   locations: ILocation[];
   menu: {
-    sections: IMenuSection[];
+    sections: {
+      products: IMenuSection[];
+      ingredients: IMenuSection[];
+    };
   };
   theme: { colors: { hero: string } };
 }

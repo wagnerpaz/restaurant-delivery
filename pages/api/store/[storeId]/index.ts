@@ -24,8 +24,11 @@ export default async function store(req: NextApiRequest, res: NextApiResponse) {
         { new: true }
       )
         .populate({
-          path: "menu",
-          populate: { path: "sections", populate: { path: "items" } },
+          path: "menu.sections",
+          populate: [
+            { path: "products", populate: "items" },
+            { path: "ingredients", populate: "items" },
+          ],
         })
         .exec();
       res.status(200).json(serverStore.toObject());

@@ -70,7 +70,13 @@ const Store: FC<StoreProps> = ({ store }) => {
   const [search, setSearch] = useState("");
 
   const allMenuItems = useMemo(
-    () => clientStore.menu.sections.map((m) => m.items).flat(),
+    () =>
+      [
+        ...clientStore.menu.sections.products,
+        ...clientStore.menu.sections.ingredients,
+      ]
+        .map((m) => m.items)
+        .flat(),
     [clientStore.menu.sections]
   );
 
@@ -116,14 +122,16 @@ const Store: FC<StoreProps> = ({ store }) => {
         <StoreHeader />
         <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 0 })}>
-            <main>
-              <Menu type="product" sections={clientStore.menu.sections} />
-            </main>
+            <Menu
+              type="product"
+              sections={clientStore.menu.sections.products}
+            />
           </TabPanel>
           <TabPanel className={classNames({ "min-h-screen": tabIndex === 1 })}>
-            <main>
-              <Menu type="ingredient" sections={clientStore.menu.sections} />
-            </main>
+            <Menu
+              type="ingredient"
+              sections={clientStore.menu.sections.ingredients}
+            />
           </TabPanel>
           <TabList
             className={classNames(
