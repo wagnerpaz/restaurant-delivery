@@ -9,8 +9,8 @@ const ScreenSizeContext = createContext({
 
 export const ScreenSizeProvider = ({
   children,
-  screenSizeWidth = 1920,
-  screenSizeHeight = 1080,
+  screenSizeWidth = 414,
+  screenSizeHeight = 896,
 }) => {
   const [_screenSizeWidth, setScreenSizeWidth] = useState(screenSizeWidth);
   const [_screenSizeHeight, setScreenSizeHeight] = useState(screenSizeHeight);
