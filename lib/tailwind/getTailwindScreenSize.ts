@@ -1,10 +1,17 @@
-import resolveConfig from "tailwindcss/resolveConfig";
-
-import tailwindConfig from "/tailwind.config.js";
-
 export type ScreenWidthRange = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
-const fullConfig = resolveConfig(tailwindConfig);
+// const fullConfig = resolveConfig(tailwindConfig);
+const fullConfig = {
+  theme: {
+    screens: {
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
+  },
+};
 
 export default function getTailwindScreenSize(
   width: number

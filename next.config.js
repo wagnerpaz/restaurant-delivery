@@ -23,9 +23,7 @@ const nextConfig = withBundleAnalyzer({
   },
   experimental: {
     // enabling this will enable SSR for Tailwind
-    optimizeCss: {
-      pruneSource: true,
-    },
+    optimizeCss: true,
   },
   i18n,
 });
