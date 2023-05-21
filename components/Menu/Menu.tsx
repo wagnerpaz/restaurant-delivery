@@ -75,7 +75,7 @@ const Menu: React.FC<MenuProps> = ({
   };
 
   const loader = <div key="loader">Loading ...</div>;
-  const [infiniteIndex, setInfiniteIndex] = useState(1);
+  const [infiniteIndex, setInfiniteIndex] = useState(0);
   const [infiniteSections, setInfiniteSections] = useState(
     localSections?.[0] ? [localSections[0]] : []
   );
@@ -91,7 +91,7 @@ const Menu: React.FC<MenuProps> = ({
     }
     setInfiniteIndex((infiniteIndex) => {
       const newInfiniteIndex = infiniteIndex + 1;
-      setInfiniteSections([
+      setInfiniteSections((infiniteSections) => [
         ...infiniteSections,
         localSections[newInfiniteIndex],
       ]);
