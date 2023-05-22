@@ -130,7 +130,6 @@ const EditMenuItemModal: React.FC<EditMenuItemModalProps> = ({
       const index = menuSection.items.findIndex(
         (f) => f._id === serverMenuItem._id
       );
-      console.log(index);
       setMenuSection({
         ...menuSection,
         items:

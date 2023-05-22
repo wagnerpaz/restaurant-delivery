@@ -188,8 +188,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       ? localMenuSection.editModeIngredient
       : localMenuSection.editModeProduct;
 
-  console.log(localMenuSection);
-
   return (
     <MenuSectionContext.Provider
       value={{

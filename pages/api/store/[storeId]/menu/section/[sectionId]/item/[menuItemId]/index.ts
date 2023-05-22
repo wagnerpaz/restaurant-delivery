@@ -5,7 +5,6 @@ import connectToDatabase from "/lib/mongoose";
 import MenuItem from "/models/MenuItem";
 import Store from "/models/Store";
 import { authOptions } from "/pages/api/auth/[...nextauth]";
-import revalidateCall from "/lib/revalidateCall";
 import MenuSection from "/models/MenuSection";
 
 async function menuItem(req: NextApiRequest, res: NextApiResponse) {

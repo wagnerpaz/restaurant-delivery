@@ -39,14 +39,22 @@ export const getStaticProps: GetServerSideProps = ssrHelpers.pipe(
   localeSSP(),
   storeSSP()
 );
-export async function getStaticPaths() {
+export async function getStaticPaths({ locales }) {
   await connectToDatabase();
   const slugs = await StoreModel.find({}, { slug: 1 });
-  console.log("slugs", slugs);
-  return {
-    paths: slugs.map(({ slug }) => ({ params: { storeSlug: slug } })),
+  const staticPaths = {
+    paths: locales
+      .map((locale) =>
+        slugs.map(({ slug }) => ({ params: { storeSlug: slug, locale } }))
+      )
+      .flat(),
     fallback: false, // can also be true or 'blocking'
   };
+  console.log(
+    "staticPaths",
+    staticPaths.paths.map((i) => i.params)
+  );
+  return staticPaths;
 }
 
 export default StorePage;

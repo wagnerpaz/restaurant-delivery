@@ -27,6 +27,7 @@ async function connectToDatabase(): Promise<Connection> {
   }
 
   if (!cached.promise) {
+    mongoose.set("strictQuery", false);
     cached.promise = mongoose
       .connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
