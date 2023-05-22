@@ -49,6 +49,15 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
   const allProcessAfter = performance.now();
   console.log(`all process took ${allProcessAfter - allProcessBefore} ms`);
 
+  console.log({
+    ...input.props,
+    ...(storeObject && { store: storeObject }),
+    ...(storeObject?.locations?.[0] && {
+      selectedLocation: storeObject.locations[0],
+    }),
+    ...(storeObject?.theme && { theme: storeObject.theme }),
+  });
+
   // merge props and pass down to the next function
   return {
     props: {
