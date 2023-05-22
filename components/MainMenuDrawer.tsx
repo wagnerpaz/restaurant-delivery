@@ -72,7 +72,9 @@ const MainMenuDrawer: React.FC<MainMenuDrawerProps> = ({
             "!rounded-none !justify-start !normal-case border-b-[1px] w-full"
           )}
           onClick={() => {
-            router.push("#menu-section-" + section._id);
+            router.push("#menu-section-" + section._id, undefined, {
+              shallow: true,
+            });
             onClose();
           }}
         >
