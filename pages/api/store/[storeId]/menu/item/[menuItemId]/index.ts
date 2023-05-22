@@ -26,7 +26,7 @@ async function menuItem(req: NextApiRequest, res: NextApiResponse) {
         _id: menuItemId,
       }).exec();
       const { slug } = await Store.findById(storeId, { slug: 1 });
-      await res.revalidate(`/store/${slug}`);
+      await res.revalidate(`/en/store/${slug}`);
       res.status(200).end();
     } else {
       res.status(405).json({ message: "Method not allowed" });
