@@ -39,13 +39,11 @@ const storeSSP = (): TPipeGetServerSideProps => async (context, input) => {
       ],
     })
     .exec();
-  console.log(store);
 
   // Convert the store object to a plain JavaScript object
   const storeObject = store && serializeJson(store?.toObject());
   const jsonString = JSON.stringify(storeObject);
   const bytes = new TextEncoder().encode(jsonString).byteLength;
-  console.log("storeObject", storeObject);
   console.log(`Initial store size is ${bytes / 1024} kbs`);
 
   const allProcessAfter = performance.now();
